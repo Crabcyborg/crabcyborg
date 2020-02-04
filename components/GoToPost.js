@@ -2,9 +2,9 @@ import m from 'mithril';
 
 export var GoToPost = {
 	oninit: function(v) {
-		const { title } = require('$app/posts/'+v.attrs.key);
+	//	const { title } = require('$app/posts/'+v.attrs.key);
 		v.state = {
-			title
+			title: 'Test'
 		}
 	},
 	view: function(v) {

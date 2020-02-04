@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Antlers } from '$app/components/parts';
+import { Antlers } from './Antlers';
 
 export var Head = {
 	view: function(v) {

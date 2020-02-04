@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Foot } from '$app/components/parts';
+import { Foot } from './Foot';
 
 export var Leg = {
 	view: function(v) {

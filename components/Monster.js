@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Head, Leg, Torso, Tail } from '$app/components/parts';
+import { Head, Leg, Torso, Tail } from './parts';
 
 export var Monster = {
 	view: function(v) {

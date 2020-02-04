@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { GoToPost } from '$app/components';
+import { GoToPost } from './GoToPost';
 import { posts } from '$app/posts';
 
 export var Posts = {
