@@ -1,13 +1,8 @@
 import m from 'mithril';
+import { posts } from '$app/posts';
 
 export var GoToPost = {
-	oninit: function(v) {
-	//	const { title } = require('$app/posts/'+v.attrs.key);
-		v.state = {
-			title: 'Test'
-		}
-	},
 	view: function(v) {
-		return m('div', m('a', {href: '/post/'+v.attrs.key}, v.attrs.prepend, v.state.title));
+		return m('div', m('a', {href: '/post/'+v.attrs.key}, v.attrs.prepend, posts[v.attrs.key].title));
 	}
 };

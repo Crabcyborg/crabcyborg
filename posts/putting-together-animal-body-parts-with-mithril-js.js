@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { config as lady_tiger } from '$app/monsters/lady-tiger';
-import { Caption, Gist, GoToPost } from '$app/components';
+import { Caption, Gist } from '$app/components';
 
 export const title = 'Putting Together Animal Body Parts with Mithril.js';
 
@@ -27,6 +27,7 @@ export const content = [
 	m(Gist, {id: 'lady-tiger-js', gistId: 'Crabcyborg/4b470462136e0a61769f418f8f9b01d0'}),
 	m('h3', "What's next?"),
 	m('p', "Play with this config file to customize Lady Tiger! Maybe she would look better with some wings! You can add whatever images you want to use to the folder ", m('i', 'assets'), ", then include a reference to the file in ", m('i', 'assets/index.js'), "."),
-	"For now, working with this configuration file might be a little tedious, but if we set up an editor that generates these configs for us, it might be already pretty close to useable.",
-	m(GoToPost, {prepend: 'Next: ', key: 'animating-your-amalgamation-of-animal-appendages'})
+	"For now, working with this configuration file might be a little tedious, but if we set up an editor that generates these configs for us, it might be already pretty close to useable."
 ];
+
+export const next = 'animating-your-amalgamation-of-animal-appendages';

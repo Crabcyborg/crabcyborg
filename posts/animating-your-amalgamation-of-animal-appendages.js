@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { config as lady_tiger } from '$app/monsters/lady-tiger';
-import { Caption, Gist, GoToPost } from '$app/components';
+import { Caption, Gist } from '$app/components';
 
 const claw = () => {
 	const target = document.getElementById('claw-target');
@@ -78,7 +78,6 @@ export const oninit = () => {
 export const title = 'Animating your Amalgamation of Animal Appendages';
 
 export const content = [
-	m(GoToPost, {prepend: 'Previous: ', key: 'putting-together-animal-body-parts-with-mithril-js'}),
 	{...lady_tiger, id: 'claw-target'},
 	m(Caption, "Giving a wave"),
 	{...lady_tiger, id: 'walk-target'},
@@ -86,3 +85,5 @@ export const content = [
 	{...lady_tiger, id: 'fan-target'},
 	m(Caption, "Until programming this animation I hadn't considered that peacocks are male")
 ];
+
+export const previous = 'putting-together-animal-body-parts-with-mithril-js';
