@@ -1,0 +1,39 @@
+import m from 'mithril';
+import { posts } from '$app/posts';
+import { Logo, Monster } from '$app/components';
+
+export var Post = {
+	oninit: function(v) {
+		const postId = m.route.get().replace('/post/', '');
+		const post = posts[postId];
+		const { title, content } = post;		
+
+		v.state = {
+			title,
+			content
+		};
+	
+		post.oninit && post.oninit();
+	},
+	view: function(v) {
+		return [
+			m(Logo),
+			m(
+				'div',
+				m('h2', v.state.title),
+				v.state.content.map(item => {
+					if(typeof item === 'string') {
+						return m('p', item);
+					}
+
+					if(typeof item.tag !== 'undefined') {
+						return item;
+					}
+
+					// if item isn't a string, monster config is assumed and wrapped in a box
+					return m('.tc.demo.center.overflow-hidden', m(Monster, {id: item.id, configuration: item}));
+				})
+			)
+		];
+	}
+};
