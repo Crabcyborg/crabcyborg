@@ -16,7 +16,7 @@ export const content = [
 		'yarn install\n',
 		'yarn start'
 	),
-	m('p', "Then open up ", m('a', {href: 'http://localhost:8080/'}, 'localhost'), " and you should have your very own Lady Tiger!"),
+	m('p', "Then open up ", m('b', 'http://localhost:8080/'), " and you should have your very own Lady Tiger!"),
 	lady_tiger,
 	m(Caption, "Gorgeous, isn't she?"),
 	m('h3', "So what is Lady Tiger?"),
