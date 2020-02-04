@@ -1,2 +1,14 @@
 /dist/main.bundle.js /main.bundle.js 200
 /*    /index.html   200
+
+[[redirects]]
+ from = "/dist/*.png"
+ to = "/:splat.png"
+ status = 200
+ force = true
+
+[[redirects]]
+ from = "/dist/*.jpg"
+ to = "/:splat.jpg"
+ status = 200
+ force = true
