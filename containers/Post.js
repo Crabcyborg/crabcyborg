@@ -22,7 +22,7 @@ export var Post = {
 			m(Logo),
 			m(
 				'div',
-				v.state.previous ? m(GoToPost, {key: v.state.previous}) : null,
+				v.state.previous ? m(GoToPost, {prepend: 'Previous: ', key: v.state.previous}) : null,
 				m('h2', v.state.title),
 				v.state.content.map(item => {
 					if(typeof item === 'string') {
@@ -36,7 +36,7 @@ export var Post = {
 					// if item isn't a string, monster config is assumed and wrapped in a box
 					return m('.tc.demo.center.overflow-hidden', m(Monster, {id: item.id, configuration: item}));
 				}),
-				v.state.next ? m(GoToPost, {key: v.state.next}) : null,
+				v.state.next ? m(GoToPost, {prepend: 'Next: ', key: v.state.next}) : null,
 			)
 		];
 	}
