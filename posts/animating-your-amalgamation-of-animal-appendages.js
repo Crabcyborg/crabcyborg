@@ -122,6 +122,7 @@ const walk = () => {
 
 const fan = () => {
 	const target = document.getElementById('fan-target');
+	const head = target.childNodes[0];
 	const lower_section = target.childNodes[2];
 	const back_legs = [lower_section.childNodes[1], lower_section.childNodes[2]];
 	const front_legs = [lower_section.childNodes[3], lower_section.childNodes[4]];
@@ -147,6 +148,10 @@ const fan = () => {
 		leg.style.transform = 'rotate(-10deg)';
 	}
 
+	head.style.transition = '1s ease-in-out';
+	head.style['transform-origin'] = '10% 50%';
+	head.style.transform = 'rotate(30deg)';
+
 	setTimeout(() => {
 		target.style.right = '10px';
 		tail.style.transform = original_tail_transform;
@@ -154,6 +159,8 @@ const fan = () => {
 		for(let leg of back_legs.concat(front_legs)) {
 			leg.style.transform = 'rotate(0deg)';
 		}
+
+		head.style.transform = 'rotate(0deg)';
 	}, 1100);
 
 	setTimeout(fan, 2300);
