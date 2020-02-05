@@ -10,15 +10,14 @@ const typetypetype = () => {
 	const front_legs = [lower_section.childNodes[3], lower_section.childNodes[4]];
 
 	target.style.top = '3px';
-	target.style.transition = '.8s ease-in-out';
 
 	setInterval(() => {
+		target.style.transition = '.8s ease-in-out';
 		target.style.transform = 'rotate(-52deg)';
 		setTimeout(() => target.style.transform = 'rotate(-55deg)', 1000);
 	}, 2000);
 	target.style.transform = 'rotate(-55deg)';
 
-	tail.style.transition = '.8s ease-in-out';
 	tail.style.transform = 'translateX(-54px) translateY(-32px) rotate(110deg)';
 
 	for(let leg of back_legs.concat(front_legs)) {
@@ -160,11 +159,63 @@ const fan = () => {
 	setTimeout(fan, 2300);
 };
 
+const happybaby = () => {
+	const target = document.getElementById('happy-baby-target');
+	const lower_section = target.childNodes[2];
+	const tail = lower_section.childNodes[0];
+	const back_legs = [lower_section.childNodes[1], lower_section.childNodes[2]];
+	const front_legs = [lower_section.childNodes[3], lower_section.childNodes[4]];
+
+	target.style.bottom = '50px';
+
+	setInterval(() => {
+		target.style.transition = '.8s ease-in-out';
+		target.style.transform = 'rotate(-182deg)';
+		setTimeout(() => target.style.transform = 'rotate(-184deg)', 1000);
+	}, 2000);
+	target.style.transform = 'rotate(-184deg)';
+
+	tail.style.transform = 'translateX(-54px) translateY(-32px) rotate(70deg)';
+
+	for(let leg of back_legs.concat(front_legs)) {
+		leg.style['transform-origin'] = '50% 10%';
+	}
+
+	setTimeout(() => {
+		for(let leg of back_legs.concat(front_legs)) {
+			leg.style.transition = '1s ease-in-out';
+		}
+	}, 100);
+
+	const claw = front_legs[1].childNodes[0].childNodes[1]
+	claw.style.transform = 'rotate(-216deg)';
+	claw.style.top = '60px';
+	claw.style.left = '27px';
+
+	const setLegsIntoInitialPosition = () => {
+		back_legs[0].style.transform = 'rotate(-50deg)';
+		back_legs[1].style.transform = 'rotate(-20deg)';
+		front_legs[0].style.transform = 'rotate(40deg)';
+		front_legs[1].style.transform = 'rotate(50deg)';
+	};
+
+	setInterval(() => {
+		back_legs[0].style.transform = 'rotate(-52deg)';
+		back_legs[1].style.transform = 'rotate(-24deg)';
+		front_legs[0].style.transform = 'rotate(50deg)';
+		front_legs[1].style.transform = 'rotate(55deg)';
+		setTimeout(setLegsIntoInitialPosition, 950);
+	}, 2000);
+
+	setLegsIntoInitialPosition();
+};
+
 export const oninit = () => {
 	setTimeout(wave, 0);
 	setTimeout(walk, 0);
 	setTimeout(fan, 0);
 	setTimeout(typetypetype, 0);
+	setTimeout(happybaby, 0);
 };
 
 export const title = 'Animating your Amalgamation of Animal Appendages';
@@ -175,7 +226,9 @@ export const content = [
 	{...lady_tiger, id: 'walk-target'},
 	m(Caption, "Strutting her stuff"),
 	{...lady_tiger, id: 'type-target'},
-	m(Caption, "Typing"),
+	m(Caption, "Typing, or dancing... type dancing?"),
+	{...lady_tiger, id: 'happy-baby-target'},
+	m(Caption, "Happy baby"),
 	{...lady_tiger, id: 'fan-target'},
 	m(Caption, "Until programming this animation I hadn't considered that peacocks are male")
 ];
