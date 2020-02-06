@@ -21,3 +21,7 @@ export { default as lady_crab_claw } from './lady-crab-claw.png'
 
 // antlers
 export { default as koodoo_antlers } from './koodoo-antlers.png'
+
+// wings
+export { default as bat_wing_1 } from './bat-wing-1.png';
+export { default as bat_wing_2 } from './bat-wing-2.png';
