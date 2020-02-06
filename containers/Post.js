@@ -15,7 +15,7 @@ export var Post = {
 			next: post.next || false
 		};
 	
-		post.oninit && post.oninit();
+		post.oninit && setTimeout(post.oninit, 0);
 	},
 	view: function(v) {
 		return [

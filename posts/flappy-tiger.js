@@ -45,19 +45,16 @@ const gravity = (id) => {
 };
 
 export const oninit = () => {
+	gravity('flap-target');
+
 	let last_flap = false;
-
-	setTimeout(() => gravity('flap-target'), 0);
-
-	setTimeout(() => {
-		document.getElementById('flappy-bird').addEventListener('click', (event) => {
-			let now = new Date().getTime();
-			if(!last_flap || last_flap < now - 2100) {
-				flap('flap-target');
-				last_flap = now;
-			}
-		});
-	}, 0);
+	document.getElementById('flappy-bird').addEventListener('click', (event) => {
+		let now = new Date().getTime();
+		if(!last_flap || last_flap < now - 2100) {
+			flap('flap-target');
+			last_flap = now;
+		}
+	});
 };
 
 const lady_tiger_with_wings = {
@@ -95,10 +92,17 @@ export const content = [
 	"In this tutorial, we're going to give Lady Tiger some wings and teach her how to fly!",
 	m(
 		'#flappy-bird.tc.center.overflow-hidden',
-		{style: 'max-width: 600px; height: 300px; border: 1px solid #ddd;'},
+		{
+			style: {
+				'max-width': '600px',
+				height: '300px',
+				border: '1px solid #ddd'
+			}
+		},
 		m(Monster, {id: 'flap-target', configuration: lady_tiger_with_wings})
 	),
 	m(Caption, 'Touch the box to flap!')
 ];
 
 export const previous = 'animating-your-amalgamation-of-animal-appendages';
+export const next = 'a-challenger-appears';

@@ -1,11 +1,16 @@
 import m from 'mithril';
 import { config as lady_tiger } from '$app/monsters/lady-tiger';
 import { Caption, Gist } from '$app/components';
+import { wave } from '$app/animations/lady-tiger';
 
 export const title = 'Putting Together Animal Body Parts with Mithril.js';
 
+export const oninit = () => {
+	wave('wave-target');
+};
+
 export const content = [
-	lady_tiger,
+	{...lady_tiger, id: 'wave-target'},
 	"This tutorial is for anyone who grew up wishing to be a mad scientist but ending up as a web developer instead. We are going to be frankensteining our very own monster using JavaScript, mithril, tachyons, and webpack.",
 	"If you don't have git or yarn (npm works too) installed, you should probably figure that out first. Then all you need to do to get this entire blog post running on localhost is to execute these commands:",
 	m(

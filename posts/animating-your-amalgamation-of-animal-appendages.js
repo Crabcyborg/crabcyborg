@@ -1,14 +1,14 @@
 import m from 'mithril';
 import { config as lady_tiger } from '$app/monsters/lady-tiger';
-import { Caption, Gist } from '$app/components';
 import { fan, happybaby, typetypetype, walk, wave } from '$app/animations/lady-tiger';
+import { Caption, Gist } from '$app/components';
 
 export const oninit = () => {
-	setTimeout(() => wave('wave-target'), 0);
-	setTimeout(() => walk('walk-target'), 0);
-	setTimeout(() => fan('fan-target'), 0);
-	setTimeout(() => typetypetype('type-target'), 0);
-	setTimeout(() => happybaby('happy-baby-target'), 0);
+	wave('wave-target');
+	walk('walk-target');
+	fan('fan-target');
+	typetypetype('type-target');
+	happybaby('happy-baby-target');
 };
 
 export const title = 'Animating your Amalgamation of Animal Appendages';
