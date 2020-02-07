@@ -6,11 +6,8 @@ export var Leg = {
 		return m(
 			'.dib.relative',
 			{style: v.attrs.style},
-			m(
-				'div',
-				m('img', {src: v.attrs.image}),
-				m(Foot, v.attrs.foot)
-			)
+			m('img', {src: v.attrs.image}),
+			m(Foot, v.attrs.foot)
 		);
 	}
 };

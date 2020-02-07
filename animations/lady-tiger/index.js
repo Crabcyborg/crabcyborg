@@ -190,7 +190,7 @@ export const happybaby = (id) => {
 		}
 	}, 100);
 
-	const claw = front_legs[1].childNodes[0].childNodes[1]
+	const claw = front_legs[1].childNodes[1]
 	claw.style.transform = 'rotate(-216deg)';
 	claw.style.top = '60px';
 	claw.style.left = '27px';

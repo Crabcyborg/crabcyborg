@@ -8,9 +8,10 @@ export var config = {
 		image: assets.giraffe_head,
 		style: {
 			top: '62px',
-			left: '79px',
+			left: '72px',
 			'z-index': 1,
-			'max-width': '31px'
+			'max-width': '31px',
+			'transform-origin': '40% 46%'
 		}
 	},
 	torso: {
@@ -75,8 +76,8 @@ export var config = {
 		{
 			image: assets.lemur_leg_4,
 			style: {
-				bottom: '55px',
-				right: '14px',
+				bottom: '56px',
+				right: '20px',
 				'z-index': 1,
 				'max-width': '34px'
 			}
