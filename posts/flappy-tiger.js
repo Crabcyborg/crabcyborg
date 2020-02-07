@@ -14,9 +14,7 @@ const flap = (id) => {
 	const wings = [midsection.childNodes[1], midsection.childNodes[2]];
 	const backup_wing_transforms = [wings[0].style.transform, wings[1].style.transform];
 
-	ySpeed -= 80;
-	ySpeed < -120 && (ySpeed = -120);
-
+	ySpeed = Math.max(ySpeed - 80, -120);
 	wings[0].style.transform = 'scaleY(-1) rotate(40deg)';
 	wings[1].style.transform = 'rotate(80deg)';
 	target.style.transform = 'rotate(-10deg)';
