@@ -31,7 +31,7 @@ export var config = {
 			style: {
 				'max-width': '22px',
 				right: '10px',
-				bottom: '54px',
+				bottom: '40px',
 				zIndex: 1
 			},
 			foot: {
@@ -48,12 +48,12 @@ export var config = {
 			style: {
 				'max-width': '30px',
 				right: '10px',
-				bottom: '60px'
+				bottom: '50px'
 			},
 			foot: {
 				image: assets.baboon_foot_2,
 				style: {
-					bottom: '5px',
+					bottom: '10px',
 					'max-width': '20px',
 					left: '5px'
 				}
@@ -64,7 +64,7 @@ export var config = {
 			style: {
 				'max-width': '22px',
 				left: '8px',
-				bottom: '62px'
+				bottom: '52px'
 			},
 			foot: {
 				image: assets.baboon_foot_3,
@@ -79,7 +79,7 @@ export var config = {
 			image: assets.water_buffalo_leg_4,
 			style: {
 				'max-width': '22px',
-				bottom: '80px',
+				bottom: '65px',
 				zIndex: 4,
 				position: 'relative'
 			},
@@ -101,7 +101,7 @@ export var config = {
 		image: assets.peacock_tail,
 		style: {
 			'max-width': '66px',
-			transform: 'translateX(-48px) translateY(-52px) rotate(16deg)',
+			transform: 'translateX(-48px) translateY(-36px) rotate(16deg)',
 			'z-index': 2,
 			'transform-origin': 'top right'
 		}

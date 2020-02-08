@@ -1,3 +1,5 @@
+import anime from 'animejs/lib/anime.es.js';
+
 export const wave = (id) => {
 	const target = document.getElementById(id);
 	const head = target.childNodes[0];
@@ -9,7 +11,7 @@ export const wave = (id) => {
 	
 	tail.style.transition = head.style.transition = target.style.transition = '1s ease-in-out';
 
-	tail.style.transform = 'translateX(-60px) translateY(-60px) rotate(-10deg)';
+	tail.style.transform = 'translateX(-60px) translateY(-45px) rotate(-10deg)';
 
 	target.style.left = '45px';
 
@@ -179,3 +181,36 @@ export const attack = (id) => {
 		}, 1000);
 	}, 1000);
 };
+
+/*
+export const wave2 = (id) => {
+	anime({
+		targets: '#'+id,
+		duration: 1400,
+		direction: 'alternate',
+		loop: true,
+		translateX: [70, 65],
+		easing: 'easeInOutSine'
+	});
+
+	anime({
+		targets: '#'+id+' > *:nth-child(2) > *:last-child',
+		duration: 1400,
+		direction: 'alternate',
+		loop: true,
+		rotate: [-60, 5],
+		transformOrigin: '10% 10%',
+		easing: 'easeInOutSine'
+	});
+
+	anime({
+		targets: '#'+id+' > *:nth-child(2) > *:not(:last-child)',
+		duration: 1400,
+		direction: 'alternate',
+		loop: true,
+		rotate: [5, 0],
+		transformOrigin: '50% 10%',
+		easing: 'easeInOutSine'
+	});
+};
+*/

@@ -30,10 +30,14 @@ const Wing = AbsolutePart;
 
 export var Monster = {
 	view: v => m(
-		'.dib.f7.monster',
+		'.dib.relative',
 		{ id: v.attrs.id, style: v.attrs.configuration.style },
 		m(Head, v.attrs.configuration.head),
-		m('.midsection.h3', m(Torso, {...v.attrs.configuration.torso}), v.attrs.configuration.wings && v.attrs.configuration.wings.map(wing => m(Wing, wing))),
-		m('.lowersection.tc.relative', m(Tail, v.attrs.configuration.tail), v.attrs.configuration.legs.map(leg => m(Leg, leg)))
+		m(
+			'div',
+			m(Torso, {...v.attrs.configuration.torso}),
+			v.attrs.configuration.wings && v.attrs.configuration.wings.map(wing => m(Wing, wing))
+		),
+		m('.relative', m(Tail, v.attrs.configuration.tail), v.attrs.configuration.legs.map(leg => m(Leg, leg)))
 	)
 };

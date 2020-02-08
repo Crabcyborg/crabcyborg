@@ -81,3 +81,4 @@ export const content = [
 ];
 
 export const previous = 'flappy-tiger';
+export const next = 'crab-v-giraffe';

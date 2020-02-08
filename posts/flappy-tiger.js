@@ -62,7 +62,7 @@ const lady_tiger_with_wings = {
 		{
 			image: assets.bat_wing_1,
 			style: {
-				bottom: '120px',
+				bottom: '110px',
 				'width': '43px',
 				'transform-origin': '62% 79%',
 				transform: 'rotate(40deg)',
@@ -73,7 +73,7 @@ const lady_tiger_with_wings = {
 		{
 			image: assets.bat_wing_2,
 			style: {
-				bottom: '87px',
+				bottom: '77px',
 				transform: 'scaleX(-1) rotate(-40deg)',
 				'transform-origin': '3% 36%',
 				'z-index': 5,

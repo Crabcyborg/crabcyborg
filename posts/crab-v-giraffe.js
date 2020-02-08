@@ -6,7 +6,7 @@ import { config as girooster } from '$app/monsters/girooster';
 //import { attack, headbang, wave, walk } from '$app/animations/girooster';
 
 import { fan } from '$app/animations/lady-tiger';
-import { wave } from '$app/animations/girooster';
+import { wave2 } from '$app/animations/girooster';
 
 import { Caption, Gist, Monster } from '$app/components';
 import * as assets from '$app/assets';
@@ -15,7 +15,7 @@ export const title = 'Crab vs. Giraffe';
 
 export const oninit = () => {
 	fan('left');
-	wave('right');
+//	wave2('right');
 };
 
 let left = {...lady_tiger};
@@ -24,7 +24,7 @@ left.style.transform = 'translateX(44px)';
 left.style.top = '110px';
 
 let right = {...girooster};
-right.style.transform = 'scaleX(-1) translateX(76px)';
+//right.style.transform = 'scaleX(-1) translateX(76px)';
 
 export const content = [
 	m(

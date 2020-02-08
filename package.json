@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Frankenfighter",
   "dependencies": {
+    "animejs": "^3.1.0",
     "mithril": "^1.1.6"
   },
   "devDependencies": {

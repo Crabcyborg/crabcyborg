@@ -27,7 +27,7 @@ export var config = {
 		{
 			image: assets.rhino_leg_1,
 			style: {
-				bottom: '35px',
+				bottom: '25px',
 				right: '8px',
 				'z-index': 1,
 				'max-width': '26px'
@@ -35,7 +35,7 @@ export var config = {
 			foot: {
 				image: assets.tiger_foot_1,
 				style: {
-					bottom: '4px',
+					bottom: '6px',
 					left: '3px'
 				}
 			}
@@ -45,7 +45,7 @@ export var config = {
 			style: {
 				'max-width': '40px',
 				right: '10px',
-				bottom: '35px'
+				bottom: '25px'
 			},
 			foot: {
 				image: assets.rooster_foot,
@@ -60,7 +60,7 @@ export var config = {
 		{
 			image: assets.lemur_leg_3,
 			style: {
-				bottom: '42px',
+				bottom: '32px',
 				right: '13px',
 				'max-width': '29px',
 				zIndex: 3
@@ -77,7 +77,7 @@ export var config = {
 		{
 			image: assets.lemur_leg_4,
 			style: {
-				bottom: '56px',
+				bottom: '46px',
 				right: '20px',
 				'z-index': 2,
 				'max-width': '34px'
@@ -88,7 +88,7 @@ export var config = {
 		image: assets.porbeagle_shark_tail,
 		style: {
 			'max-width': '62px',
-			transform: 'translateX(-60px) translateY(-60px) rotate(10deg)',
+			transform: 'translateX(-60px) translateY(-45px) rotate(10deg)',
 			'transform-origin': '100% 60%'
 		}
 	},

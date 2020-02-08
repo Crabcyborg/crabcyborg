@@ -1,3 +1,6 @@
+// add a post for using anime js, see if it solves issues with flipping giraffe around
+// https://github.com/juliangarnier/anime
+
 import * as putting_together_animal_body_parts_with_mithril_js from './putting-together-animal-body-parts-with-mithril-js';
 import * as animating_your_amalgamation_of_animal_parts from './animating-your-amalgamation-of-animal-appendages';
 import * as flappy_tiger from './flappy-tiger';
