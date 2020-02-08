@@ -9,7 +9,7 @@ export var config = {
 		style: {
 			top: '62px',
 			left: '72px',
-			'z-index': 1,
+			'z-index': 3,
 			'max-width': '31px',
 			'transform-origin': '40% 46%'
 		}
@@ -19,7 +19,8 @@ export var config = {
 		style: {
 			'max-width': '90px',
 			top: '6px',
-			right: '30px'
+			right: '30px',
+			zIndex: 1
 		}
 	},
 	legs: [
@@ -44,8 +45,7 @@ export var config = {
 			style: {
 				'max-width': '40px',
 				right: '10px',
-				bottom: '35px',
-				zIndex: 1
+				bottom: '35px'
 			},
 			foot: {
 				image: assets.rooster_foot,
@@ -63,7 +63,7 @@ export var config = {
 				bottom: '42px',
 				right: '13px',
 				'max-width': '29px',
-				zIndex: 1
+				zIndex: 4
 			},
 			foot: {
 				image: assets.leopard_foot_3,
@@ -79,7 +79,7 @@ export var config = {
 			style: {
 				bottom: '56px',
 				right: '20px',
-				'z-index': 1,
+				'z-index': 4,
 				'max-width': '34px'
 			}
 		}
@@ -89,7 +89,6 @@ export var config = {
 		style: {
 			'max-width': '62px',
 			transform: 'translateX(-60px) translateY(-60px) rotate(10deg)',
-			'z-index': -1,
 			'transform-origin': '100% 60%'
 		}
 	},
@@ -98,7 +97,8 @@ export var config = {
 			image: assets.red_snapper_back,
 			style: {
 				transform: 'translateY(-63px) scaleX(-1) rotate(-12deg)',
-				'max-width': '90px'
+				'max-width': '90px',
+				zIndex: 2
 			}
 		}
 	]

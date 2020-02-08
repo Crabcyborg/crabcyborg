@@ -77,7 +77,7 @@ export const content = [
 		},
 		m(Monster, {configuration: fisticuffer, id: 'attack-target'})
 	),
-	m(Caption, 'Putting his dukes up')
+	m(Caption, 'And putting his dukes up to battle you!')
 ];
 
 export const previous = 'flappy-tiger';
