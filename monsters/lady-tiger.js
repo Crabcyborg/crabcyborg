@@ -21,7 +21,8 @@ export var config = {
 	torso: {
 		image: assets.tiger_torso,
 		style: {
-			'max-width': '90px'
+			'max-width': '90px',
+			'z-index': 1
 		}
 	},
 	legs: [
@@ -47,15 +48,14 @@ export var config = {
 			style: {
 				'max-width': '30px',
 				right: '10px',
-				bottom: '60px',
-				zIndex: -1
+				bottom: '60px'
 			},
 			foot: {
 				image: assets.baboon_foot_2,
 				style: {
-					bottom: '13px',
+					bottom: '5px',
 					'max-width': '20px',
-					left: '0px'
+					left: '5px'
 				}
 			}
 		},
@@ -64,8 +64,7 @@ export var config = {
 			style: {
 				'max-width': '22px',
 				left: '8px',
-				bottom: '62px',
-				zIndex: -1
+				bottom: '62px'
 			},
 			foot: {
 				image: assets.baboon_foot_3,

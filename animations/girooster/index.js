@@ -83,6 +83,8 @@ export const walk = (id) => {
 	const target = document.getElementById(id);
 	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
+	let scaleX = 1;
+
 	const step = (leg, degree) => {
 		leg.style.transform = 'rotate('+degree+'deg)';
 
@@ -101,19 +103,80 @@ export const walk = (id) => {
 	target.style.transform = 'translateX('+x+'px)';
 
 	setInterval(() => {
-		if(x > 210) {
-			setTimeout(() => {
-				x = -210;
-				target.style.transform = 'translateX('+x+'px)';
-			}, 10);
-			return;
+		if((x > 210 && scaleX === 1) || (x < -210 && scaleX === -1)) {
+			scaleX *= -1;
 		}
 
-		target.style.transform = 'translateX('+(x += 50)+'px)';
+		target.style.transform = 'translateX('+(x += 50*scaleX)+'px) scaleX('+scaleX+')';
 
 		step(legs[0], 20);
 		step(legs[2], 20);
 		step(legs[1], -30);
 		step(legs[3], -30);
 	}, 2000);
+};
+
+export const attack = (id) => {
+	const target = document.getElementById(id);
+	target.style.transition = 'transform .8s ease-in-out';
+	target.style['transform-origin'] = '20% 60%';
+	target.style.transform = 'rotate(-30deg)';
+
+	const lower_section = target.childNodes[2];
+	const legs = [lower_section.childNodes[1], lower_section.childNodes[2]];
+	const paws = [lower_section.childNodes[3], lower_section.childNodes[4]];
+
+	for(let leg of legs) {
+		leg.style['transform-origin'] = '10% 0%';
+		leg.style.transform = 'rotate(20deg)';
+		leg.style.transition = 'transform .8s ease-in-out';
+	}
+
+	paws[0].style['transform-origin'] = '10% 0%';
+	paws[0].style['z-index'] = 2;
+	paws[1].style['transform-origin'] = '10% 10%';
+
+	let deg = -30;
+	for(let paw of paws) {
+		paw.style.transition = 'transform .8s ease-in-out';
+		paw.style.transform = 'rotate('+deg+'deg)';
+		deg -= 10;
+	}
+
+	setTimeout(() => target.style.transform = 'rotate(-32deg)', 0);
+	setInterval(() => {
+		target.style.transform = 'rotate(-30deg)';
+		
+		for(let leg of legs) {
+			leg.style.transform = 'rotate(26deg)';
+		}
+
+		setTimeout(() => {
+			target.style.transform = 'rotate(-32deg)';
+
+			for(let leg of legs) {
+				leg.style.transform = 'rotate(25deg)';
+			}
+		}, 1000);
+	}, 2000);
+
+	let t0 = 0;
+	let from0 = -50;
+	let to0 = -80;
+	setInterval(() => {
+		t0 = 1 - t0;
+		paws[0].style.transform = 'rotate('+to0+'deg)';
+		[from0, to0] = [to0, from0]; // swap
+	}, 1000);
+
+	let t1 = 0;
+	let from1 = -20;
+	let to1 = -60;
+	setTimeout(() => {
+		setInterval(() => {
+			t1 = 1 - t1;
+			paws[1].style.transform = 'rotate('+to1+'deg)';
+			[from1, to1] = [to1, from1]; // swap
+		}, 1000);
+	}, 1000);
 };

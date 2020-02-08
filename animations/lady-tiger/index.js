@@ -81,6 +81,8 @@ export const walk = (id) => {
 	const target = document.getElementById(id);
 	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
+	let scaleX = 1;
+
 	const step = (leg, degree) => {
 		leg.style.transform = 'rotate('+degree+'deg)';
 
@@ -99,15 +101,11 @@ export const walk = (id) => {
 	target.style.transform = 'translateX('+x+'px)';
 
 	setInterval(() => {
-		if(x > 300) {
-			setTimeout(() => {
-				x = -250;
-				target.style.transform = 'translateX('+x+'px)';
-			}, 10);
-			return;
+		if((x > 300 && scaleX === 1) || (x < -250 && scaleX === -1)) {
+			scaleX *= -1;
 		}
 
-		target.style.transform = 'translateX('+(x += 50)+'px)';
+		target.style.transform = 'translateX('+(x += 50*scaleX)+'px) scaleX('+scaleX+')';
 
 		step(legs[0], 20);
 		step(legs[2], 20);

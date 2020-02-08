@@ -45,7 +45,7 @@ export var config = {
 				'max-width': '40px',
 				right: '10px',
 				bottom: '35px',
-				zIndex: -1
+				zIndex: 1
 			},
 			foot: {
 				image: assets.rooster_foot,
@@ -63,6 +63,7 @@ export var config = {
 				bottom: '42px',
 				right: '13px',
 				'max-width': '29px',
+				zIndex: 1
 			},
 			foot: {
 				image: assets.leopard_foot_3,

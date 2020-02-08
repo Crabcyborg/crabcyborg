@@ -29,7 +29,7 @@ export { default as zebra_leg_4 } from './zebra-leg-4.png';
 
 // feet
 export { default as baboon_foot_1 } from './baboon-foot-1.png';
-export { default as baboon_foot_2 } from './baboon-foot-2.jpg';
+export { default as baboon_foot_2 } from './baboon-foot-2.png';
 export { default as baboon_foot_3 } from './baboon-foot-3.png';
 export { default as lady_crab_claw } from './lady-crab-claw.png'
 export { default as rooster_foot } from './rooster-foot.png';
@@ -52,3 +52,4 @@ export { default as red_snapper_back } from './red-snapper-back.png';
 
 // backgrounds
 export { default as beach } from './beach.jpg';
+export { default as cliff } from './cliff.jpg';

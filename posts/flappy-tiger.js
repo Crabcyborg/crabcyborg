@@ -5,7 +5,7 @@ import * as assets from '$app/assets';
 
 export const title = 'Flappy Tiger';
 
-const yMax = 174;
+const yMax = 164;
 let ySpeed = 0;
 
 const flap = (id) => {
@@ -63,7 +63,6 @@ const lady_tiger_with_wings = {
 			image: assets.bat_wing_1,
 			style: {
 				bottom: '120px',
-				'z-index': -1,
 				'width': '43px',
 				'transform-origin': '62% 79%',
 				transform: 'rotate(40deg)',
@@ -89,7 +88,7 @@ const lady_tiger_with_wings = {
 export const content = [
 	"In this tutorial, we're going to give Lady Tiger some wings and teach her how to fly!",
 	m(
-		'#flappy-bird.tc.center.overflow-hidden',
+		'#flappy-bird.tc.center.overflow-hidden.relative',
 		{
 			style: {
 				'max-width': '600px',
@@ -97,6 +96,11 @@ export const content = [
 				border: '1px solid #ddd'
 			}
 		},
+		m(
+			'.absolute.overflow-hidden',
+			{style: {width: '600px', height: '300px', right: 0}},
+			m('img', {src: assets.cliff})
+		),
 		m(Monster, {id: 'flap-target', configuration: lady_tiger_with_wings})
 	),
 	m(Caption, 'Touch the box to flap!')

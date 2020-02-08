@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { config as girooster } from '$app/monsters/girooster';
-import { headbang, wave, walk } from '$app/animations/girooster';
+import { attack, headbang, wave, walk } from '$app/animations/girooster';
 import { Caption, Gist, Monster } from '$app/components';
 import * as assets from '$app/assets';
 
@@ -10,12 +10,12 @@ export const oninit = () => {
 	wave('wave-target');
 	headbang('headbang-target');
 	walk('walk-target');
+	attack('attack-target');
 };
 
 girooster.style.bottom = '55px';
-
-let headbanger = {...girooster};
-headbanger.style.left = '30px';
+let headbanger = {...girooster, style: {...girooster.style, left: '30px'}};
+let fisticuffer = {...girooster, style: {...girooster.style, bottom: '35px', left: '30px'}};
 
 export const content = [
 	m(
@@ -66,6 +66,18 @@ export const content = [
 		m(Monster, {configuration: {...girooster}, id: 'walk-target'})
 	),
 	m(Caption, 'And walks on the beach!'),
+	m(
+		'.tc.center.overflow-hidden',
+		{
+			style: {
+				'max-width': '280px',
+				height: '210px',
+				border: '1px solid #ddd'
+			}
+		},
+		m(Monster, {configuration: fisticuffer, id: 'attack-target'})
+	),
+	m(Caption, 'Putting his dukes up')
 ];
 
 export const previous = 'flappy-tiger';
