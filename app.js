@@ -5,9 +5,9 @@ import { posts } from '$app/posts';
 var container = document.getElementById('container');
 
 var lastRoute = null;
-var route = function(key, component) {
+var route = (key, component) => {
 	return {
-		onmatch: function(params) {
+		onmatch: params => {
 			if(lastRoute !== key) {
 				window.scrollTo(0, 0);
 				lastRoute = key;
@@ -19,7 +19,7 @@ var route = function(key, component) {
 	}
 };
 
-const routing = function() {
+const routing = () => {
 	let routeDetails = [
 		[Sandbox, '/sandbox'],
 		[Home, '/']

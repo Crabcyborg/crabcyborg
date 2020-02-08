@@ -12,7 +12,7 @@ const lerp = (v0, v1, t) => {
 */
 
 export var Sandbox = {
-	view: function(v) {
+	view: v => {
 		return m('.tc.demo.center', m(Monster, {configuration: lady_tiger}));
 	}
 };

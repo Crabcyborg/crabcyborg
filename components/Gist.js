@@ -12,18 +12,14 @@ const entityMap = {
 };
 
 const escapeHtml = (string) => {
-	return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-		return entityMap[s];
-	});
+	return String(string).replace(/[&<>"'`=\/]/g, s => entityMap[s]);
 };
 
 const loadGist = (id, gistId) => {
 	var element = document.getElementById(id);
 
 	if(element === null) {
-		setTimeout(function() {
-			loadGist(id, gistId);
-		}, 50);
+		setTimeout(() => loadGist(id, gistId), 50);
 		return;
 	}
 	
@@ -33,7 +29,7 @@ const loadGist = (id, gistId) => {
 		callbackName = "gist_callback"+counter++;
 	}
 
-    window[callbackName] = function (gistData) {
+    window[callbackName] = gistData => {
         delete window[callbackName];
         var html = '<link rel="stylesheet" href="' + escapeHtml(gistData.stylesheet) + '"></link>';
         html += gistData.div;
@@ -46,10 +42,6 @@ const loadGist = (id, gistId) => {
 };
 
 export var Gist = {
-	oninit: function(v) {
-		loadGist(v.attrs.id, v.attrs.gistId);
-	},
-	view: function(v) {
-		return m('#'+v.attrs.id);
-	}
+	oninit: v => loadGist(v.attrs.id, v.attrs.gistId),
+	view: v => m('#'+v.attrs.id)
 };
