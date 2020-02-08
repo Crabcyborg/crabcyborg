@@ -78,3 +78,42 @@ export const headbang = (id) => {
 
 	setTimeout(() => headbang(id), 2000);
 };
+
+export const walk = (id) => {
+	const target = document.getElementById(id);
+	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
+
+	const step = (leg, degree) => {
+		leg.style.transform = 'rotate('+degree+'deg)';
+
+		setTimeout(() => {
+			leg.style.transform = 'rotate(0deg)';
+		}, 1000);
+	};
+
+	for(let leg of legs) {
+		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transition = 'transform .8s ease-out';
+	}
+
+	let x = -210;
+	target.style.transition = 'transform 1s ease-in-out';
+	target.style.transform = 'translateX('+x+'px)';
+
+	setInterval(() => {
+		if(x > 210) {
+			setTimeout(() => {
+				x = -210;
+				target.style.transform = 'translateX('+x+'px)';
+			}, 10);
+			return;
+		}
+
+		target.style.transform = 'translateX('+(x += 50)+'px)';
+
+		step(legs[0], 20);
+		step(legs[2], 20);
+		step(legs[1], -30);
+		step(legs[3], -30);
+	}, 2000);
+};
