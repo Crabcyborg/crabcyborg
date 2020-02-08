@@ -63,7 +63,7 @@ export var config = {
 				bottom: '42px',
 				right: '13px',
 				'max-width': '29px',
-				zIndex: 4
+				zIndex: 3
 			},
 			foot: {
 				image: assets.leopard_foot_3,
@@ -79,7 +79,7 @@ export var config = {
 			style: {
 				bottom: '56px',
 				right: '20px',
-				'z-index': 4,
+				'z-index': 2,
 				'max-width': '34px'
 			}
 		}

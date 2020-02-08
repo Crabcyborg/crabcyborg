@@ -133,7 +133,6 @@ export const attack = (id) => {
 	}
 
 	paws[0].style['transform-origin'] = '10% 0%';
-	paws[0].style['z-index'] = 2;
 	paws[1].style['transform-origin'] = '10% 10%';
 
 	let deg = -30;
