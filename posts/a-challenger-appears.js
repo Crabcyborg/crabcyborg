@@ -254,9 +254,9 @@ export const content = [
 		},
 		m(Monster, {configuration: fisticuffer, id: 'attack-target'})
 	),
-	m(Caption, 'And putting his dukes up to battle you!'),
+	m(Caption, 'And putting his dukes up to battle Lady Tiger!'),
 	m(Gist, {id: 'attack-js', gistId: '6b4b30c15cee284e6e810d2da57d0fb4'})
 ];
 
 export const previous = 'flappy-tiger';
-//export const next = 'crab-v-giraffe';
+export const next = 'using-anime-js';
