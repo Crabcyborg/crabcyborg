@@ -89,7 +89,9 @@ const lady_tiger_with_wings = {
 
 export const content = [
 	"The Monster component already includes support for a Wing component, but Lady Tiger wasn't taking any advantage!",
-	"Until now, and what are wings without flying.",
+	"Since Lady Tiger doesn't want to have wings every day, we can just copy her configuration and use our new winged version instead!",
+	m(Gist, {id: 'config-js', gistId: 'ccca084d3f53d5f591421bd62b10acbc'}),
+	"And what are wings without flying.",
 	m(
 		'#flappy-bird.tc.center.overflow-hidden.relative',
 		{
