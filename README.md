@@ -2,7 +2,7 @@
 
 ```
 git clone https://github.com/Crabcyborg/crabcyborg.git
-cd crabcyb
+cd crabcyborg
 yarn install
 yarn start
 ```
