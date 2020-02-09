@@ -3,6 +3,8 @@ import { config as lady_tiger } from '$app/monsters/lady-tiger';
 import { Caption, Gist, Monster } from '$app/components';
 import * as assets from '$app/assets';
 
+// TODO I need to go into details about how the wings are added
+
 export const title = 'Flappy Tiger';
 
 const yMax = 164;
@@ -86,7 +88,8 @@ const lady_tiger_with_wings = {
 };
 
 export const content = [
-	"In this tutorial, we're going to give Lady Tiger some wings and teach her how to fly!",
+	"The Monster component already includes support for a Wing component, but Lady Tiger wasn't taking any advantage!",
+	"Until now, and what are wings without flying.",
 	m(
 		'#flappy-bird.tc.center.overflow-hidden.relative',
 		{
@@ -103,7 +106,13 @@ export const content = [
 		),
 		m(Monster, {id: 'flap-target', configuration: lady_tiger_with_wings})
 	),
-	m(Caption, 'Touch the box to flap!')
+	m(Caption, 'Touch the box to flap!'),
+	"This wonderful, totally feature complete game consists of two simple functions, two commonly shared variables (yMax and ySpeed), and some pretty simple initialization code.",
+	m(Gist, {id: 'flap-js', gistId: 'c28a2862adb7e1f5bc039ac8d92e3eaa'}),
+	m(Gist, {id: 'gravity-js', gistId: '24cddd9fab979f5265f2d09823c2265c'}),
+	m(Gist, {id: 'init-js', gistId: '28e3064a9bfbd299eed6de8b9186398e'}),
+	m('h3', "What's next?"),
+	"We probably want to add obstacles and scoring. Give it a shot and make a pull request!"
 ];
 
 export const previous = 'animating-your-amalgamation-of-animal-appendages';

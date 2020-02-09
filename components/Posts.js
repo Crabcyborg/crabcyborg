@@ -8,5 +8,5 @@ export var Posts = {
 			postSlugs: Object.keys(posts)
 		};
 	},
-	view: v => m('.mt3', v.state.postSlugs.map(slug => m(GoToPost, {key: slug})))
+	view: v => v.state.postSlugs.map(slug => m(GoToPost, {key: slug}))
 };

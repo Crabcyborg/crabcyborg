@@ -11,6 +11,8 @@ const lerp = (v0, v1, t) => {
 };
 */
 
+// TODO add prism js for a syntax highlighter
+
 export var Sandbox = {
 	view: v => {
 		return m('.tc.demo.center', m(Monster, {configuration: lady_tiger}));
