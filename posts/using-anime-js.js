@@ -6,35 +6,24 @@ import * as assets from '$app/assets';
 
 export const title = 'Using Anime.js';
 
-const wave = (id) => {
-	anime({
-		targets: '#'+id,
-		duration: 1400,
+const wave = id => anime.timeline({
 		direction: 'alternate',
+		duration: 1400,
 		loop: true,
-		translateX: [70, 65],
 		easing: 'easeInOutSine'
-	});
-
-	anime({
+	}).add({
+		targets: '#'+id,
+		translateX: [65, 70]
+	}).add({
 		targets: '#'+id+' > *:nth-child(3) > *:last-child',
 		duration: 2200,
-		loop: true,
 		rotate: [-60, -40, -65, -45, -70, 5, 0, 5],
-		transformOrigin: '10% 10%',
-		easing: 'easeInOutSine'
-	});
-
-	anime({
+		transformOrigin: '10% 10%'
+	}, 0).add({
 		targets: '#'+id+' > *:nth-child(3) > *:not(:last-child)',
-		duration: 1400,
-		direction: 'alternate',
-		loop: true,
-		rotate: [5, 0],
-		transformOrigin: '50% 10%',
-		easing: 'easeInOutSine'
-	});
-};
+		rotate: [0, 5],
+		transformOrigin: '50% 10%'
+	}, 0);
 
 export const oninit = () => {
 	wave('wave-target');
@@ -47,7 +36,7 @@ export const content = [
 		'.tc.center.overflow-hidden',
 		{
 			style: {
-				'max-width': '300px',
+				maxWidth: '300px',
 				height: '180px',
 				border: '1px solid #ddd'
 			}

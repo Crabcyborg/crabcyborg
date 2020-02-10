@@ -20,12 +20,12 @@ export const wave = (id) => {
 	head.style.transform = 'rotate(4deg)';
 
 	paw.style.transition = 'transform .8s ease-in-out';
-	paw.style['transform-origin'] = '10% 10%';
+	paw.style.transformOrigin = '10% 10%';
 	paw.style.transform = 'rotate(-60deg)';
 
 	for(let leg of other_legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(5deg)';
 	}
 
@@ -62,7 +62,7 @@ export const headbang = (id) => {
 
 	for(let leg of legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(10deg)';
 	}
 
@@ -96,7 +96,7 @@ export const walk = (id) => {
 	};
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transition = 'transform .8s ease-out';
 	}
 
@@ -121,7 +121,7 @@ export const walk = (id) => {
 export const attack = (id) => {
 	const target = document.getElementById(id);
 	target.style.transition = 'transform .8s ease-in-out';
-	target.style['transform-origin'] = '20% 60%';
+	target.style.transformOrigin = '20% 60%';
 	target.style.transform = 'rotate(-30deg)';
 
 	const lower_section = target.childNodes[2];
@@ -129,13 +129,13 @@ export const attack = (id) => {
 	const paws = [lower_section.childNodes[3], lower_section.childNodes[4]];
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '10% 0%';
+		leg.style.transformOrigin = '10% 0%';
 		leg.style.transform = 'rotate(20deg)';
 		leg.style.transition = 'transform .8s ease-in-out';
 	}
 
-	paws[0].style['transform-origin'] = '10% 0%';
-	paws[1].style['transform-origin'] = '10% 10%';
+	paws[0].style.transformOrigin = '10% 0%';
+	paws[1].style.transformOrigin = '10% 10%';
 
 	let deg = -30;
 	for(let paw of paws) {

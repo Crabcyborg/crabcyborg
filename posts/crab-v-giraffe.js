@@ -31,7 +31,7 @@ export const content = [
 		'.tc.center.overflow-hidden',
 		{
 			style: {
-				'max-width': '300px',
+				maxWidth: '300px',
 				height: '320px',
 				border: '1px solid #ddd'
 			}

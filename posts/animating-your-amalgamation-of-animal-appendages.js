@@ -6,17 +6,17 @@ const wave = (id) => {
 	const target = document.getElementById(id);
 	const lower_section = target.childNodes[2];
 	const claw = lower_section.childNodes[4];
-	const other_legs = [lower_section.childNodes[1], lower_section.childNodes[2], lower_section.childNodes[3]];
+	const other_legs = Array.from(lower_section.childNodes).slice(1, 4);
 
 	target.style.transition = '1s ease-in-out';
 	target.style.right = '-5px';
 	claw.style.transition = 'transform .8s ease-in-out';
-	claw.style['transform-origin'] = '50% 10%';
+	claw.style.transformOrigin = '50% 10%';
 	claw.style.transform = 'rotate(-60deg)';
 
 	for(let leg of other_legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(5deg)';
 	}
 
@@ -36,18 +36,13 @@ const walk = (id) => {
 	const target = document.getElementById(id);
 	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
-	let scaleX = 1;
-
 	const step = (leg, degree) => {
 		leg.style.transform = 'rotate('+degree+'deg)';
-
-		setTimeout(() => {
-			leg.style.transform = 'rotate(0deg)';
-		}, 1000);
+		setTimeout(() => leg.style.transform = 'rotate(0deg)', 1000);
 	};
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transition = 'transform .8s ease-out';
 	}
 
@@ -55,6 +50,7 @@ const walk = (id) => {
 	target.style.transition = 'transform 1s ease-in-out';
 	target.style.transform = 'translateX('+x+'px)';
 
+	let scaleX = 1;
 	setInterval(() => {
 		if((x > 250 && scaleX === 1) || (x < -250 && scaleX === -1)) {
 			scaleX *= -1;
@@ -87,7 +83,7 @@ export const typetypetype = (id) => {
 	}, 2000);
 
 	for(let leg of back_legs.concat(front_legs)) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	back_legs[0].style.transform = 'rotate(-25deg)';
@@ -134,7 +130,7 @@ export const happybaby = (id) => {
 	}, 2000);
 
 	for(let leg of back_legs.concat(front_legs)) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	setTimeout(() => {
@@ -178,12 +174,12 @@ export const fan = (id) => {
 	head.style.transition = tail.style.transition = target.style.transition = '1s ease-in-out';
 	target.style.right = '-10px';
 	tail.style.transform = 'translateX(-54px) translateY(-32px) rotate(90deg)';
-	head.style['transform-origin'] = '10% 50%';
+	head.style.transformOrigin = '10% 50%';
 	head.style.transform = 'rotate(30deg)';
 
 	for(let leg of back_legs.concat(front_legs)) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	for(let leg of back_legs) {
@@ -238,7 +234,7 @@ export const content = [
 	m(Caption, "Shake ya tailfeather"),
 	m(Gist, {id: 'fan-js', gistId: '961a0553a8fe775ead9e28e15e7c5c7a'}),
 	m('h3.mb0', "What's next?"),
-	"If you want to try animation Lady Tiger too, go for it, and make a pull request - maybe I'll host it in this post! Or just keep reading on.",
+	"If you want to try animating Lady Tiger too, go for it, and make a pull request - maybe I'll host it in this post! Or just keep reading on.",
 	"Lady Tiger is ready for her work out tape sponsorship."
 ];
 

@@ -3,8 +3,6 @@ import { config as lady_tiger } from '$app/monsters/lady-tiger';
 import { Caption, Gist, Monster } from '$app/components';
 import * as assets from '$app/assets';
 
-// TODO I need to go into details about how the wings are added
-
 export const title = 'Flappy Tiger';
 
 const yMax = 164;
@@ -65,8 +63,8 @@ const lady_tiger_with_wings = {
 			image: assets.bat_wing_1,
 			style: {
 				bottom: '110px',
-				'width': '43px',
-				'transform-origin': '62% 79%',
+				width: '43px',
+				transformOrigin: '62% 79%',
 				transform: 'rotate(40deg)',
 				left: '20px',
 				transition: '.5s ease-in-out'
@@ -77,9 +75,9 @@ const lady_tiger_with_wings = {
 			style: {
 				bottom: '77px',
 				transform: 'scaleX(-1) rotate(-40deg)',
-				'transform-origin': '3% 36%',
-				'z-index': 5,
-				'width': '64px',
+				transformOrigin: '3% 36%',
+				zIndex: 5,
+				width: '64px',
 				left: '57px',
 				transition: '.5s ease-in-out'
 			}
@@ -96,7 +94,7 @@ export const content = [
 		'#flappy-bird.tc.center.overflow-hidden.relative',
 		{
 			style: {
-				'max-width': '600px',
+				maxWidth: '600px',
 				height: '300px',
 				border: '1px solid #ddd'
 			}

@@ -17,7 +17,7 @@ export const typetypetype = (id) => {
 	tail.style.transform = 'translateX(-54px) translateY(-32px) rotate(110deg)';
 
 	for(let leg of back_legs.concat(front_legs)) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	back_legs[0].style.transform = 'rotate(-25deg)';
@@ -56,12 +56,12 @@ export const wave = (id) => {
 	target.style.right = '-5px';
 
 	claw.style.transition = 'transform .8s ease-in-out';
-	claw.style['transform-origin'] = '50% 10%';
+	claw.style.transformOrigin = '50% 10%';
 	claw.style.transform = 'rotate(-60deg)';
 
 	for(let leg of other_legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(5deg)';
 	}
 
@@ -92,7 +92,7 @@ export const walk = (id) => {
 	};
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transition = 'transform .8s ease-out';
 	}
 
@@ -131,7 +131,7 @@ export const fan = (id) => {
 
 	for(let leg of back_legs.concat(front_legs)) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	for(let leg of back_legs) {
@@ -143,7 +143,7 @@ export const fan = (id) => {
 	}
 
 	head.style.transition = '1s ease-in-out';
-	head.style['transform-origin'] = '10% 50%';
+	head.style.transformOrigin = '10% 50%';
 	head.style.transform = 'rotate(30deg)';
 
 	setTimeout(() => {
@@ -179,7 +179,7 @@ export const happybaby = (id) => {
 	tail.style.transform = 'translateX(-54px) translateY(-32px) rotate(70deg)';
 
 	for(let leg of back_legs.concat(front_legs)) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 	}
 
 	setTimeout(() => {

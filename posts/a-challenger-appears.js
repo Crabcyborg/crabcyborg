@@ -8,7 +8,7 @@ export const wave = (id) => {
 	const head = target.childNodes[0];
 	const lower_section = target.childNodes[2];
 	const paw = lower_section.childNodes[4];
-	const other_legs = [lower_section.childNodes[1], lower_section.childNodes[2], lower_section.childNodes[3]];
+	const other_legs = Array.from(lower_section.childNodes).slice(1, 4);
 	const tail = lower_section.childNodes[0];
 	const original_tail_transform = tail.style.transform;
 	
@@ -19,12 +19,12 @@ export const wave = (id) => {
 	head.style.left = '76px';
 	head.style.transform = 'rotate(4deg)';
 	paw.style.transition = 'transform .8s ease-in-out';
-	paw.style['transform-origin'] = '10% 10%';
+	paw.style.transformOrigin = '10% 10%';
 	paw.style.transform = 'rotate(-60deg)';
 
 	for(let leg of other_legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(5deg)';
 	}
 
@@ -47,8 +47,7 @@ export const wave = (id) => {
 export const headbang = (id) => {
 	const target = document.getElementById(id);
 	const head = target.childNodes[0];
-	const lower_section = target.childNodes[2];
-	const legs = [lower_section.childNodes[1], lower_section.childNodes[2], lower_section.childNodes[3], lower_section.childNodes[4]];
+	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
 	head.style.transition = target.style.transition = '1s ease-in-out';
 	target.style.left = '45px';
@@ -58,7 +57,7 @@ export const headbang = (id) => {
 
 	for(let leg of legs) {
 		leg.style.transition = '1s ease-in-out';
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transform = 'rotate(10deg)';
 	}
 
@@ -91,7 +90,7 @@ export const walk = (id) => {
 	};
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '50% 10%';
+		leg.style.transformOrigin = '50% 10%';
 		leg.style.transition = 'transform .8s ease-out';
 	}
 
@@ -116,7 +115,7 @@ export const walk = (id) => {
 export const attack = (id) => {
 	const target = document.getElementById(id);
 	target.style.transition = 'transform .8s ease-in-out';
-	target.style['transform-origin'] = '20% 60%';
+	target.style.transformOrigin = '20% 60%';
 	target.style.transform = 'rotate(-30deg)';
 
 	const lower_section = target.childNodes[2];
@@ -124,13 +123,13 @@ export const attack = (id) => {
 	const paws = [lower_section.childNodes[3], lower_section.childNodes[4]];
 
 	for(let leg of legs) {
-		leg.style['transform-origin'] = '10% 0%';
+		leg.style.transformOrigin = '10% 0%';
 		leg.style.transform = 'rotate(20deg)';
 		leg.style.transition = 'transform .8s ease-in-out';
 	}
 
-	paws[0].style['transform-origin'] = '10% 0%';
-	paws[1].style['transform-origin'] = '10% 10%';
+	paws[0].style.transformOrigin = '10% 0%';
+	paws[1].style.transformOrigin = '10% 10%';
 
 	let deg = -30;
 	for(let paw of paws) {
@@ -197,7 +196,7 @@ export const content = [
 		'.tc.center.overflow-hidden',
 		{
 			style: {
-				'max-width': '280px',
+				maxWidth: '280px',
 				height: '180px',
 				border: '1px solid #ddd'
 			}
@@ -210,7 +209,7 @@ export const content = [
 		'.tc.center.overflow-hidden',
 		{
 			style: {
-				'max-width': '280px',
+				maxWidth: '280px',
 				height: '180px',
 				border: '1px solid #ddd'
 			}
@@ -223,7 +222,7 @@ export const content = [
 		'.tc.center.overflow-hidden.relative',
 		{
 			style: {
-				'max-width': '280px',
+				maxWidth: '280px',
 				height: '180px',
 				border: '1px solid #ddd'
 			}
@@ -247,7 +246,7 @@ export const content = [
 		'.tc.center.overflow-hidden',
 		{
 			style: {
-				'max-width': '280px',
+				maxWidth: '280px',
 				height: '210px',
 				border: '1px solid #ddd'
 			}
