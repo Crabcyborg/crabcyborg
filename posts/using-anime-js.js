@@ -14,11 +14,11 @@ const wave = id => anime.timeline({
 	}).add({
 		targets: '#'+id,
 		translateX: [65, 70]
-	}).add({
+	}, 0).add({
 		targets: '#'+id+' > *:nth-child(3) > *:last-child',
-		duration: 2200,
-		rotate: [-60, -40, -65, -45, -70, 5, 0, 5],
-		transformOrigin: '10% 10%'
+		rotate: [-70, -30, -75],
+		transformOrigin: '10% 10%',
+		delay: 100
 	}, 0).add({
 		targets: '#'+id+' > *:nth-child(3) > *:not(:last-child)',
 		rotate: [0, 5],

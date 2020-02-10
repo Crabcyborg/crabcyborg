@@ -71,6 +71,7 @@ export { default as rocky_mountain_sheep_horns } from './rocky-mountain-sheep-ho
 export { default as bat_wing_1 } from './bat-wing-1.png';
 export { default as bat_wing_2 } from './bat-wing-2.png';
 export { default as red_snapper_back } from './red-snapper-back.png';
+export { default as porcupine_spine } from './porcupine-spine.png';
 
 // backgrounds
 export { default as beach } from './beach.jpg';
