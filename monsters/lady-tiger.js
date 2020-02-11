@@ -17,7 +17,7 @@ const torso = {
 const legs = [
 	{
 		image: assets.water_buffalo_leg_1,
-		style: { maxWidth: '22px', right: '10px', bottom: '40px', zIndex: 1 },
+		style: { maxWidth: '22px', right: '10px', bottom: '40px', zIndex: 1, transformOrigin: '50% 25%' },
 		foot: {
 			image: assets.baboon_foot_1,
 			style: { bottom: '8px', maxWidth: '20px', right: '8px' }
