@@ -1,6 +1,7 @@
 import m from 'mithril';
 import { Caption, Gist } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
+import { colors } from '$app/shapeup/colors';
 
 export const title = 'Recreating Shape Up with Mithril.js';
 
@@ -21,21 +22,62 @@ const Cell = {
 
 const targets = [128,64,32,16,8,4,2,1];
 
+const shuffle = a => {
+	var j, x, i;
+	for(i = a.length - 1; i > 0; i--) {
+		j = Math.floor(Math.random() * (i + 1));
+		x = a[i];
+		a[i] = a[j];
+		a[j] = x;
+	}
+
+	return a;
+}
+
+const rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
 const ShapeUp = {
 	oninit: v => {
 		const [ height, width ] = v.attrs.configuration;
 		const data = v.attrs.configuration.slice(2);
+		const use_colors = shuffle(colors);
 
-		let x = 0, y = 0, data_index = 0, target_index = 0, grid = [];
+		let x = 0, y = 0, data_index = 0, target_index = 0, color_index = 0, grid = [];
 		while(y++ < height) {
 			let row = [];
 
 			while(x++ < width) {
 				let byte = data[data_index];
 
-				row.push({
-					color: (byte & targets[target_index]) === 0 ? '#efefef' : '#333'
-				});
+				if((byte & targets[target_index]) === 0) {
+					// empty space
+					row.push({ empty: true, color: '#efefef' });
+				} else {
+					let use_color_index = false;
+					
+					if(grid.length && rand(1,3) === 1) {
+						// try up
+						let previous_row = grid[grid.length-1];
+						if(!previous_row[x-1].empty) {
+							use_color_index = previous_row[x-1].color_index;
+						}
+					} else if(x > 1 && (y < height/2 || rand(1,2) === 1)) {
+						// try left
+						if(!row[x-2].empty) {
+							use_color_index = row[x-2].color_index;
+						}
+					}
+
+					use_color_index || (use_color_index = color_index++);
+
+					// TODO check previous rows and previous cells at random					
+
+					row.push({
+						empty: false,
+						color_index: use_color_index,
+						color: 'rgb('+use_colors[use_color_index]+')'
+					});
+				}
 
 				if(target_index++ === 7) {
 					++data_index;
@@ -53,6 +95,10 @@ const ShapeUp = {
 };
 
 export const content = [
+	m(ShapeUp, { configuration: shapes.SPADE }),
+	m(ShapeUp, { configuration: shapes.HEEL }),
+	m(ShapeUp, { configuration: shapes.BUZZ }),
+	m(ShapeUp, { configuration: shapes.TREE }),
 	"It's fine, I don't expect you to know what Shape Up even is, but if you just look up at the Crab Cyborg logo you should have a good idea of what we're trying to build today. There are going to be a few steps:",
 	m(
 		'ol',
