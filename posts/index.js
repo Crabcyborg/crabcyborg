@@ -7,6 +7,7 @@ import * as flappy_tiger from './flappy-tiger';
 import * as a_challenger_appears from './a-challenger-appears';
 import * as using_anime_js from './using-anime-js';
 //import * as crab_v_giraffe from './crab-v-giraffe';
+import * as shape_up from './shape-up';
 
 export var posts = {
 	'putting-together-animal-body-parts-with-mithril-js': putting_together_animal_body_parts_with_mithril_js,
@@ -14,5 +15,6 @@ export var posts = {
 	'flappy-tiger': flappy_tiger,
 	'a-challenger-appears': a_challenger_appears,
 //	'crab-v-giraffe': crab_v_giraffe
-	'using-anime-js': using_anime_js
+	'using-anime-js': using_anime_js,
+	'shape-up': shape_up
 };

@@ -11,9 +11,10 @@ export const jump = id => {
 		anime({
 			targets: [leg(1), leg(2), leg(3), leg(4)],
 			direction: 'alternate',
-			translateY: [5, 0],
+			translateY: [6, -3],
 			delay: 20,
-			duration: 800
+			duration: 600,
+			easing: 'easeInOutQuad'
 		});
 
 		anime({
