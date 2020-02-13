@@ -188,10 +188,8 @@ const ShapeUp = {
 			}
 		}
 
-		console.log(highest_color);
-		console.log(coordinates_by_color[highest_color]);
-
 		v.state = { width, height, grid, highest_color };
+		v.attrs.onHighestColor && v.attrs.onHighestColor({ color: highest_color, coordinates: coordinates_by_color[highest_color]});
 
 		setTimeout(() => {
 
@@ -222,10 +220,76 @@ const ShapeUp = {
 	view: v => m('.dib', { id: v.attrs.id, style: v.attrs.style }, v.state.grid.map(row => m('div', { style: `height: ${size}px;` }, row.map(cell => m(Cell, cell)))))
 };
 
+let highest_colors = {
+	crab1: {},
+	crab2: {},
+	crab3: {},
+	crab4: {},
+	crab5: {}
+};
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const TargetShape = {
+	oninit: async function(v) {
+		console.log('oninit');
+
+		let config;
+		while((config = v.attrs.onConfig()) == {}) {
+			await sleep(100);
+		}
+
+		const { coordinates } = config;
+
+		let min_x = false, min_y = false, max_x = 0, max_y = 0;
+		for(let coordinate of coordinates) {
+			coordinate.x > max_x && (max_x = coordinate.x);
+			(min_x === false || coordinate.x < min_x) && (min_x = coordinate.x);
+			coordinate.y > max_y && (max_y = coordinate.y);
+			(min_y === false || coordinate.y < min_y) && (min_y = coordinate.y);
+		}
+
+		v.state = { ready: true, min_x, min_y, max_x, max_y };
+	},
+	view: v => {
+		if(!v.state.ready) {
+			return '';
+		}
+
+		const { min_x, min_y, max_x, max_y } = v.state;
+		const { color, coordinates } = v.attrs.onConfig();
+
+		return m(
+			'.relative.dib.mr2',
+			{
+				style: {
+					width: ((max_x-min_x)*size)+'px',
+					height: ((max_y-min_y)*size)+'px'
+				}
+			},
+			coordinates.map(
+				coordinate => m('.absolute', {
+					style: {
+						left: ((coordinate.x-min_x)*size)+'px',
+						top: ((coordinate.y-min_y)*size)+'px'
+					}
+				}, m(Cell, { color }))
+			)
+		);
+	}
+};
+
 const borderRight = {style: { borderRight: '5px solid #fff' }};
 
 export const content = [
-	[{...borderRight, id: 'crab1'}, borderRight, borderRight, borderRight, {}].map(attrs => m(ShapeUp, { ...attrs, configuration: shapes.CRAB })),
+	[0,1,2,3,4].map(
+		i => m(ShapeUp, {...borderRight, configuration: shapes.CRAB, onHighestColor: x => highest_colors[i] = x})
+	),
+	[0,1,2,3,4].map(
+		i => m(TargetShape, {onConfig: x => highest_colors[i]})
+	),
 	"It's fine, I don't expect you to know what Shape Up even is, but if you just look up at the Crab Cyborg logo, or the other five crabs on screen, you should have a good idea of what we're trying to build today. There are going to be a few steps:",
 	m(
 		'ol',
