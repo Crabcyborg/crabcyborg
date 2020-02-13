@@ -28,7 +28,8 @@ export var Post = {
 					return m('p', item);
 				}
 
-				if(typeof item.tag !== 'undefined') {
+				if(typeof item.tag !== 'undefined' || Array.isArray(item)) {
+					// return as a regular mithril component
 					return item;
 				}
 
