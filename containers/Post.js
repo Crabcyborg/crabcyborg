@@ -9,6 +9,7 @@ export var Post = {
 		const { title, content } = post;		
 
 		v.state = {
+			postId,
 			title,
 			content,
 			previous: post.previous || false,
@@ -23,7 +24,7 @@ export var Post = {
 			'div',
 			v.state.previous && m(GoToPost, {prepend: 'Previous: ', key: v.state.previous}),
 			m('h2', v.state.title),
-			v.state.content.map(item => {
+			(typeof v.state.content === 'function' ? v.state.content() : v.state.content).map(item => {
 				if(typeof item === 'string') {
 					return m('p', item);
 				}

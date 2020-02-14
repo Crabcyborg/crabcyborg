@@ -64,132 +64,145 @@ const ShapeOnly = {
     view: v => m('.dib.mr2', v.state.grid.map(row => m('div', { style: `height: ${size}px;` }, row.map(cell => m(Cell, cell)))))
 };
 
+const updateShapeUpComponent = (v) => {
+	const [ height, width ] = v.attrs.configuration;
+	const use_colors = shuffle(colors);
+	let x = -1, y = -1, data_index = 2, target_index = 0, color_index = 0, grid = [], unassigned = [];
+	let random_target = 0.3;
+	let count_by_color = {}, coordinates_by_color = {};
+
+	const getColor = index => `rgb(${use_colors[index]})`;
+
+	const assign = (target, adjacent) => {
+		if(adjacent.empty || adjacent.unassigned) {
+			return false;
+		}
+
+		target.color_index = adjacent.color_index;
+		target.color = getColor(target.color_index);
+		count_by_color[target.color]++;
+		coordinates_by_color[target.color].push({x: target.x, y: target.y});
+		target.unassigned = false;
+		return true;
+	};
+
+	while(++y < height) {
+		let row = [];
+
+		while(++x < width) {
+			let obj = {x,y};
+			let byte = v.attrs.configuration[data_index];
+			obj.empty = (byte & targets[target_index]) === 0;
+
+			if(obj.empty) {
+				obj.color = '#fff';
+				row.push(obj);
+			} else {
+				obj.unassigned = true;
+
+				let checks = [];
+				grid.length && checks.push('up');
+				x > 0 && checks.push('left');
+				checks.length > 1 && Math.random() < .5 && (checks = [checks[1], checks[0]]);
+
+				for(let check of checks) {
+					if(Math.random() > random_target) {
+						continue;
+					}
+
+					let cell;
+					switch(check) {
+						case 'up': cell = grid[grid.length-1][x]; break;
+						case 'left': cell = row[x-1]; break;
+					}
+
+					if(assign(obj, cell)) {
+						break;
+					}
+				}
+
+				if(obj.unassigned) {
+					obj.color_index = color_index++;
+					obj.color_index % 5 === 0 && (random_target = Math.max(random_target + .5, .9));
+
+					if(obj.color_index >= colors.length) {
+						delete obj.color_index;
+						obj.color = '#000';
+						unassigned.push(obj);
+					} else {
+						obj.color = getColor(obj.color_index);
+						count_by_color[obj.color] = 1;
+						coordinates_by_color[obj.color] = [{x: obj.x, y: obj.y}];
+						obj.unassigned = false;
+					}
+				}
+
+				row.push(obj);
+			}
+
+			if(target_index++ === 7) {
+				++data_index;
+				target_index = 0;
+			}
+		}
+
+		grid.push(row);
+		x = -1;
+	}
+
+	let tries = 0;
+	while(unassigned.length && tries++ < 10) {
+		unassigned = unassigned.filter(obj => {
+			let checks = [];
+			obj.x > 1 && checks.push(grid[obj.y][obj.x-1]);
+			obj.y > 1 && checks.push(grid[obj.y-1][obj.x]);
+			obj.x+1 < width && checks.push(grid[obj.y][obj.x+1]);
+			obj.y+1 < height && checks.push(grid[obj.y+1][obj.x]);
+
+			while(checks.length) {
+				let random_index = Math.floor(Math.random()*checks.length);
+				let check = checks.splice(random_index, 1);
+
+				if(assign(obj, check)) {
+					return true;
+				}
+			}
+
+			return false;
+		});
+	}
+
+	var color_keys = Object.keys(count_by_color);
+	var highest = 0;
+	var highest_color;
+	for(let color of color_keys) {
+		if(count_by_color[color] > highest) {
+			highest_color = color;
+			highest = count_by_color[color];
+
+			// randomly quit early to avoid only picking the largest object
+			if(highest > 10 && Math.random() < .5) {
+				break;
+			}
+		}
+	}
+
+	v.state = { width, height, grid, highest_color };
+
+	processTargetShapeState(
+		v.attrs.i,
+		{
+			color: highest_color,
+			coordinates: coordinates_by_color[highest_color]
+		}
+	);
+
+	setTimeout(m.redraw, 0);
+};
+
 const ShapeUp = {
 	oninit: v => {
-		const [ height, width ] = v.attrs.configuration;
-		const use_colors = shuffle(colors);
-		let x = -1, y = -1, data_index = 2, target_index = 0, color_index = 0, grid = [], unassigned = [];
-		let random_target = 0.3;
-		let count_by_color = {}, coordinates_by_color = {};
-
-		const getColor = index => `rgb(${use_colors[index]})`;
-
-		const assign = (target, adjacent) => {
-			if(adjacent.empty || adjacent.unassigned) {
-				return false;
-			}
-
-			target.color_index = adjacent.color_index;
-			target.color = getColor(target.color_index);
-			count_by_color[target.color]++;
-			coordinates_by_color[target.color].push({x: target.x, y: target.y});
-			target.unassigned = false;
-			return true;
-		};
-
-		while(++y < height) {
-			let row = [];
-
-			while(++x < width) {
-				let obj = {x,y};
-				let byte = v.attrs.configuration[data_index];
-				obj.empty = (byte & targets[target_index]) === 0;
-
-				if(obj.empty) {
-					obj.color = '#fff';
-					row.push(obj);
-				} else {
-					obj.unassigned = true;
-
-					let checks = [];
-					grid.length && checks.push('up');
-					x > 0 && checks.push('left');
-					checks.length > 1 && Math.random() < .5 && (checks = [checks[1], checks[0]]);
-
-					for(let check of checks) {
-						if(Math.random() > random_target) {
-							continue;
-						}
-
-						let cell;
-						switch(check) {
-							case 'up': cell = grid[grid.length-1][x]; break;
-							case 'left': cell = row[x-1]; break;
-						}
-
-						if(assign(obj, cell)) {
-							break;
-						}
-					}
-
-					if(obj.unassigned) {
-						obj.color_index = color_index++;
-						obj.color_index % 5 === 0 && (random_target = Math.max(random_target + .5, .9));
-
-						if(obj.color_index >= colors.length) {
-							delete obj.color_index;
-							obj.color = '#000';
-							unassigned.push(obj);
-						} else {
-							obj.color = getColor(obj.color_index);
-							count_by_color[obj.color] = 1;
-							coordinates_by_color[obj.color] = [{x: obj.x, y: obj.y}];
-							obj.unassigned = false;
-						}
-					}
-
-					row.push(obj);
-				}
-
-				if(target_index++ === 7) {
-					++data_index;
-					target_index = 0;
-				}
-			}
-
-			grid.push(row);
-			x = -1;
-		}
-
-		let tries = 0;
-		while(unassigned.length && tries++ < 10) {
-			unassigned = unassigned.filter(obj => {
-				let checks = [];
-				obj.x > 1 && checks.push(grid[obj.y][obj.x-1]);
-				obj.y > 1 && checks.push(grid[obj.y-1][obj.x]);
-				obj.x+1 < width && checks.push(grid[obj.y][obj.x+1]);
-				obj.y+1 < height && checks.push(grid[obj.y+1][obj.x]);
-
-				while(checks.length) {
-					let random_index = Math.floor(Math.random()*checks.length);
-					let check = checks.splice(random_index, 1);
-
-					if(assign(obj, check)) {
-						return true;
-					}
-				}
-
-				return false;
-			});
-		}
-
-		var color_keys = Object.keys(count_by_color);
-		var highest = 0;
-		var highest_color;
-		for(let color of color_keys) {
-			if(count_by_color[color] > highest) {
-				highest_color = color;
-				highest = count_by_color[color];
-
-				// randomly quit early to avoid only picking the largest object
-				if(highest > 10 && Math.random() < .25) {
-					break;
-				}
-			}
-		}
-
-		v.state = { width, height, grid, highest_color };
-		v.attrs.onHighestColor && v.attrs.onHighestColor({ color: highest_color, coordinates: coordinates_by_color[highest_color]});
+		updateShapeUpComponent(v);
 
 		setTimeout(() => {
 
@@ -217,58 +230,70 @@ const ShapeUp = {
 
 		}, 0);
 	},
-	view: v => m('.dib', { id: v.attrs.id, style: v.attrs.style }, v.state.grid.map(row => m('div', { style: `height: ${size}px;` }, row.map(cell => m(Cell, cell)))))
+	view: v => m(
+		'.dib',
+		{
+			id: v.attrs.id,
+			style: v.attrs.style,
+			onclick: e => {
+				const color = e.target.style.backgroundColor.replace(/ /g, '');
+				const clicked_the_target = color === v.state.highest_color;
+				
+				if(clicked_the_target) {
+					updateShapeUpComponent(v);
+				}
+			}
+		},
+		v.state.grid.map(row => m('div', { style: `height: ${size}px;` }, row.map(cell => m(Cell, cell))))
+	)
 };
 
-let highest_colors = {
-	crab1: {},
-	crab2: {},
-	crab3: {},
-	crab4: {},
-	crab5: {}
-};
+let highest_colors = {};
+let target_shape_vnodes = {};
 
-function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
+const processTargetShapeState = (i, config, retries) => {
+	if(target_shape_vnodes[i] === undefined) {
+		retries === undefined && (retries = 0);
+		retries < 10 && setTimeout(() => processTargetShapeState(i, config, ++retries), 10);
+		return;
+	}
+
+	const v = target_shape_vnodes[i];
+	const { coordinates, color } = config;
+
+	let min_x = false, min_y = false, max_x = 0, max_y = 0;
+	for(let coordinate of coordinates) {
+		coordinate.x > max_x && (max_x = coordinate.x);
+		(min_x === false || coordinate.x < min_x) && (min_x = coordinate.x);
+		coordinate.y > max_y && (max_y = coordinate.y);
+		(min_y === false || coordinate.y < min_y) && (min_y = coordinate.y);
+	}
+
+	v.state.ready = true;
+	v.state.coordinates = coordinates;
+	v.state.min_x = min_x;
+	v.state.min_y = min_y;
+	v.state.max_x = max_x;
+	v.state.max_y = max_y;
+	v.state.color = color;
+	v.state.width = ((max_x-min_x)*size)+'px';
+	v.state.height = ((max_y-min_y)*size)+'px';
+};
 
 const TargetShape = {
-	oninit: async function(v) {
-		console.log('oninit');
+	oninit: v => {
+		v.state = {
+			ready: false
+		};
 
-		let config;
-		while((config = v.attrs.onConfig()) == {}) {
-			await sleep(100);
-		}
-
-		const { coordinates } = config;
-
-		let min_x = false, min_y = false, max_x = 0, max_y = 0;
-		for(let coordinate of coordinates) {
-			coordinate.x > max_x && (max_x = coordinate.x);
-			(min_x === false || coordinate.x < min_x) && (min_x = coordinate.x);
-			coordinate.y > max_y && (max_y = coordinate.y);
-			(min_y === false || coordinate.y < min_y) && (min_y = coordinate.y);
-		}
-
-		v.state = { ready: true, min_x, min_y, max_x, max_y };
+		target_shape_vnodes[v.attrs.i] = v;
 	},
 	view: v => {
-		if(!v.state.ready) {
-			return '';
-		}
+		const { ready, min_x, min_y, max_x, max_y, color, coordinates, width, height } = v.state;
 
-		const { min_x, min_y, max_x, max_y } = v.state;
-		const { color, coordinates } = v.attrs.onConfig();
-
-		return m(
+		return ready ? m(
 			'.relative.dib.mr2',
-			{
-				style: {
-					width: ((max_x-min_x)*size)+'px',
-					height: ((max_y-min_y)*size)+'px'
-				}
-			},
+			{ style: { width, height } },
 			coordinates.map(
 				coordinate => m('.absolute', {
 					style: {
@@ -277,19 +302,17 @@ const TargetShape = {
 					}
 				}, m(Cell, { color }))
 			)
-		);
+		) : '';
 	}
 };
 
 const borderRight = {style: { borderRight: '5px solid #fff' }};
 
-export const content = [
+export const content = () => [
 	[0,1,2,3,4].map(
-		i => m(ShapeUp, {...borderRight, configuration: shapes.CRAB, onHighestColor: x => highest_colors[i] = x})
+		i => m(ShapeUp, {...borderRight, i, configuration: shapes.CRAB})
 	),
-	[0,1,2,3,4].map(
-		i => m(TargetShape, {onConfig: x => highest_colors[i]})
-	),
+	[0,1,2,3,4].map(i => m(TargetShape, {i})),
 	"It's fine, I don't expect you to know what Shape Up even is, but if you just look up at the Crab Cyborg logo, or the other five crabs on screen, you should have a good idea of what we're trying to build today. There are going to be a few steps:",
 	m(
 		'ol',
