@@ -170,9 +170,12 @@ const updateShapeUpComponent = (v) => {
 		}
 	}
 
-	v.state = { width, height, grid, highest_color };
+	v.state.width = width;
+	v.state.height = height;
+	v.state.grid = grid;
+	v.state.highest_color = highest_color;
 
-	processTargetShapeState(
+	v.attrs.behaviour === 'click-target' && processTargetShapeState(
 		v.attrs.i,
 		{
 			color: highest_color,
@@ -181,6 +184,11 @@ const updateShapeUpComponent = (v) => {
 	);
 
 	setTimeout(m.redraw, 10);
+
+	v.attrs.behaviour === 'blink' && setTimeout(
+		() => updateShapeUpComponent(v),
+		v.attrs.blink_delay ? (typeof v.attrs.blink_delay === 'function' ? v.attrs.blink_delay() : v.attrs.blink_delay) : 100
+	);
 };
 
 export const Cell = {
@@ -194,47 +202,15 @@ export const Cell = {
 
 export const ShapeUp = {
 	oninit: v => {
+		v.state = {};
 		updateShapeUpComponent(v);
-
-		setTimeout(() => {
-
-			/*
-			anime({
-				targets: '#crab1 > div > div',
-				scale: [
-				  {value: .1, easing: 'easeOutSine', duration: 500},
-				  {value: 1, easing: 'easeInOutQuad', duration: 1200}
-				],
-				delay: anime.stagger(200, {grid: [13, 13], from: 'center'})
-			});
-			*/
-
-			/*
-			anime({
-				targets: '#crab1 > div > div',
-				translateX: anime.stagger(10, {grid: [13, 13], from: 'center', axis: 'x'}),
-				translateY: anime.stagger(10, {grid: [13, 13], from: 'center', axis: 'y'}),
-				rotateZ: anime.stagger([0, 90], {grid: [13, 13], from: 'center', axis: 'x'}),
-				delay: anime.stagger(200, {grid: [13, 13], from: 'center'}),
-				easing: 'easeInOutQuad'
-			});
-			*/
-
-		}, 0);
 	},
 	view: v => m(
 		'.dib',
 		{
 			id: v.attrs.id,
 			style: v.attrs.style,
-			onclick: e => {
-				const color = e.target.style.backgroundColor.replace(/ /g, '');
-				const clicked_the_target = color === v.state.highest_color;
-				
-				if(clicked_the_target) {
-					updateShapeUpComponent(v);
-				}
-			}
+			onclick: v.attrs.behaviour === 'click-target' ? e => e.target.style.backgroundColor.replace(/ /g, '') === v.state.highest_color && updateShapeUpComponent(v) : false
 		},
 		v.state.grid.map(row => m('div', { style: `height: ${v.attrs.size}px;` }, row.map(cell => m(Cell, {...cell, size: v.attrs.size}))))
 	)

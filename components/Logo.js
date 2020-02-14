@@ -11,7 +11,7 @@ export var Logo = {
 			{
 				href: on_homepage ? false : '/'
 			},
-			m(ShapeUp, {i: 'logo', size: 6, configuration: shapes.LOGO}),
+			m(ShapeUp, {i: 'logo', size: 6, configuration: shapes.LOGO, behaviour: on_homepage ? 'click-target' : false}),
 			on_homepage && m(
 				'.absolute',
 				{
