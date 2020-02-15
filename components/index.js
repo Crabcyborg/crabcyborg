@@ -3,6 +3,8 @@ export * from './Monster';
 export * from './Gist';
 export * from './Caption';
 export * from './GoToPost';
+export * from './GoToExperiment';
 export * from './Posts';
+export * from './Experiments';
 export * from './ShapeUp';
 export * from './Trigger';

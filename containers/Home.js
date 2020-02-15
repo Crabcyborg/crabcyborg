@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Logo, Posts, Trigger } from '$app/components';
+import { Logo, Posts, Experiments, Trigger } from '$app/components';
 
 const github = 'https://github.com/Crabcyborg/crabcyborg';
 
@@ -11,6 +11,8 @@ export var Home = {
 		m('p', "This is an experimental blog/tutorial series, where we start by putting together our very own public domain Frankenstein."),
 		m('h4.mb0', 'Here are the posts:'),
 		m(Posts),
+		m('h4.mb0', 'Here are the experiments:'),
+		m(Experiments),
 		m(
 			Trigger,
 			{

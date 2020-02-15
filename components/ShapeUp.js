@@ -21,7 +21,7 @@ const shuffle = a => {
 	return a;
 }
 
-const processTargetShapeState = (i) => {
+const processTargetShapeState = i => {
 	if(!vnodes.shapes[i] || !vnodes.targets[i]) {
 		return;
 	}
@@ -50,8 +50,10 @@ const processTargetShapeState = (i) => {
 	target.state.height = ((max_y-min_y)*target.attrs.size)+'px';
 };
 
-const updateShapeUpComponent = (v) => {
-	const [ height, width ] = v.attrs.configuration;
+const updateShapeUpComponent = v => {
+	const configuration = typeof v.attrs.configuration === 'function' ? v.attrs.configuration() : v.attrs.configuration;
+
+	const [ height, width ] = configuration;
 	const use_colors = shuffle(colors);
 	let x = -1, y = -1, data_index = 2, target_index = 0, color_index = 0, grid = [], unassigned = [];
 	let random_target = 0.3;
@@ -77,7 +79,7 @@ const updateShapeUpComponent = (v) => {
 
 		while(++x < width) {
 			let obj = {x,y};
-			let byte = v.attrs.configuration[data_index];
+			let byte = configuration[data_index];
 			obj.empty = (byte & targets[target_index]) === 0;
 
 			if(obj.empty) {
@@ -224,7 +226,12 @@ export const ShapeUp = {
 			} : false
 		},
 		v.state.grid.map(row => m('div', { style: `height: ${v.attrs.size}px;` }, row.map(cell => m(Cell, {...cell, size: v.attrs.size}))))
-	)
+	),
+	trigger: details => {
+		switch(details.task) {
+			case 'redraw': updateShapeUpComponent(vnodes.shapes[details.i]); console.log('here', details.i, vnodes.shapes); break;
+		}
+	}
 };
 
 export const TargetShape = {
