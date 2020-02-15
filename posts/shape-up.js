@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Cell } from '$app/components';
+import { Caption, Gist, ShapeUp, TargetShape, Cell, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 
 export const title = 'Recreating Shape Up with Mithril.js';
@@ -84,7 +84,8 @@ export const content = () => [
 				}
 			},
 			m(TargetShape, {i: 'jelly', size, style: { top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' }})
-		)
+		),
+		m(Score, {i: 'jelly', style: { position: 'absolute', left: (shapes.JELLY[1]*size*2 + 40)+'px' }})
 	),
 	m('h3', "What's Next?"),
 	m('p', "Check out ", m('i', '/shapeup/shapes'), " for other config files. There are over 100 shapes, and I'm definitely open to growing that number!")

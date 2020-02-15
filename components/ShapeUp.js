@@ -5,7 +5,8 @@ const targets = [128,64,32,16,8,4,2,1];
 
 let vnodes = {
 	shapes: {},
-	targets: {}
+	targets: {},
+	scores: {}
 };
 
 const shuffle = a => {
@@ -185,7 +186,10 @@ const updateShapeUpComponent = (v) => {
 
 		case 'blink': {
 			setTimeout(
-				() => updateShapeUpComponent(v),
+				() => {
+					updateShapeUpComponent(v);
+					m.redraw();
+				},
 				v.attrs.blink_delay ? (typeof v.attrs.blink_delay === 'function' ? v.attrs.blink_delay() : v.attrs.blink_delay) : 100
 			);
 		} break;
@@ -212,7 +216,12 @@ export const ShapeUp = {
 		{
 			id: v.attrs.id,
 			style: v.attrs.style,
-			onclick: v.attrs.behaviour === 'click-target' ? e => e.target.style.backgroundColor.replace(/ /g, '') === v.state.highest_color && updateShapeUpComponent(v) : false
+			onclick: v.attrs.behaviour === 'click-target' ? e => {
+				if(e.target.style.backgroundColor.replace(/ /g, '') === v.state.highest_color) {
+					vnodes.scores[v.attrs.i] && vnodes.scores[v.attrs.i].state.score++;
+					updateShapeUpComponent(v);
+				}
+			} : false
 		},
 		v.state.grid.map(row => m('div', { style: `height: ${v.attrs.size}px;` }, row.map(cell => m(Cell, {...cell, size: v.attrs.size}))))
 	)
@@ -239,4 +248,12 @@ export const TargetShape = {
 			)
 		);
 	}
+};
+
+export const Score = {
+	oninit: v => {
+		v.state = { score: 0 };
+		vnodes.scores[v.attrs.i] = v;
+	},
+	view: v => v.state.score > 0 && m('.dib.cambay.unclickable', {...v.attrs}, v.state.score)
 };

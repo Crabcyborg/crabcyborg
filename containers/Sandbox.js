@@ -32,6 +32,7 @@ const oncreate = v => {
 //	wave('girooster');
 //	jump('lady-tiger');
 
+/*
 	const grid = [11,63];
 
 	anime({
@@ -56,13 +57,14 @@ const oncreate = v => {
 		direction: 'alternate',
 		loop: true
 	});
+*/
 };
 
 export var Sandbox = {
 	oncreate,
 	view: v => [
-		m(ShapeUp, {id: 'ben1', configuration: shapes.BEN, size: 6, behaviour: 'blink', blink_delay: 1000}),
-		m(ShapeUp, {id: 'ben2', style: { position: 'absolute', right: '10px' }, configuration: shapes.BEN, size: 6, behaviour: 'blink', blink_delay: 1000}),
+//		m(ShapeUp, {id: 'ben1', configuration: shapes.BEN, size: 6, behaviour: 'blink', blink_delay: 1000}),
+//		m(ShapeUp, {id: 'ben2', style: { position: 'absolute', right: '10px' }, configuration: shapes.BEN, size: 6, behaviour: 'blink', blink_delay: 1000}),
 //		m('.tc.center.absolute', { style: { top: '250px', left: '80px', height: '200px' } }, m(Monster, {configuration: lady_tiger, id: 'lady-tiger'}))
 //		Array.from({length: 6}, (x,i) => i).map(i => m(ShapeUp, {configuration: shapes.HEART, size: 6, behaviour: 'blink', blink_delay: () => Math.random()*1000, style: { marginRight: '5px' }}))
 //		m('.tc.center', { style: { height: '220px' } }, m(Monster, {configuration: {...zebrelephant, style: {...zebrelephant.style, left: '', right: '25px'}}, id: 'zebrelephant'})),
