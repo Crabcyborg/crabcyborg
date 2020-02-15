@@ -2,7 +2,7 @@ import m from 'mithril';
 
 export var Trigger = {
 	view: v => m(
-		'.cambay',
+		'.cambay.dib',
 		{
 			style: {
 				cursor: 'pointer',

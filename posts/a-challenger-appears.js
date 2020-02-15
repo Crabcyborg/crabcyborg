@@ -195,11 +195,7 @@ export const content = () => [
 	m(
 		'.tc.center.overflow-hidden',
 		{
-			style: {
-				maxWidth: '280px',
-				height: '180px',
-				border: '1px solid #ddd'
-			}
+			style: { maxWidth: '280px', height: '180px', border: '1px solid #ddd' }
 		},
 		m(Monster, {configuration: {...girooster}, id: 'wave-target'})
 	),
@@ -208,11 +204,7 @@ export const content = () => [
 	m(
 		'.tc.center.overflow-hidden',
 		{
-			style: {
-				maxWidth: '280px',
-				height: '180px',
-				border: '1px solid #ddd'
-			}
+			style: { maxWidth: '280px', height: '180px', border: '1px solid #ddd' }
 		},
 		m(Monster, {configuration: headbanger, id: 'headbang-target'})
 	),
@@ -221,21 +213,12 @@ export const content = () => [
 	m(
 		'.tc.center.overflow-hidden.relative',
 		{
-			style: {
-				maxWidth: '280px',
-				height: '180px',
-				border: '1px solid #ddd'
-			}
+			style: { maxWidth: '280px', height: '180px', border: '1px solid #ddd' }
 		},
 		m(
 			'img.absolute',
 			{
-				style: {
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0
-				},
+				style: { top: 0, left: 0, right: 0, bottom: 0 },
 				src: assets.beach
 			}
 		),
@@ -245,11 +228,7 @@ export const content = () => [
 	m(
 		'.tc.center.overflow-hidden',
 		{
-			style: {
-				maxWidth: '280px',
-				height: '210px',
-				border: '1px solid #ddd'
-			}
+			style: { maxWidth: '280px', height: '210px', border: '1px solid #ddd' }
 		},
 		m(Monster, {configuration: fisticuffer, id: 'attack-target'})
 	),

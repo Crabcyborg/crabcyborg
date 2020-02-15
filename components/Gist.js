@@ -43,25 +43,23 @@ const loadGist = (id, gistId) => {
 };
 
 export var Gist = {
-	oninit: v => {		
-		v.state = { visible: false };
-	},
+	oninit: v => v.state = { visible: false },
 	view: v => v.state.visible
 		? m('#'+v.attrs.id)
 		: m(
-			Trigger,
-			{
-				style: {
-					display: 'block'
-				},
-				onclick: () => {
-					if(!v.state.visible) {
-						v.state.visible = true;
-						loadGist(v.attrs.id, v.attrs.gistId);
+			'div',
+				m(
+				Trigger,
+				{
+					onclick: () => {
+						if(!v.state.visible) {
+							v.state.visible = true;
+							loadGist(v.attrs.id, v.attrs.gistId);
+						}
 					}
-				}
-			},
-			'Load Gist',
-			v.attrs.title && m('span', ': ', v.attrs.title)
+				},
+				'Load Gist',
+				v.attrs.title && m('span', ': ', v.attrs.title)
+			)
 		)
 };

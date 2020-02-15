@@ -16,15 +16,11 @@ export const content = () => [
 	m(
 		'.tc.center.overflow-hidden',
 		{
-			style: {
-				maxWidth: '300px',
-				height: '180px',
-				border: '1px solid #ddd'
-			}
+			style: { maxWidth: '300px', height: '180px', border: '1px solid #ddd' }
 		},
 		m(
 			Monster,
-			{	
+			{
 				id: 'wave-target',
 				configuration: {...girooster, style: {...girooster.style, transform: 'scaleX(-1) translateX(76px)'} }
 			}

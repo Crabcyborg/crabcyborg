@@ -14,10 +14,7 @@ export var Home = {
 		m(
 			Trigger,
 			{
-				style: {
-					display: 'inline-block',
-					marginTop: '25px'
-				},
+				style: { marginTop: '25px' },
 				onclick: () => m.route.set('/sandbox')
 			},
 			'Or go to the Sandbox'
