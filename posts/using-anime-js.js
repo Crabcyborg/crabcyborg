@@ -10,7 +10,7 @@ export const oninit = () => {
 	wave('wave-target');
 };
 
-export const content = [
+export const content = () => [
 	"Before we get into any epic crab battles, let's explore an alternative method of handling our animations - using an animation library.",
 	"Animation libraries handle all of the complicated details - looping, alternating, delaying, easing. They're a must have.",
 	m(

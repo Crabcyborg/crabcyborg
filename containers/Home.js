@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Logo, Posts } from '$app/components';
+import { Logo, Posts, Trigger } from '$app/components';
 
 const github = 'https://github.com/Crabcyborg/crabcyborg';
 
@@ -11,6 +11,16 @@ export var Home = {
 		m('p', "This is an experimental blog/tutorial series, where we start by putting together our very own public domain Frankenstein."),
 		m('h4.mb0', 'Here are the posts:'),
 		m(Posts),
-		m('a.dib.mt3', { href: '/sandbox' }, 'Or go to the Sandbox')
+		m(
+			Trigger,
+			{
+				style: {
+					display: 'inline-block',
+					marginTop: '25px'
+				},
+				onclick: () => m.route.set('/sandbox')
+			},
+			'Or go to the Sandbox'
+		)
 	]
 };

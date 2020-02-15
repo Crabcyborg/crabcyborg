@@ -213,7 +213,7 @@ export const oninit = () => {
 
 export const title = 'Animating your Amalgamation of Animal Appendages';
 
-export const content = [
+export const content = () => [
 	"So far we've only covered the Component so our Lady Tiger looks like a lifeless corpse.",
 	{...lady_tiger},
 	m(Caption, "She's still gorgeous though, isn't she?"),

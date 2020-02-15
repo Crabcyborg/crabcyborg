@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { Trigger } from '$app/components';
 
 const entityMap = {
 	'&': '&amp;',
@@ -42,6 +43,25 @@ const loadGist = (id, gistId) => {
 };
 
 export var Gist = {
-	oninit: v => loadGist(v.attrs.id, v.attrs.gistId),
-	view: v => m('#'+v.attrs.id)
+	oninit: v => {		
+		v.state = { visible: false };
+	},
+	view: v => v.state.visible
+		? m('#'+v.attrs.id)
+		: m(
+			Trigger,
+			{
+				style: {
+					display: 'block'
+				},
+				onclick: () => {
+					if(!v.state.visible) {
+						v.state.visible = true;
+						loadGist(v.attrs.id, v.attrs.gistId);
+					}
+				}
+			},
+			'Load Gist',
+			v.attrs.title && m('span', ': ', v.attrs.title)
+		)
 };

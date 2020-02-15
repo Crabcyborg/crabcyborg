@@ -4,7 +4,7 @@ import { GoToPost, Logo, Monster } from '$app/components';
 
 export var Post = {
 	oninit: v => {
-		const postId = m.route.get().replace('/post/', '');
+		const postId = v.attrs.slug;
 		const post = posts[postId];
 		const { title, content } = post;		
 

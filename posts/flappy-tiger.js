@@ -85,7 +85,7 @@ const lady_tiger_with_wings = {
 	]
 };
 
-export const content = [
+export const content = () => [
 	"The Monster component already includes support for a Wing component, but Lady Tiger wasn't taking any advantage!",
 	"Since Lady Tiger doesn't want to have wings every day, we can just copy her configuration and use our new winged version instead!",
 	m(Gist, {id: 'config-js', gistId: 'ccca084d3f53d5f591421bd62b10acbc'}),
@@ -108,9 +108,9 @@ export const content = [
 	),
 	m(Caption, 'Touch the box to flap!'),
 	"This wonderful, totally feature complete game consists of two simple functions, two commonly shared variables (yMax and ySpeed), and some pretty simple initialization code.",
-	m(Gist, {id: 'flap-js', gistId: 'c28a2862adb7e1f5bc039ac8d92e3eaa'}),
-	m(Gist, {id: 'gravity-js', gistId: '24cddd9fab979f5265f2d09823c2265c'}),
-	m(Gist, {id: 'init-js', gistId: '28e3064a9bfbd299eed6de8b9186398e'}),
+	m(Gist, {title: "Flap Function", id: 'flap-js', gistId: 'c28a2862adb7e1f5bc039ac8d92e3eaa'}),
+	m(Gist, {title: "Gravity Function", id: 'gravity-js', gistId: '24cddd9fab979f5265f2d09823c2265c'}),
+	m(Gist, {title: "Initialization Script", id: 'init-js', gistId: '28e3064a9bfbd299eed6de8b9186398e'}),
 	m('h3', "What's next?"),
 	"We probably want to add obstacles and scoring. Give it a shot and make a pull request!"
 ];

@@ -5,11 +5,10 @@ import { shapes } from '$app/shapeup/shapes';
 export var Logo = {
 	view: v => {
 		const on_homepage = m.route.get() === '/';
-
 		return m(
-			'a.dib',
+			'.dib',
 			{
-				href: on_homepage ? false : '/'
+				onclick: on_homepage ? false : () => m.route.set('/')
 			},
 			m(ShapeUp, {i: 'logo', size: 6, configuration: shapes.LOGO, behaviour: on_homepage ? 'click-target' : false}),
 			on_homepage && m(

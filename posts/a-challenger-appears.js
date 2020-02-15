@@ -189,7 +189,7 @@ girooster.style.bottom = '55px';
 let headbanger = {...girooster, style: {...girooster.style, left: '30px'}};
 let fisticuffer = {...girooster, style: {...girooster.style, bottom: '35px', left: '30px'}};
 
-export const content = [
+export const content = () => [
 	"Why make a fully configurable component based monster and stop at just the one? I get it, it took me time too, Lady Tiger is just so lovable.",
 	"But now I must reveal Girooster - part giraffe, lemur, shark, tiger, leopard, red snapper, rhino, and rooster.",
 	m(

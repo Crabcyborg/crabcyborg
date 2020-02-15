@@ -11,7 +11,7 @@ export const oninit = () => {
 
 const github_url = 'https://github.com/Crabcyborg/crabcyborg'; // this should come from a config
 
-export const content = [
+export const content = () => [
 	{...lady_tiger, id: 'wave-target'},
 	m(Caption, "Lady Tiger says hello!"),
 	"We're going to begin this tutorial series with Lady Tiger, my first Frankenstein.",

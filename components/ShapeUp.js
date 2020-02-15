@@ -3,8 +3,10 @@ import { colors } from '$app/shapeup/colors';
 
 const targets = [128,64,32,16,8,4,2,1];
 
-let highest_colors = {};
-let target_shape_vnodes = {};
+let vnodes = {
+	shapes: {},
+	targets: {}
+};
 
 const shuffle = a => {
 	let j, x, i;
@@ -18,15 +20,15 @@ const shuffle = a => {
 	return a;
 }
 
-const processTargetShapeState = (i, config, retries) => {
-	if(target_shape_vnodes[i] === undefined) {
-		retries === undefined && (retries = 0);
-		retries < 10 && setTimeout(() => processTargetShapeState(i, config, ++retries), 10);
+const processTargetShapeState = (i) => {
+	if(!vnodes.shapes[i] || !vnodes.targets[i]) {
 		return;
 	}
 
-	const v = target_shape_vnodes[i];
-	const { coordinates, color } = config;
+	const shape = vnodes.shapes[i];
+	const target = vnodes.targets[i];
+	const color = shape.state.highest_color;
+	const coordinates = shape.state.highest_color_coordinates;
 
 	let min_x = false, min_y = false, max_x = 0, max_y = 0;
 	for(let coordinate of coordinates) {
@@ -36,15 +38,15 @@ const processTargetShapeState = (i, config, retries) => {
 		(min_y === false || coordinate.y < min_y) && (min_y = coordinate.y);
 	}
 
-	v.state.ready = true;
-	v.state.coordinates = coordinates;
-	v.state.min_x = min_x;
-	v.state.min_y = min_y;
-	v.state.max_x = max_x;
-	v.state.max_y = max_y;
-	v.state.color = color;
-	v.state.width = ((max_x-min_x)*v.attrs.size)+'px';
-	v.state.height = ((max_y-min_y)*v.attrs.size)+'px';
+	target.state.ready = true;
+	target.state.coordinates = coordinates;
+	target.state.min_x = min_x;
+	target.state.min_y = min_y;
+	target.state.max_x = max_x;
+	target.state.max_y = max_y;
+	target.state.color = color;
+	target.state.width = ((max_x-min_x)*target.attrs.size)+'px';
+	target.state.height = ((max_y-min_y)*target.attrs.size)+'px';
 };
 
 const updateShapeUpComponent = (v) => {
@@ -174,21 +176,20 @@ const updateShapeUpComponent = (v) => {
 	v.state.height = height;
 	v.state.grid = grid;
 	v.state.highest_color = highest_color;
+	v.state.highest_color_coordinates = coordinates_by_color[highest_color];
 
-	v.attrs.behaviour === 'click-target' && processTargetShapeState(
-		v.attrs.i,
-		{
-			color: highest_color,
-			coordinates: coordinates_by_color[highest_color]
-		}
-	);
+	switch(v.attrs.behaviour) {
+		case 'click-target': {
+			processTargetShapeState(v.attrs.i);
+		} break;
 
-	setTimeout(m.redraw, 10);
-
-	v.attrs.behaviour === 'blink' && setTimeout(
-		() => updateShapeUpComponent(v),
-		v.attrs.blink_delay ? (typeof v.attrs.blink_delay === 'function' ? v.attrs.blink_delay() : v.attrs.blink_delay) : 100
-	);
+		case 'blink': {
+			setTimeout(
+				() => updateShapeUpComponent(v),
+				v.attrs.blink_delay ? (typeof v.attrs.blink_delay === 'function' ? v.attrs.blink_delay() : v.attrs.blink_delay) : 100
+			);
+		} break;
+	}
 };
 
 export const Cell = {
@@ -203,6 +204,7 @@ export const Cell = {
 export const ShapeUp = {
 	oninit: v => {
 		v.state = {};
+		v.attrs.i && (vnodes.shapes[v.attrs.i] = v);
 		updateShapeUpComponent(v);
 	},
 	view: v => m(
@@ -218,17 +220,15 @@ export const ShapeUp = {
 
 export const TargetShape = {
 	oninit: v => {
-		v.state = {
-			ready: false
-		};
-
-		target_shape_vnodes[v.attrs.i] = v;
+		v.state = { ready: false };
+		vnodes.targets[v.attrs.i] = v;
+		processTargetShapeState(v.attrs.i);
 	},
 	view: v => {
-		const { ready, min_x, min_y, max_x, max_y, color, coordinates, width, height } = v.state;
+		const { ready, min_x, min_y, color, coordinates, width, height } = v.state;
 		return ready && m(
 			'.relative.dib.mr2',
-			{ style: { width, height } },
+			{ style: { width, height, ...v.attrs.style } },
 			coordinates.map(
 				coordinate => m('.absolute', {
 					style: {
