@@ -5,6 +5,11 @@ import * as assets from '$app/assets';
 
 export const wave = (id) => {
 	const target = document.getElementById(id);
+
+	if(!target) {
+		return;
+	}
+
 	const head = target.childNodes[0];
 	const lower_section = target.childNodes[2];
 	const paw = lower_section.childNodes[4];
@@ -46,6 +51,11 @@ export const wave = (id) => {
 
 export const headbang = (id) => {
 	const target = document.getElementById(id);
+
+	if(!target) {
+		return;
+	}
+
 	const head = target.childNodes[0];
 	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
@@ -77,6 +87,11 @@ export const headbang = (id) => {
 
 export const walk = (id) => {
 	const target = document.getElementById(id);
+
+	if(!target) {
+		return;
+	}
+
 	const legs = Array.from(target.childNodes[2].childNodes).slice(1);
 
 	let scaleX = 1;
@@ -114,6 +129,11 @@ export const walk = (id) => {
 
 export const attack = (id) => {
 	const target = document.getElementById(id);
+
+	if(!target) {
+		return;
+	}
+	
 	target.style.transition = 'transform .8s ease-in-out';
 	target.style.transformOrigin = '20% 60%';
 	target.style.transform = 'rotate(-30deg)';

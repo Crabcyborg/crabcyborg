@@ -177,7 +177,7 @@ const updateShapeUpComponent = v => {
 		} break;
 
 		case 'blink': {
-			setTimeout(
+			v.state.blink_timeout = setTimeout(
 				() => {
 					updateShapeUpComponent(v);
 					m.redraw();
@@ -244,6 +244,9 @@ export const ShapeUp = {
 		switch(details.task) {
 			case 'redraw': updateShapeUpComponent(vnodes.shapes[details.i]); break;
 		}
+	},
+	onremove: v => {
+		v.attrs.behaviour === 'blink' && clearTimeout(v.state.blink_timeout);
 	}
 };
 

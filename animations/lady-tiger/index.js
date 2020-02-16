@@ -34,6 +34,11 @@ export const jump = id => {
 
 export const wave = (id) => {
 	const target = document.getElementById(id);
+
+	if(!target) {
+		return;
+	}
+
 	const lower_section = target.childNodes[2];
 	const claw = lower_section.childNodes[4];
 	const other_legs = Array.from(lower_section.childNodes).slice(1, 4);
