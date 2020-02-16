@@ -1,13 +1,16 @@
 import m from 'mithril';
 import { config as girooster } from '$app/monsters/girooster';
+import { config as zebrelephant } from '$app/monsters/zebrelephant';
 import { Caption, Gist, Monster } from '$app/components';
 import { wave } from '$app/animations/girooster';
+import { bounce } from '$app/animations/zebrelephant';
 import * as assets from '$app/assets';
 
 export const title = 'Using Anime.js';
 
 export const oninit = () => {
 	wave('wave-target');
+	bounce('bounce-target');
 };
 
 export const content = () => [
@@ -28,7 +31,9 @@ export const content = () => [
 	),
 	m(Caption, "Wax on, wax off"),
 	m(Gist, {id: 'wave-js', gistId: '4b61f0c00d7558649fac415ff38bb2c0'}),
-	"So much better. Let's never talk about the other way again moving forward."
+	m('.tc.center', { style: { height: '260px' } }, m(Monster, {configuration: {...zebrelephant, style: {...zebrelephant.style, left: '', right: '25px'}}, id: 'bounce-target'})),
+	m(Gist, {id: 'bounce-js', gistId: '14e8e66ce553fe1a8c116cd51e2db864'}),
+	"So much better. Let's never talk about the other way again moving forward.",
 ];
 
 export const previous = 'a-challenger-appears';
