@@ -36,6 +36,8 @@ export const content = () => [
 				}
 			},
 			m(Gist, {title: 'Animating Ben', id: 'ben-js', gistId: 'f2ce1ce2721dd5c8e84a57788cb9e62c'})
-		)
+		),
+		m(ShapeUp, {configuration: shapes.EARTH, size: 6, behaviour: 'scatter', style: { marginTop: '25px' }}),
+		m(Gist, {id: 'scatter-js', gistId: 'cf7089adccf9d42f9917bd968af73c5b'})
 	)
 ];

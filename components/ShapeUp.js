@@ -1,6 +1,7 @@
 import m from 'mithril';
 import { colors } from '$app/shapeup/colors';
 import { injectClassDefinition, injectClassDefinitions, shuffle } from '$app/helpers';
+import anime from 'animejs/lib/anime.es.js';
 
 const class_prefix = 'su';
 const color_class_prefix = 'c';
@@ -183,6 +184,22 @@ const updateShapeUpComponent = v => {
 				},
 				v.attrs.blink_delay ? (typeof v.attrs.blink_delay === 'function' ? v.attrs.blink_delay() : v.attrs.blink_delay) : 100
 			);
+		} break;
+
+		case 'scatter': {
+			const step = 150;
+			const duration = step*(color_keys.length+4)*2;
+			let delay = -step;
+			for(let color_index of color_keys) {
+				setTimeout(() => anime({
+					targets: `.${class_prefix}${v.state.index} .${class_prefix}${color_class_prefix}${color_index}`,
+					translateX: [75, 0, 75],
+					direction: 'alternate',
+					loop: true,
+					duration,
+					easing: 'easeInOutExpo'
+				}), delay += step);
+			}
 		} break;
 	}
 };
