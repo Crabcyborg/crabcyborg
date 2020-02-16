@@ -1,11 +1,20 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Cell, Score } from '$app/components';
+import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 
 export const title = 'Recreating Shape Up with Mithril.js';
 
 const targets = [128,64,32,16,8,4,2,1];
 const size = 6;
+
+export const Cell = {
+	view: v => m(
+		'div',
+		{
+			style: { width: `${v.attrs.size}px`, height: `${v.attrs.size}px`, backgroundColor: v.attrs.color, float: 'left' }
+		}
+	)
+};
 
 const ShapeOnly = {
 	oninit: v => {
