@@ -20,8 +20,12 @@ export const Cell = {
 	)
 };
 
+const frameDuration = v => {
+	return v.attrs.frame_duration || 600;
+}
+
 const initialize = v => {
-	const level = levels[v.state.level_index % levels.length];
+	const level = levels[(v.state.level_index + levels.length) % levels.length];
 	const [ height ] = level;
 	const row_size = (level.length-1)/height;
 	
@@ -43,8 +47,12 @@ const initialize = v => {
 };
 
 const moveBlocky = v => {
+	const { grid } = v.state;
+	const height = grid.length;
 	const { x, y } = v.state.blocky_coordinates;
-	x >= 0 && x < v.state.grid[y].length && (v.state.grid[y][x].type = AIR);
+	const width = grid[y].length;
+
+	x >= 0 && x < width && (grid[y][x].type = AIR);
 
 	v.state.blocky_coordinates.x += v.state.x_speed;
 	v.state.blocky_coordinates.y += v.state.y_speed;
@@ -52,7 +60,7 @@ const moveBlocky = v => {
 	let move = false;
 
 	if(v.state.x_speed > 0) {
-		if(v.state.blocky_coordinates.x < v.state.grid[y].length) {
+		if(v.state.blocky_coordinates.x < grid[y].length) {
 			move = true;
 		} else {
 			++v.state.level_index;
@@ -63,25 +71,25 @@ const moveBlocky = v => {
 		if(v.state.blocky_coordinates.x >= 0) {
 			move = true;
 		} else {
-			--v.state.level_index;
-			initialize(v);
-		//	v.state.x_speed = 1;
+		//	--v.state.level_index;
+		//	initialize(v);
+			v.state.x_speed = 1;
 		}
 	}
 
-	if(v.state.blocky_coordinates.y === v.state.grid.length) {
+	if(v.state.blocky_coordinates.y === grid.length) {
 		move = false;
-		setTimeout(() => initialize(v), 1000);
+		setTimeout(() => initialize(v), frameDuration(v));
 	}
 
 	if(move) {
-		const target = v.state.grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x];
+		const target = grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x];
 
 		switch(target.type) {
 			case ENEMY: {
 				if(v.state.y_speed > 0) {
-					v.state.grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x].type = AIR;
-					v.state.grid[v.state.blocky_coordinates.y-1][v.state.blocky_coordinates.x].type = BLOCKY;
+					grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x].type = AIR;
+					grid[v.state.blocky_coordinates.y-1][v.state.blocky_coordinates.x].type = BLOCKY;
 					v.state.blocky_coordinates.y = y;
 					v.state.y_speed = -2;
 				} else {
@@ -98,15 +106,15 @@ const moveBlocky = v => {
 
 				v.state.blocky_coordinates.y = y;
 				v.state.blocky_coordinates.x = x;
-				v.state.grid[y][x].type = BLOCKY;
+				grid[y][x].type = BLOCKY;
 				moveBlocky(v);
 				return;
 			} break;
 
 			case AIR: {
-				v.state.grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x].type = BLOCKY;
+				grid[v.state.blocky_coordinates.y][v.state.blocky_coordinates.x].type = BLOCKY;
 
-				if(v.state.blocky_coordinates.y+1 === v.state.grid.length || v.state.grid[v.state.blocky_coordinates.y+1][v.state.blocky_coordinates.x].type === AIR) {
+				if(v.state.blocky_coordinates.y+1 === grid.length || grid[v.state.blocky_coordinates.y+1][v.state.blocky_coordinates.x].type === AIR) {
 					v.state.y_speed = 1;					
 				}
 			} break;
@@ -119,14 +127,14 @@ const moveBlocky = v => {
 	}
 
 	m.redraw();
-	setTimeout(() => moveBlocky(v), 1000);
+	setTimeout(() => moveBlocky(v), frameDuration(v));
 };
 
 export const Blocky = {
 	oninit: v => {
 		v.state = { level_index: v.attrs.level_index };
 		initialize(v);
-		setTimeout(() => moveBlocky(v), 1000);
+		setTimeout(() => moveBlocky(v), frameDuration(v));
 	},
 	view: v => m(
 		'.dib',
