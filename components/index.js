@@ -8,3 +8,4 @@ export * from './Posts';
 export * from './Experiments';
 export * from './ShapeUp';
 export * from './Trigger';
+export * from './Blocky';

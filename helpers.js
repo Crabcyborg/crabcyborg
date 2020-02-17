@@ -9,7 +9,7 @@ export const injectClassDefinitions = definitions => {
 
 export const injectClassDefinition = (selector, style) => {
 	injectClassDefinitions([{ selector, style }]);
-}
+};
 
 export const shuffle = a => {
 	let j, x, i;
@@ -21,4 +21,8 @@ export const shuffle = a => {
 	}
 
 	return a;
-}
+};
+
+export const range = length => {
+	return Array.from({length}, (x,i) => i);
+};
