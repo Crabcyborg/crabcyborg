@@ -23,6 +23,5 @@ export const shuffle = a => {
 	return a;
 };
 
-export const range = length => {
-	return Array.from({length}, (x,i) => i);
-};
+export const range = length => Array.from({length}, (x,i) => i);
+export const between = (value, a, b) => value >= Math.min(a,b) && value <= Math.max(a,b);
