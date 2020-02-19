@@ -1,9 +1,12 @@
 import m from 'mithril';
 import { Trigger } from '$app/components';
 import { levels } from '$app/blocky/levels';
-import { between } from '$app/helpers';
+import { between, injectClassDefinition, injectClassDefinitions } from '$app/helpers';
 
-const size = 24;
+const class_prefix = 'bl';
+const color_class_prefix = 'c';
+let index = 0;
+let initialized = false;
 
 const
 AIR = 0,
@@ -19,7 +22,7 @@ LOCK = 9,
 KEY = 10,
 CRUMBLING_PLATFORM = 11;
 
-let color_by_type = {
+const color_by_type = {
 	[AIR]: 'lightblue',
 	[WALL]: 'darkgray',
 	[BLOCKY]: 'tomato',
@@ -34,19 +37,6 @@ let color_by_type = {
 	[CRUMBLING_PLATFORM]: 'brown'
 };
 
-export const Cell = {
-	view: v => m(
-		'div',
-		{
-			style: { width: `${v.attrs.size}px`, height: `${v.attrs.size}px`, backgroundColor: color_by_type[v.attrs.type], float: 'left' }
-		}
-	)
-};
-
-const frameDuration = v => {
-	return v.attrs.frame_duration || 600;
-};
-
 const useType = (v, type, details) => {
 	switch(type) {
 		case LOCK: return v.state.has_key ? AIR : (details && details.rendering ? LOCK : WALL);
@@ -56,33 +46,40 @@ const useType = (v, type, details) => {
 	}
 };
 
-const getBlinkType = v => {
-	return v.state.frame_index % 6 <= 3 ? WALL : AIR;
-};
+const frameDuration = v => v.attrs.frame_duration || 600;
+const getBlinkType = v => v.state.frame_index % 6 <= 3 ? WALL : AIR;
+const getLevel = v => levels[(v.state.level_index + levels.length) % levels.length];
 
 const updateWaterPhysics = (v, force) => {
+	if(v.state.y_speed === -1) {
+		v.state.offset_water_physics = v.state.frame_index % 2;
+	}
+
 	if(force || v.state.previous_target_type === WATER) {
-		v.state.y_speed >= 0 && (v.state.y_speed = 1 - v.state.y_speed);
+		if(v.state.y_speed >= 0) {
+			v.state.y_speed = 1 - v.state.y_speed;
+		} else if(v.state.frame_index % 2 === (v.state.offset_water_physics || 0)) {
+			v.state.y_speed++;
+		}
+
 		v.state.water_physics_timeout && clearTimeout(v.state.water_physics_timeout);
 		v.state.water_physics_timeout = setTimeout(() => updateWaterPhysics(v), frameDuration(v)*2);
 	}
 };
 
-const getLevel = v => levels[(v.state.level_index + levels.length) % levels.length];
-
 const checkSpaceUnderneath = v => {
+	if(v.state.y_speed < 0) {
+		return;
+	}
+
 	const { grid } = v.state;
 	const height = grid.length;
 	if(v.state.blocky_coordinates.y+1 < height) {
 		const grid_space_underneath = grid[v.state.blocky_coordinates.y+1][v.state.blocky_coordinates.x];
 		switch(useType(v, grid_space_underneath.type)) {
 			case AIR: v.state.y_speed = 1; break;
-			case WATER: {						
-				updateWaterPhysics(v, true);
-			} break;
-			case CRUMBLING_PLATFORM: {
-				setTimeout(() => grid_space_underneath.type = AIR, frameDuration(v)*2);
-			} break;
+			case WATER: updateWaterPhysics(v, true); break;
+			case CRUMBLING_PLATFORM: setTimeout(() => grid_space_underneath.type = AIR, frameDuration(v)*2); break;
 			case TRAMPOLINE: v.state.y_speed === 0 && (v.state.y_speed = -2); break;
 		}
 	} else {
@@ -95,10 +92,10 @@ const initialize = v => {
 	const [ height ] = level;
 	const row_size = (level.length-1)/height;
 	
-	let grid = [], row = [], index = 0, blocky_coordinates = false;
-	while(++index < level.length) {
-		level[index] === BLOCKY && (blocky_coordinates = {index, x: row.length, y: grid.length});
-		row.push({type: level[index]});
+	let grid = [], row = [], level_index = 0, blocky_coordinates = false;
+	while(++level_index < level.length) {
+		level[level_index] === BLOCKY && (blocky_coordinates = {level_index, x: row.length, y: grid.length});
+		row.push({type: level[level_index]});
 
 		if(row.length === row_size) {
 			grid.push(row);
@@ -193,7 +190,7 @@ const moveBlocky = v => {
 			case WATER: {
 				v.state.previous_target_type = target.type;
 				target.type = BLOCKY;
-				v.state.frame_index % 2 === 0 && checkSpaceUnderneath(v);
+				v.state.frame_index % 2 === (v.state.offset_water_physics || 0) && checkSpaceUnderneath(v);
 			} break;
 
 			case PIPE: {
@@ -223,6 +220,7 @@ const moveBlocky = v => {
 	}
 
 	switch(v.state.y_speed) {
+		case -3: v.state.y_speed = -2; break;
 		case -2: v.state.y_speed = -1; break;
 		case -1: v.state.y_speed = 1; break;
 	}
@@ -236,29 +234,46 @@ const moveBlocky = v => {
 
 export const Blocky = {
 	oninit: v => {
-		v.state = { level_index: v.attrs.level_index };
+		if(!initialized) {
+			let definitions = [];
+			let color_index = 0;
+
+			const types = Object.keys(color_by_type);
+
+			for(let type of types) {
+				definitions.push({
+					selector: `.${class_prefix}${color_class_prefix}${type}`,
+					style: `background-color: ${color_by_type[type]}`
+				});
+			}
+			injectClassDefinitions(definitions);
+			initialized = true;
+		}
+
+		v.state = { level_index: v.attrs.level_index, index: index++ };
 		initialize(v);
 		setTimeout(() => moveBlocky(v), frameDuration(v));
+		injectClassDefinition(`.${class_prefix}${v.state.index} > div > div`, `float: left; width: ${v.attrs.size}px; height: ${v.attrs.size}px;`);
 	},
 	view: v => m(
 		'.dib',
 		m(
-			'div',
+			`.${class_prefix}${v.state.index}`,
 			{ onclick: () => v.state.y_speed === 0 && (v.state.y_speed = -1) },
-			v.state.grid.map(row => m('div', { style: `height: ${size}px;` }, row.map(cell => m(Cell, { type: useType(v, cell.type, {rendering: true}), size}))))
+			v.state.grid.map(row => m('div', row.map(cell => m(`.${class_prefix}${color_class_prefix}`+useType(v, cell.type, {rendering: true})))))
 		),
 		v.attrs.display_level_picker && m(
-			'div',
-			levels.map((level, index) => m(
+			'.dib',
+			levels.map((level, level_index) => m(
 				Trigger,
 				{
 					onclick: () => {
-						v.state.level_index = index;
+						v.state.level_index = level_index;
 						initialize(v)
 					},
 					style: { marginRight: '4px' }
 				},
-				index
+				level_index
 			))
 		)
 	)

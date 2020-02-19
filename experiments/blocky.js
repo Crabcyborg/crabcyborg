@@ -7,12 +7,14 @@ export var experiment = {
 	view: v => [
 		m(
 			'div',
-			m(Blocky,
+			m(
+				Blocky,
 				{
-				level_index: 0,
-				frame_duration: 250,
-				display_level_picker: true,
-			//	repeat: true
+					level_index: 0,
+					frame_duration: 250,
+					size: 24,
+					display_level_picker: true,
+				//	repeat: true
 				}
 			)
 		)
