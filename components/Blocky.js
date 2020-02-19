@@ -20,7 +20,8 @@ WATER = 7,
 PIPE = 8,
 LOCK = 9,
 KEY = 10,
-CRUMBLING_PLATFORM = 11;
+CRUMBLING_PLATFORM = 11,
+BLINKING_SPIKE = 12;
 
 const color_by_type = {
 	[AIR]: 'lightblue',
@@ -34,20 +35,21 @@ const color_by_type = {
 	[PIPE]: 'lightgreen',
 	[LOCK]: 'black',
 	[KEY]: 'gold',
-	[CRUMBLING_PLATFORM]: 'brown'
+	[CRUMBLING_PLATFORM]: 'brown',
+	[BLINKING_SPIKE]: 'orange'
 };
 
 const useType = (v, type, details) => {
 	switch(type) {
 		case LOCK: return v.state.has_key ? AIR : (details && details.rendering ? LOCK : WALL);
-		case BLINK: return getBlinkType(v);
+		case BLINK: return v => v.state.frame_index % 6 <= 3 ? WALL : AIR;
+		case BLINKING_SPIKE: return v.state.frame_index % 6 <= 3 ? (details && details.rendering ? BLINKING_SPIKE : SPIKE) : AIR;
 		case CRUMBLING_PLATFORM: return details && details.occupying ? WALL : CRUMBLING_PLATFORM;
 		default: return type;
 	}
 };
 
 const frameDuration = v => v.attrs.frame_duration || 600;
-const getBlinkType = v => v.state.frame_index % 6 <= 3 ? WALL : AIR;
 const getLevel = v => levels[(v.state.level_index + levels.length) % levels.length];
 
 const updateWaterPhysics = (v, force) => {

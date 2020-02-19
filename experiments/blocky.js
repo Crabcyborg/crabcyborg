@@ -14,7 +14,7 @@ export var experiment = {
 					frame_duration: 250,
 					size: 24,
 					display_level_picker: true,
-				//	repeat: true
+					repeat: true
 				}
 			)
 		)
