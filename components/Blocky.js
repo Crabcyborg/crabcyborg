@@ -42,7 +42,7 @@ const color_by_type = {
 const useType = (v, type, details) => {
 	switch(type) {
 		case LOCK: return v.state.has_key ? AIR : (details && details.rendering ? LOCK : WALL);
-		case BLINK: return v => v.state.frame_index % 6 <= 3 ? WALL : AIR;
+		case BLINK: return v.state.frame_index % 6 <= 3 ? WALL : AIR;
 		case BLINKING_SPIKE: return v.state.frame_index % 6 <= 3 ? (details && details.rendering ? BLINKING_SPIKE : SPIKE) : AIR;
 		case CRUMBLING_PLATFORM: return details && details.occupying ? WALL : CRUMBLING_PLATFORM;
 		default: return type;
@@ -85,21 +85,21 @@ const checkSpaceUnderneath = v => {
 			case TRAMPOLINE: v.state.y_speed === 0 && (v.state.y_speed = -2); break;
 		}
 	} else {
-		v.state.y_speed = 1;
+	//	v.state.y_speed = 1;
 	}
 };
 
 const initialize = v => {
 	const level = getLevel(v);
 	const [ height ] = level;
-	const row_size = (level.length-1)/height;
+	const width = (level.length-1)/height;
 	
 	let grid = [], row = [], level_index = 0, blocky_coordinates = false;
 	while(++level_index < level.length) {
 		level[level_index] === BLOCKY && (blocky_coordinates = {level_index, x: row.length, y: grid.length});
 		row.push({type: level[level_index]});
 
-		if(row.length === row_size) {
+		if(row.length === width) {
 			grid.push(row);
 			row = [];
 		}
@@ -113,6 +113,10 @@ const initialize = v => {
 	v.state.x_speed = 1;
 	v.state.y_speed = 0;
 	v.state.blocky_coordinates = blocky_coordinates;
+	v.state.height = height;
+	v.state.width = width;
+
+	v.attrs.onInitialize && v.attrs.onInitialize(v);
 };
 
 const moveBlocky = v => {
@@ -229,6 +233,15 @@ const moveBlocky = v => {
 
 	v.state.safe = safe;
 	v.state.frame_index++;
+
+	v.attrs.onMovedBlocky && v.attrs.onMovedBlocky({
+		old_x: x,
+		old_y: y,
+		new_x: v.state.blocky_coordinates.x,
+		new_y: v.state.blocky_coordinates.y,
+		width,
+		height
+	});
 
 	m.redraw();
 	setTimeout(() => moveBlocky(v), frameDuration(v));

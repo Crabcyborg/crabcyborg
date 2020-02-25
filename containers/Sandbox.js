@@ -29,8 +29,28 @@ m(
 ),
 */
 
-const oncreate = v => {
+/*
+const size = 24;
 
+let myPerceptron;
+let myTrainer;
+let train;
+
+const nn = v => {
+	myPerceptron = new synaptic.Architect.Perceptron(2,2,2);
+	myTrainer = new synaptic.Trainer(myPerceptron);
+	train = data => myTrainer.train(data, {rate: 0.1, iterations: 1000});
+};
+*/
+
+const oninit = v => {
+/*
+	v.state = { vars: {}, ghosty: { style: {} } };
+	var script = document.createElement('script');
+	script.src = 'https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js';
+	script.addEventListener('load', () => nn(v));
+	document.body.appendChild(script);
+*/
 
 //	bounce('zebrelephant');
 //	wave('girooster');
@@ -79,10 +99,58 @@ const oncreate = v => {
 	*/
 };
 
+/*
+const Ghosty = {
+	view: v => m(
+		'.absolute',
+		{ style: v.attrs.style },
+		'boo'
+	)
+};
+
+const updateGhosty = v => {
+	const { width, height } = v.state.vars;	
+	const input = [(v.state.ghosty.x || 0)/width, (v.state.ghosty.y || 0)/height];
+	const output = myPerceptron.activate(input);
+	v.state.ghosty.x = output[0]*width;
+	v.state.ghosty.y = output[1]*height;
+	v.state.ghosty.style.left = v.state.ghosty.x*size+'px';
+	v.state.ghosty.style.top = v.state.ghosty.y*size+'px';
+};
+
+let training = [];
+*/
+
 export var Sandbox = {
-	oncreate,
+	oninit,
 	view: v => [
-//		m('div', m(Blocky, {level_index: 0})),
+	//	m('p', m('b', 'vars'), ' ', JSON.stringify(v.state.vars)),
+	//	m('p', m('b', 'ghosty'), ' x: ', v.state.ghosty.x, ' y: ', v.state.ghosty.y),
+	/*
+		m(
+			'.relative',
+			m(
+				Blocky,
+				{
+					level_index: 0,
+					size,
+					onInitialize: blocky => {
+						v.state.ghosty.x = v.state.ghosty.y = 0;
+					},
+					onMovedBlocky: vars => {
+						const {old_x, old_y, new_x, new_y, width, height} = vars;
+						const input = [old_x/width, old_y/height];
+						const output = [new_x/width, new_y/height];
+						v.state.vars = { ...vars, input, output };
+						training.push({input, output});
+						train(training);
+						updateGhosty(v);
+					}
+				}
+			),
+			m(Ghosty, {...v.state.ghosty})
+		)
+		*/
 //		m('div', m(Blocky, {level_index: 1, display_level_picker: true}))
 //		m(ShapeUp, {configuration: shapes.HORSE, size: 6, id: 'horse', style: { margin: '100px 0 0 100px' }}),
 //		m(ShapeUp, {id: 'ben2', style: { position: 'absolute', right: '10px' }, configuration: shapes.BEN, size: 6, behaviour: 'blink', blink_delay: 1000}),
