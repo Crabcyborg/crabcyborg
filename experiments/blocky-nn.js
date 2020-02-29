@@ -4,9 +4,10 @@ import { injectScript } from '$app/helpers';
 
 const size = 24;
 let perceptron;
+let rate = 0.5;
 
 const oninit = v => {
-	v.state = { vars: {}, ghosty: { style: {} } };
+	v.state = { vars: {}, ghosty: { x: 0, y: 0, style: {} } };
 
 	injectScript('https://cdnjs.cloudflare.com/ajax/libs/synaptic/1.1.4/synaptic.js', () => {
 		perceptron = new synaptic.Architect.Perceptron(2,2,2);
@@ -14,17 +15,22 @@ const oninit = v => {
 };
 
 const Ghosty = {
-	view: v => m('.absolute.unclickable', { style: v.attrs.style }, 'boo')
+	view: v => m('.absolute.unclickable', { style: {...v.attrs.style, color: '#6600cc'} }, 'boo')
 };
 
 const updateGhosty = v => {
-	const { width, height } = v.state.vars;	
-	const input = [(v.state.ghosty.x || 0)/width, (v.state.ghosty.y || 0)/height];
+	if(perceptron === undefined) {
+		return;
+	}
+
+	let { ghosty, vars } = v.state;
+	const { width, height } = vars;	
+	const input = [ghosty.x/width, ghosty.y/height];
 	const output = perceptron.activate(input);
-	v.state.ghosty.x = output[0]*width;
-	v.state.ghosty.y = output[1]*height;
-	v.state.ghosty.style.left = v.state.ghosty.x*size+'px';
-	v.state.ghosty.style.top = v.state.ghosty.y*size+'px';
+	ghosty.x = output[0]*width;
+	ghosty.y = output[1]*height;
+	ghosty.style.left = ghosty.x*size+'px';
+	ghosty.style.top = ghosty.y*size+'px';
 };
 
 export var title = 'Blocky with an Artificial Neural Network';
@@ -39,21 +45,22 @@ export var experiment = {
 				{
 					level_index: 0,
 					size,
-					onInitialize: blocky => {
-						v.state.ghosty.x = v.state.ghosty.y = 0;
-					},
 					onMovedBlocky: vars => {
 						const {old_x, old_y, new_x, new_y, width, height} = vars;
 						const input = [old_x/width, old_y/height];
 						const output = [new_x/width, new_y/height];
 						v.state.vars = { ...vars, input, output };
-						perceptron.propagate(0.5, output);
+						perceptron.propagate(rate, output);
 						updateGhosty(v);
 					}
 				}
 			),
 			m(Ghosty, {style: v.state.ghosty.style}),
-			m('p.f7.mt3', { style: { maxWidth: '600px', width: '100%' } }, "I've been learning about Data Science and wanted to try using an Artificial Neural Network with one of my current experiments. Thanks to synaptic JS it is pretty easy to get a simple Proceptron working. Ghosty learns where to move by setting the points before and after Blocky moves, then using its own points determines where to move. Blocky sends input to the Proceptron and Ghosty uses the Proceptron to determine its outputs but the two components don't know of one another's existence. It's not much, but it was fun.")
+			m('div',
+				m('input[type=range]', {min: 0.01, max: 1, step: 0.01, value: rate, oninput: e => rate = e.target.value}),
+				m('span.cambay.ml3', rate)
+			),
+			m('p.f7.mt3', { style: { maxWidth: '600px', width: '100%' } }, "I've been learning about Data Science and wanted to try using an Artificial Neural Network with one of my current experiments. Thanks to ", m('a.f7', {href: 'https://caza.la/synaptic', target:'_blank'}, 'synaptic.js'), " it is pretty easy to get a simple perceptron working. When Blocky moves, he sends his new position to the perceptron. Ghosty then sends an input to the same perceptron and determines her new position from the output. They use the same perceptron and they do not communicate to one another but Ghosty still follows Blocky around. I've added a learning rate slider that changes the speed that Ghosty follows at.")
 		)
 	]
 };

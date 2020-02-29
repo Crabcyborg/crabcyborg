@@ -32,3 +32,5 @@ export const shuffle = a => {
 
 export const range = length => Array.from({length}, (x,i) => i);
 export const between = (value, a, b) => value >= Math.min(a,b) && value <= Math.max(a,b);
+export const sum = values => values.reduce((total, value) => total + value);
+export const average = values => sum(values) / values.length;

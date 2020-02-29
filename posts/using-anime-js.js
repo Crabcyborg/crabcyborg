@@ -14,7 +14,7 @@ export const oninit = () => {
 };
 
 export const content = () => [
-	"Before we get into any epic crab battles, let's explore an alternative method of handling our animations - using an animation library.",
+	m('p', "Before we get into any epic crab battles, let's explore an alternative method of handling our animations - using an animation library. I chose to use ", m('a', {href:'https://animejs.com', target:'_blank'}, 'anime.js'), '.'),
 	"Animation libraries handle all of the complicated details - looping, alternating, delaying, easing. They're a must have.",
 	m(
 		'.tc.center.overflow-hidden',
