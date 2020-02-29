@@ -1,3 +1,10 @@
+export const injectScript = (src, callback) => {
+	var script = document.createElement('script');
+	script.src = src;
+	callback !== undefined && script.addEventListener('load', callback);
+	document.body.appendChild(script);
+}
+
 export const injectClassDefinitions = definitions => {
 	var element = document.createElement('style');
 	for(let definition of definitions) {
