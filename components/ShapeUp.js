@@ -49,13 +49,13 @@ const updateShapeUpComponent = v => {
 
 	const [ height, width ] = configuration;
 	let x = -1, y = -1, data_index = 2, target_index = 0, color_index = 0, grid = [], unassigned = [];
-	let random_target = 0.3;
+	let random_target = 0.1;
 	let count_by_color_index = {}, coordinates_by_color_index = {};
 
 	const use_colors = shuffle(Array.from({length: colors.length}, (x,i) => i));
 
 	const assign = (target, adjacent) => {
-		if(adjacent.empty || adjacent.unassigned) {
+		if(adjacent.empty || adjacent.unassigned || coordinates_by_color_index[adjacent.color_index] === undefined) {
 			return false;
 		}
 
@@ -102,7 +102,7 @@ const updateShapeUpComponent = v => {
 
 				if(obj.unassigned) {
 					obj.color_index = use_colors[color_index++];
-					color_index % 5 === 0 && (random_target = Math.max(random_target + .5, .9));
+					color_index % 5 === 0 && (random_target = Math.max(random_target + .5, 1));
 
 					if(color_index+1 >= colors.length) {
 						delete obj.color_index;
@@ -141,11 +141,11 @@ const updateShapeUpComponent = v => {
 				let check = checks.splice(random_index, 1);
 
 				if(assign(obj, check)) {
-					return true;
+					return false;
 				}
 			}
 
-			return false;
+			return true;
 		});
 	}
 

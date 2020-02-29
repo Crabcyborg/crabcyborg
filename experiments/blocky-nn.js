@@ -15,7 +15,7 @@ const oninit = v => {
 };
 
 const Ghosty = {
-	view: v => m('.absolute.unclickable', { style: {...v.attrs.style, color: '#6600cc'} }, 'boo')
+	view: v => m('.absolute.unclickable', { style: {...v.attrs.style, color: '#6600cc', opacity: 0.65} }, 'boo')
 };
 
 const updateGhosty = v => {
@@ -50,6 +50,7 @@ export var experiment = {
 						const input = [old_x/width, old_y/height];
 						const output = [new_x/width, new_y/height];
 						v.state.vars = { ...vars, input, output };
+						perceptron.activate(input);
 						perceptron.propagate(rate, output);
 						updateGhosty(v);
 					}

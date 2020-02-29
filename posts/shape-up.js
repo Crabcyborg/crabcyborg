@@ -69,7 +69,7 @@ export const content = () => [
 	"This handy code (yes, it uses a bitwise AND operator) takes that configuration data and creates an array (rows) of arrays (cells) containing, at this moment, a color.",
 	m(Gist, {title: 'Rendering a Basic ShapeUp Object with Mithril.js', id: 'mithril-component-js', gistId: '0a04080738c84c6626c034fbde2af00e'}),
 	"Mithril makes it really simple to turn that data into a ton of divs, but it's sort of boring. Let's give it some life!",
-	m(Gist, {title: 'Render a ShapeUp Object with nested Shapes', id: 'shapeup-js', gistId: '979191a7e0cf14a3a44277a3f00c5538'}),
+	m(Gist, {title: 'Render a ShapeUp Object with nested Shapes', id: 'shapeup-js', gistId: '83512d1e66d38821726e60101b8eb996'}),
 	"There are a lot of ways you could write this, and I encourage you to play with it yourself as well.",
 	"In my example, I try to fill in colors during initial loop where I'm also determining is a space should be filled. This means that the squares to the left and the top will be set, but any future cells are not yet accessible. I randomly pick to check up or left first in order to make my shape more random. As fewer colors become available, I increase the frequency that a color is matched to an adjacent cell, to avoid running out of colors. If I have run out of colors, I collect the unfilled cells and loop through them again, this time looking in all directions for a match.",
 	"Now we need to pick a target shape!",
