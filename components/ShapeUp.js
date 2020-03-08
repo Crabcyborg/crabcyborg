@@ -202,6 +202,8 @@ const updateShapeUpComponent = v => {
 			}
 		} break;
 	}
+
+	v.attrs.onUpdate && v.attrs.onUpdate(v)
 };
 
 export const ShapeUp = {
