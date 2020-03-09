@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 
-export const title = 'Recreating Shape Up with Mithril.js';
+export const title = 'Recreating Shape Up with Mithril';
 
 const targets = [128,64,32,16,8,4,2,1];
 const size = 6;
@@ -67,7 +67,7 @@ export const content = () => [
 	"8, by 9, check. But 62? 62 is the sum of 32+16+8+4+2, which as a binary octet looks like 00111110. The first two spaces (128,64) are empty, then 5 (32,16,8,4,2) are filled in, and the last space (1) is empty.",
 	m(Gist, {title: 'Computing ShapeUp Configuration Data', id: 'configuration-js', gistId: 'a5150d2d40cbc72f24d5b70814857537'}),
 	"This handy code (yes, it uses a bitwise AND operator) takes that configuration data and creates an array (rows) of arrays (cells) containing, at this moment, a color.",
-	m(Gist, {title: 'Rendering a Basic ShapeUp Object with Mithril.js', id: 'mithril-component-js', gistId: '0a04080738c84c6626c034fbde2af00e'}),
+	m(Gist, {title: 'Rendering a Basic ShapeUp Object with Mithril', id: 'mithril-component-js', gistId: '0a04080738c84c6626c034fbde2af00e'}),
 	"Mithril makes it really simple to turn that data into a ton of divs, but it's sort of boring. Let's give it some life!",
 	m(Gist, {title: 'Render a ShapeUp Object with nested Shapes', id: 'shapeup-js', gistId: '83512d1e66d38821726e60101b8eb996'}),
 	"There are a lot of ways you could write this, and I encourage you to play with it yourself as well.",

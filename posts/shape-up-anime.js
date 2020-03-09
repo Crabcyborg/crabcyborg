@@ -5,7 +5,7 @@ import anime from 'animejs/lib/anime.es.js';
 
 export const previous = 'shape-up';
 
-export const title = 'Animating Shape Up with Anime.js';
+export const title = 'Animating Shape Up with anime.js';
 
 export const oninit = () => {
 	let grid;

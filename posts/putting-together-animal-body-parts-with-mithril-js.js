@@ -3,7 +3,7 @@ import { config as lady_tiger } from '$app/monsters/lady-tiger';
 import { Caption, Gist } from '$app/components';
 import { wave } from '$app/animations/lady-tiger';
 
-export const title = 'Putting Together Animal Body Parts with Mithril.js';
+export const title = 'Putting Together Animal Body Parts with Mithril';
 
 export const oninit = () => {
 	wave('wave-target');

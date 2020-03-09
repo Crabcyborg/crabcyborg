@@ -6,7 +6,7 @@ import { wave } from '$app/animations/girooster';
 import { bounce } from '$app/animations/zebrelephant';
 import * as assets from '$app/assets';
 
-export const title = 'Using Anime.js';
+export const title = 'Animating your Amalgamation with anime.js';
 
 export const oninit = () => {
 	wave('wave-target');
