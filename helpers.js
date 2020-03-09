@@ -1,6 +1,13 @@
+let injectedScripts = [];
 export const injectScript = (src, callback) => {
+	if(injectedScripts.indexOf(src) >= 0) {
+		callback !== undefined && callback();
+		return;
+	}
+
 	var script = document.createElement('script');
 	script.src = src;
+	injectedScripts.push(src);
 	callback !== undefined && script.addEventListener('load', callback);
 	document.body.appendChild(script);
 }
