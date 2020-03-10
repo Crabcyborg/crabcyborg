@@ -14,29 +14,12 @@ export const colors = [
 	[21,36,174],[255,154,53],[221,0,111],[82,197,33]
 ];
 
-export const refactorColors = format => {
-	switch(format) {
-		case '255,255,255': return colors.map(color => color.join(','));
-
-		case '#ffffff': return colors.map(
-			color => '#'.concat(
-				color.map(
-					value => parseInt(value).toString(16).padStart(2,'0')
-				).join('')
-			)
-		);
-
-		case '[1,1,1,1]': return colors.map(
-			color => {
-				const [ r,g,b ] = color;
-				return [r/255, g/255, b/255, 1];
-			}
-		);
-
-		case '0xffffff': return colors.map(
-			color => parseInt('0x'.concat(
-				color.map(value => parseInt(value).toString(16).padStart(2,'0')).join('')
-			))
-		);
-	}
+const ff = value => parseInt(value).toString(16).padStart(2,'0');
+const callbacks = {
+	'255,255,255': color => color.join(','),
+	'#ffffff': color => '#'.concat(...color.map(ff)),
+	'[1,1,1,1]': color => color.map(value => value/255).concat(1),
+	'0xffffff': color => parseInt('0x'.concat(...color.map(ff)))
 };
+
+export const refactorColors = format => colors.map(callbacks[format]);
