@@ -1,8 +1,9 @@
 import m from 'mithril';
-import { colors } from '$app/shapeup/colors';
+import { refactorColors } from '$app/shapeup/colors';
 import { injectClassDefinition, injectClassDefinitions, shuffle } from '$app/helpers';
 import anime from 'animejs/lib/anime.es.js';
 
+const colors = refactorColors('255,255,255');
 const class_prefix = 'su';
 const color_class_prefix = 'c';
 const targets = [128,64,32,16,8,4,2,1];

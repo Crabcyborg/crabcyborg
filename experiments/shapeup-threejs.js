@@ -1,9 +1,10 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { colors } from '$app/shapeup/colors';
+import { refactorColors } from '$app/shapeup/colors';
 import { injectScript } from '$app/helpers';
 
+const colors = refactorColors('0xffffff');
 let scene;
 let camera;
 let renderer;
@@ -47,10 +48,8 @@ const onLoadedThreeJs = () => {
 	scene.add(light);
 
 	materials = [];
-	for(let rgb of colors) {
-		materials.push(new THREE.MeshStandardMaterial({
-			color: parseInt('0x'.concat(rgb.split(',').map(value => parseInt(value).toString(16).padStart(2,'0')).join('')))
-		}));
+	for(let color of colors) {
+		materials.push(new THREE.MeshStandardMaterial({color}));
 	}
 
 	animate();

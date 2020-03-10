@@ -1,10 +1,10 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { colors } from '$app/shapeup/colors';
+import { refactorColors } from '$app/shapeup/colors';
 
+const colors = refactorColors('[1,1,1,1]');
 let canvas = null;
-let refactored_colors;
 let program;
 let gl;
 let aspect;
@@ -45,12 +45,6 @@ const injectFragmentScript = () => injectShaderScript(
 const oncreate = () => {
 	injectVertexScript();
 	injectFragmentScript();
-
-	refactored_colors = [];
-	for(let rgb of colors) {
-		const [ r,g,b ] = rgb.split(',');
-		refactored_colors.push([r/255, g/255, b/255, 1]);
-	}
 
 	canvas = document.getElementById('mycanvas');
 	gl = canvas.getContext('experimental-webgl');
@@ -105,7 +99,7 @@ const onUpdate = shapeup => {
 			]);
 
 			gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-			gl.uniform4fv(program.uColor, refactored_colors[color_index]);
+			gl.uniform4fv(program.uColor, colors[color_index]);
 			gl.drawArrays(gl.TRIANGLES, 0, vertices.length / item_size);
 		}
 	}

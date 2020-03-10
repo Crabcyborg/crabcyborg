@@ -4,19 +4,16 @@ import { shapes } from '$app/shapeup/shapes';
 import { refactorColors } from '$app/shapeup/colors';
 import { injectScript } from '$app/helpers';
 
-let colors = refactorColors('#ffffff');
-let loaded_paper = false;
+let canvas, context, colors;
 
-const oncreate = () => injectScript(
-	'https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js',
-	() => {
-		paper.setup(document.getElementById('mycanvas'));
-		loaded_paper = true;
-	}
-);
+const oncreate = v => {
+	colors = refactorColors('#ffffff');
+	canvas = document.getElementById('mycanvas');
+	context = canvas.getContext('2d');
+};
 
 const onUpdate = shapeup => {
-	if(!loaded_paper) {
+	if(canvas === undefined) {
 		setTimeout(() => onUpdate(shapeup), 5);
 		return;
 	}
@@ -31,24 +28,20 @@ const onUpdate = shapeup => {
 			}
 
 			const { color_index, x, y } = grid[y_index][x_index];
-			const rectangle = new paper.Rectangle(
-				new paper.Point(x*size, y*size),
-				new paper.Point(x*size+size, y*size+size)
-			);
-			const path = new paper.Path.Rectangle(rectangle);
-			path.fillColor = colors[color_index];
+			context.fillStyle = colors[color_index];
+			context.fillRect(x*size, y*size, size, size);
 		}
 	}
 };
 
-export var title = 'Rendering Shape Up using Paper.js';
+export var title = 'Rendering Shape Up using fillRect';
 
 export var experiment = {
 	oncreate,
 	view: v => [
 		[
 			m('canvas#mycanvas'),
-			m(ShapeUp, {configuration: shapes.PURR, size: 6, behaviour: 'blink', blink_delay: 1000, onUpdate})
+			m(ShapeUp, {configuration: shapes.SHELL, size: 6, behaviour: 'blink', blink_delay: 1000, onUpdate})
 		]
 	]
 };
