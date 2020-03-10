@@ -111,7 +111,7 @@ const onUpdate = shapeup => {
 	}
 };
 
-export var title = 'Rendering Shape Up with WebGL';
+export var title = 'Rendering Shape Up using WebGL';
 
 export var experiment = {
 	oncreate,
