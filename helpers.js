@@ -125,4 +125,39 @@ Rect.prototype = {
 	}
 };
 
-export { Rect };
+function V2(x,y) {
+	if(Array.isArray(x)) {
+		y = x[1];
+		x = x[0];
+	} else {
+		switch(typeof x) {
+			case 'object': 
+				y = x.y;
+				x = x.x;
+			break;
+
+			case 'string':
+				const split = x.split(',');
+				x = parseInt(split[0]);
+				y = parseInt(split[1]);
+			break;
+		}
+	}
+
+	this.x = x;
+	this.y = y;
+}
+
+V2.prototype = {
+	scale: function(scale) {
+		return new V2(this.x * scale, this.y * scale);
+	},
+	compare: function(v) {
+		return this.x == v.x && this.y == v.y;
+	},
+	toArray: function() {
+		return [this.x, this.y];
+	}
+};
+
+export { Rect, V2 };

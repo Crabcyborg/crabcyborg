@@ -2,7 +2,7 @@ import m from 'mithril';
 import { ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { refactorColors } from '$app/shapeup/colors';
-import { Rect, roughSizeInMemory } from '$app/helpers';
+import { Rect, V2, roughSizeInMemory } from '$app/helpers';
 
 const stackoverflow = 'https://stackoverflow.com/questions/13746284/merging-multiple-adjacent-rectangles-into-one-polygon#answer-13851341';
 const colors = refactorColors('#ffffff');
@@ -218,7 +218,6 @@ const toSquarePolygons = cells => cells.map(cell => ({
 	fill: colors[cell.color_index]
 }));
 
-const compare = (a,b) => a[0]==b[0] && a[1]==b[1];
 const xThenY = (a,b) => a[0]<b[0] || (a[0]==b[0] && a[1]<b[1]) ? -1 : 1;
 const yThenX = (a,b) => a[1]<b[1] || (a[1]==b[1] && a[0]<b[0]) ? -1 : 1;
 
@@ -233,59 +232,57 @@ const toPolygons = cells => {
 		let edges_v = {}, edges_h = {};
 		const setEdges = (edges, cmp, e) => {
 			points.sort(cmp);
-			let i = 0;
+			let edge_index = 0;
 			const length = points.length;
-			while(i < length) {
-				const curr = points[i][e];
+			while(edge_index < length) {
+				const curr = points[edge_index][e];
 				do {
-					edges[points[i]] = points[i+1];
-					edges[points[i+1]] = points[i];
-					i += 2
-				} while(i < length && points[i][e] == curr);
+					edges[points[edge_index]] = points[edge_index+1];
+					edges[points[edge_index+1]] = points[edge_index];
+					edge_index += 2
+				} while(edge_index < length && points[edge_index][e] == curr);
 			}
 		};
 		setEdges(edges_v, xThenY, 0);
 		setEdges(edges_h, yThenX, 1);
 		
-		let p = [], keys;
+		let polygon = [], keys;
 		while((keys = Object.keys(edges_h)).length) {
-			const key = keys[0];
+			const [ key ] = keys;
 			delete edges_h[key];
 			
-			const first_vertex = key.split(',').map(v => parseInt(v));
-			let last_polygon = [first_vertex, 0];
-			let polygon = [last_polygon];
+			const first_vertex = new V2(key);
+			let previous = [first_vertex.toArray(), 0];
+			let vertices = [first_vertex];
 
 			while(1) {
-				const [curr, e] = last_polygon;
-				const edges = [edges_v, edges_h][e];
-				const next_vertex = edges[curr];
-				const next_polygon = [next_vertex, 1-e];
+				const [edge_index, edge] = previous;
+				const edges = [edges_v, edges_h][edge];
+				const next_vertex = new V2(edges[edge_index]);
+				const next = [next_vertex.toArray(), 1-edge];
+				delete edges[edge_index];
 
-				delete edges[curr];
-				polygon.push(next_polygon);
-
-				if(compare(first_vertex, next_vertex)) {
-					polygon.pop();
+				if(first_vertex.compare(next_vertex)) {
 					break;
 				}
 
-				last_polygon = next_polygon;
+				vertices.push(next_vertex);
+				previous = next;
 			}
 
-			let poly = [];
-			for(let v of polygon) {
-				const [pt] = v;
-				const [x, y] = pt;
-				poly.push([x*size, y*size]);
-				delete edges_v[pt];
-				delete edges_h[pt];
-			}
+			let scaled_vertices = [];
+			for(let vertex of vertices) {
+				scaled_vertices.push(vertex.scale(size).toArray());
 
-			p.push(poly);
+				const edge_index = vertex.toArray();
+				delete edges_v[edge_index];
+				delete edges_h[edge_index];
+			}
+  
+			polygon.push(scaled_vertices);
 		}
-				
-		output.push({points: p, fill: colors[color_index]});
+		
+		output.push({points: polygon, fill: colors[color_index]});
 	}
 
 	return output;
