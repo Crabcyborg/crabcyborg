@@ -41,11 +41,11 @@ const cellsToIslands = (cells, meta) => {
 	return islands;
 };
 
-const groupPointsByColorIndex = (cells, scale) => {
+const groupPointsByColorIndex = (cells) => {
 	let points_by_color_index = {};
 	for(let cell of cells) {
 		const { x, y, color_index } = cell;
-		const x1 = x*scale, y1 = y*scale, x2 = x1+scale, y2 = y1+scale;
+		const x1 = x, y1 = y, x2 = x1+1, y2 = y1+1;
 		points_by_color_index[color_index] === undefined && (points_by_color_index[color_index] = {});
 		for(let point of [[x1,y1], [x2,y1], [x2,y2], [x1,y2]]) {
 			if(points_by_color_index[color_index][point] !== undefined) {
@@ -218,10 +218,12 @@ const toSquarePolygons = cells => cells.map(cell => ({
 	fill: colors[cell.color_index]
 }));
 
-const yThenX = (a,b) => a[1]<b[1] || (a[1]==b[1] && a[0]<b[0]) ? -1 : (a == b ? 0 : 1);
+const compare = (a,b) => a[0]==b[0] && a[1]==b[1];
+const xThenY = (a,b) => a[0]<b[0] || (a[0]==b[0] && a[1]<b[1]) ? -1 : 1;
+const yThenX = (a,b) => a[1]<b[1] || (a[1]==b[1] && a[0]<b[0]) ? -1 : 1;
 
 const toPolygons = cells => {
-	const points_by_color_index = groupPointsByColorIndex(cells, size);
+	const points_by_color_index = groupPointsByColorIndex(cells);
 	const color_indices = Object.keys(points_by_color_index);
 
 	let output = [];
@@ -229,7 +231,8 @@ const toPolygons = cells => {
 		const points = Object.values(points_by_color_index[color_index]);
 
 		let edges_v = {}, edges_h = {};
-		const setEdges = (edges, e) => {
+		const setEdges = (edges, cmp, e) => {
+			points.sort(cmp);
 			let i = 0;
 			const length = points.length;
 			while(i < length) {
@@ -241,30 +244,32 @@ const toPolygons = cells => {
 				} while(i < length && points[i][e] == curr);
 			}
 		};
-		points.sort(); setEdges(edges_v, 0);
-		points.sort(yThenX); setEdges(edges_h, 1);
+		setEdges(edges_v, xThenY, 0);
+		setEdges(edges_h, yThenX, 1);
 		
 		let p = [], keys;
 		while((keys = Object.keys(edges_h)).length) {
 			const key = keys[0];
 			delete edges_h[key];
 			
-			let last_polygon = [key.split(',').map(v => parseInt(v)), 0];
+			const first_vertex = key.split(',').map(v => parseInt(v));
+			let last_polygon = [first_vertex, 0];
 			let polygon = [last_polygon];
 
 			while(1) {
 				const [curr, e] = last_polygon;
 				const edges = [edges_v, edges_h][e];
-
-				if(edges[curr] === undefined) {
-					break;
-				}
-
 				const next_vertex = edges[curr];
 				const next_polygon = [next_vertex, 1-e];
 
 				delete edges[curr];
 				polygon.push(next_polygon);
+
+				if(compare(first_vertex, next_vertex)) {
+					polygon.pop();
+					break;
+				}
+
 				last_polygon = next_polygon;
 			}
 
@@ -272,14 +277,14 @@ const toPolygons = cells => {
 			for(let v of polygon) {
 				const [pt] = v;
 				const [x, y] = pt;
-				poly.push([x,y]);
+				poly.push([x*size, y*size]);
 				delete edges_v[pt];
 				delete edges_h[pt];
 			}
 
 			p.push(poly);
 		}
-
+				
 		output.push({points: p, fill: colors[color_index]});
 	}
 
