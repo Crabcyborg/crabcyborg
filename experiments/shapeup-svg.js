@@ -6,9 +6,9 @@ import { Rect, roughSizeInMemory } from '$app/helpers';
 
 const stackoverflow = 'https://stackoverflow.com/questions/13746284/merging-multiple-adjacent-rectangles-into-one-polygon#answer-13851341';
 const colors = refactorColors('#ffffff');
-const size = 10;
+const size = 6;
 
-let width, height, containers = [], active_color;
+let width, height, containers = [];
 
 const cellsToIslands = (cells, meta) => {
 	let visited = {}, indexed = {}, islands = [];
@@ -299,22 +299,7 @@ const Container = {
 		m(
 			'svg.mr3',
 			{ width, height },
-			v.attrs.data.map(
-				item => (active_color === undefined || active_color === item.fill)
-					&& m(
-						v.attrs.type, {
-							...item,
-							stroke: 'white',
-							onclick: () => {
-								if(active_color === undefined || active_color !== item.fill) {
-									active_color = item.fill;
-								} else {
-									active_color = undefined;
-								}
-							}
-						}
-					)
-			)
+			v.attrs.data.map(item => m(v.attrs.type, {...item, stroke: 'white'}))
 		),
 		m(
 			'p.tc.absolute.bottom0.width100',
@@ -329,9 +314,9 @@ export var title = 'Rendering Shape Up using SVG';
 export var experiment = {
 	view: v => [
 		[
-			m('p', 'There are a few ways to draw a Shape Up component with SVG. I used the ', m('a', { href: stackoverflow, target: '_blank' }, 'algorithm mentioned in this Stack Overflow post'), ' to simplify my points to a single polygon per color, which was a really fun challenge. Then I pieced together a few other algorithms (largest rectangle in a matrix, number of islands) to generate a component with simplified rectangles that can fill more than just a 1x1 space, for an even small data payload than the polygon per color algorithm. I\'m comparing the rough size in memory of the data being used for each SVG. All SVGs include a white stroke to illustrate how they\'re being structured'),
+			m('p', 'There are a few ways to draw a Shape Up component with SVG. I used the ', m('a', { href: stackoverflow, target: '_blank' }, 'algorithm mentioned in this Stack Overflow post'), ' to simplify my points to a single polygon per color, which was a really fun challenge. Then I pieced together a few other algorithms (largest rectangle in a matrix, number of islands) to generate a component that reduces to the smallest number of rectangles possible, for an (not always) even smaller data payload than the polygon per color algorithm. I\'m comparing the rough size in memory of the data being used for each SVG. All SVGs include a white stroke to illustrate how they\'re being structured'),
 			m('.dib', containers.map(container => m(Container, container))),
-			m(ShapeUp, {configuration: shapes.ROUND, size, /*behaviour: 'blink', blink_delay: 1000,*/ onUpdate: shapeup => {
+			m(ShapeUp, {configuration: shapes.DINO, size, behaviour: 'blink', blink_delay: 1000, onUpdate: shapeup => {
 				width = shapeup.state.width*size;
 				height = shapeup.state.height*size;
 
