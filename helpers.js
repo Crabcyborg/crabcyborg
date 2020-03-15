@@ -48,23 +48,28 @@ export const roughSizeInMemory = obj => {
 	const sizeOf = obj => {
 		if(obj !== null && obj !== undefined) {
 			switch(typeof obj) {
-			case 'number':
-				bytes += 8;
+				case 'number':
+					bytes += 8;
 				break;
-			case 'string':
-				bytes += obj.length * 2;
+				case 'string':
+					bytes += obj.length * 2;
 				break;
-			case 'boolean':
-				bytes += 4;
+				case 'boolean':
+					bytes += 4;
 				break;
-			case 'object':
-				var objClass = Object.prototype.toString.call(obj).slice(8, -1);
-				if(objClass === 'Object' || objClass === 'Array') {
-					for(var key in obj) {
-						if(!obj.hasOwnProperty(key)) continue;
-						sizeOf(obj[key]);
+				case 'object':
+					const objClass = Object.prototype.toString.call(obj).slice(8, -1);
+					if(objClass === 'Object' || objClass === 'Array') {
+						for(let key in obj) {
+							if(!obj.hasOwnProperty(key)) {
+								continue;
+							}
+
+							sizeOf(obj[key]);
+						}
+					} else {
+						bytes += obj.toString().length * 2;
 					}
-				} else bytes += obj.toString().length * 2;
 				break;
 			}
 		}
@@ -81,3 +86,43 @@ export const roughSizeInMemory = obj => {
 
 	return formatByteSize(sizeOf(obj));
 };
+
+function Rect(x,y,w,h) {
+	if(typeof x === 'object') {
+		y = x.y;
+		w = x.w || x.width;
+		h = x.h || x.height;
+		x = x.x; // do x last
+	}
+
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+}
+
+Rect.prototype = {
+	scale: function(scale) {
+		return new Rect(this.x * scale, this.y * scale, this.w * scale, this.h * scale);
+	},
+	up: function(y) {
+		return new Rect(this.x, this.y - y, this.w, this.h);
+	},
+	down: function(y) {
+		return new Rect(this.x, this.y + y, this.w, this.h);
+	},
+	left: function(x) {
+		return new Rect(this.x - x, this.y, this.w, this.h);
+	},
+	right: function(x) {
+		return new Rect(this.x + x, this.y, this.w, this.h);
+	},
+	contains: function(x, y) {
+		return x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h;
+	},
+	flat: function(obj = {}) { 
+		return { x: this.x, y: this.y, width: this.w, height: this.h, ...obj };
+	}
+};
+
+export { Rect };
