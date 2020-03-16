@@ -41,24 +41,6 @@ const cellsToIslands = (cells, meta) => {
 	return islands;
 };
 
-const groupPointsByColorIndex = (cells) => {
-	let points_by_color_index = {};
-	for(let cell of cells) {
-		const { x, y, color_index } = cell;
-		const x1 = x, y1 = y, x2 = x1+1, y2 = y1+1;
-		points_by_color_index[color_index] === undefined && (points_by_color_index[color_index] = {});
-		for(let point of [[x1,y1], [x2,y1], [x2,y2], [x1,y2]]) {
-			if(points_by_color_index[color_index][point] !== undefined) {
-				delete points_by_color_index[color_index][point];
-			} else {
-				points_by_color_index[color_index][point] = point;
-			}
-		}
-	}
-
-	return points_by_color_index;
-}
-
 const toRects = cells => cells.map(cell => ({
 	x: cell.x*size,
 	y: cell.y*size,
@@ -158,10 +140,7 @@ const toLargerRects = cells => {
 		const { x, y, color_index } = cell;
 
 		if(data_by_color_index[color_index] === undefined) {
-			data_by_color_index[color_index] = {
-				cells: [],
-				points: {}
-			};
+			data_by_color_index[color_index] = {cells: [], points: {}};
 		}
 
 		data_by_color_index[color_index].cells.push(cell);
@@ -187,7 +166,6 @@ const toLargerRects = cells => {
 		if(points.length === 4) {
 			const meta = metaFromPoints(points);
 			output.push(new Rect(meta.min.x, meta.min.y, meta.size.x, meta.size.y).scale(size).flat({fill: color}));
-		//	console.log('%c ■■■■', `color: ${color}`, new Rect(meta.min.x, meta.min.y, meta.size.x, meta.size.y), 'perfect rectangle');
 			continue;
 		}
 
@@ -196,7 +174,6 @@ const toLargerRects = cells => {
 		const rect = new Rect(m.rect).right(meta.min.x).down(meta.min.y);
 		
 		output.push(rect.scale(size).flat({fill: color}));
-	//	console.log('%c ■■■■', `color: ${color}`, new Rect(m.rect).right(meta.min.x).down(meta.min.y), `${points.length} points`, `${cells.length} cells`);
 
 		rect.w--; rect.h--;
 		const remaining = data.cells.filter(cell => !rect.contains(cell.x, cell.y));
@@ -209,12 +186,7 @@ const toLargerRects = cells => {
 };
 
 const toSquarePolygons = cells => cells.map(cell => ({
-	points: [
-		`${cell.x*size},${cell.y*size}`,
-		`${cell.x*size+size},${cell.y*size}`,
-		`${cell.x*size+size},${cell.y*size+size}`,
-		`${cell.x*size},${cell.y*size+size}`
-	].join(' '),
+	points: new V2(cell).svgPoints(size),
 	fill: colors[cell.color_index]
 }));
 
@@ -222,7 +194,20 @@ const xThenY = (a,b) => a[0]<b[0] || (a[0]==b[0] && a[1]<b[1]) ? -1 : 1;
 const yThenX = (a,b) => a[1]<b[1] || (a[1]==b[1] && a[0]<b[0]) ? -1 : 1;
 
 const toPolygons = cells => {
-	const points_by_color_index = groupPointsByColorIndex(cells);
+	let points_by_color_index = {};
+	for(let cell of cells) {
+		const { x, y, color_index } = cell;
+		const x1 = x, y1 = y, x2 = x1+1, y2 = y1+1;
+		points_by_color_index[color_index] === undefined && (points_by_color_index[color_index] = {});
+		for(let point of [[x1,y1], [x2,y1], [x2,y2], [x1,y2]]) {
+			if(points_by_color_index[color_index][point] !== undefined) {
+				delete points_by_color_index[color_index][point];
+			} else {
+				points_by_color_index[color_index][point] = point;
+			}
+		}
+	}
+
 	const color_indices = Object.keys(points_by_color_index);
 
 	let output = [];

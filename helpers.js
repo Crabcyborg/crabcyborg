@@ -155,6 +155,11 @@ V2.prototype = {
 	compare: function(v) {
 		return this.x == v.x && this.y == v.y;
 	},
+	svgPoints: function(scale = 1) {
+		const x1 = this.x*scale, x2 = x1+scale;
+		const y1 = this.y*scale, y2 = y1+scale;
+		return `${x1},${y1},${x2},${y1},${x2},${y2},${x1},${y2}`;
+	},
 	toArray: function() {
 		return [this.x, this.y];
 	}
