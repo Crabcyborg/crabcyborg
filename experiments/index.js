@@ -6,6 +6,7 @@ import * as shapeup_threejs from './shapeup-threejs';
 import * as shapeup_paperjs from './shapeup-paperjs';
 import * as shapeup_fillrect from './shapeup-fillrect';
 import * as shapeup_svg from './shapeup-svg';
+import * as shapeup_matter from './shapeup-matter';
 
 export var experiments = {	
 	'shape-up': shape_up,
@@ -15,5 +16,6 @@ export var experiments = {
 	'shapeup-threejs': shapeup_threejs,
 	'shapeup-paperjs': shapeup_paperjs,
 	'shapeup-fillrect': shapeup_fillrect,
-	'shapeup-svg': shapeup_svg
+	'shapeup-svg': shapeup_svg,
+	'shapeup-matter': shapeup_matter
 };
