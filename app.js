@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Home, Sandbox, Post, Experiment } from '$app/containers';
+import { Home, Sandbox, Post, Experiment, Shape } from '$app/containers';
 
 m.route.prefix('');
 m.route(
@@ -9,6 +9,7 @@ m.route(
 		'/': Home,
 		'/sandbox': Sandbox,
 		'/post/:slug': Post,
-		'/experiment/:slug': Experiment
+		'/experiment/:slug': Experiment,
+		'/shapeup/:shape': Shape
 	}
 );
