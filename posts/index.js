@@ -5,6 +5,7 @@ import * as a_challenger_appears from './a-challenger-appears';
 import * as using_anime_js from './using-anime-js';
 import * as shape_up from './shape-up';
 import * as shape_up_anime from './shape-up-anime';
+import * as minimizing_shape_up from './minimizing-shape-up';
 
 export var posts = {
 	'putting-together-animal-body-parts-with-mithril-js': putting_together_animal_body_parts_with_mithril_js,
@@ -13,5 +14,6 @@ export var posts = {
 	'a-challenger-appears': a_challenger_appears,
 	'using-anime-js': using_anime_js,
 	'shape-up': shape_up,
-	'shape-up-anime': shape_up_anime
+	'shape-up-anime': shape_up_anime,
+	'minimizing-shape-up': minimizing_shape_up
 };
