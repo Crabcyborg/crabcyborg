@@ -1,16 +1,17 @@
 import m from 'mithril';
 import { shapes } from '$app/shapeup/shapes';
-import { compress, decompress, counter, decounter, optimize } from '$app/shapeup/optimization-helper';
+import { shapes as optimized } from '$app/shapeup/shapes-optimized';
+import { optimize } from '$app/shapeup/optimization-helper';
 
 const oninit = v => {
 	/*
-	// this generates shapes-optimized from current data in shapes
-	const keys = Object.keys(shapes);
+	// this generates optimized-optimized from current data in optimized
+	const keys = Object.keys(optimized);
 
-	let output = ['export const shapes = {'];
+	let output = ['export const optimized = {'];
 
 	for(let key of keys) {
-		let shape = shapes[key];
+		let shape = optimized[key];
 		let optimized = optimize(shape);
 		output.push(`\t${key}: "${optimized}",`);
 	}

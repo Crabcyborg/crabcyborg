@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitue, unsub } from '$app/shapeup/optimization-helper';
 
 export const title = 'Minimizing a Shape Up Component';
 
@@ -14,12 +14,57 @@ const back_to_raw = decompress(decounter(minimized));
 const raw_csv = raw.join(',');
 const back_to_raw_csv = back_to_raw.join(',');
 
-const example_url = `https://crabcyb.org/shapeup/${raw_csv}`;
-const compressed_url = `https://crabcyb.org/shapeup/${compressed}`;
-const counter_url = `https://crabcyb.org/shapeup/${minimized}`;
+const example_url = `/shapeup/${raw_csv}`;
+const compressed_url = `/shapeup/${compressed}`;
+const counter_url = `/shapeup/${minimized}`;
 
 const small = [255,255,255];
 const long = [255,255,255,255,255,255];
+
+const count_by_pattern = {};
+let max = false;
+let max_pattern;
+const keys = Object.keys(optimized);
+for(let key of keys) {
+	const shape = optimized[key];
+
+	for(let i = 0; i < shape.length-1; ++i) {
+		const pattern = shape[i] + shape[i+1];
+		count_by_pattern[pattern] = count_by_pattern[pattern] !== undefined ? count_by_pattern[pattern] + 1 : 1;
+
+		if(!max || count_by_pattern[pattern] > max) {
+			max = count_by_pattern[pattern];
+			max_pattern = pattern;
+		}
+	}
+}
+
+const sorted_patterns = Object.keys(count_by_pattern).sort(function(a, b) {
+	return count_by_pattern[b] - count_by_pattern[a];
+});
+
+const show = 10;
+
+let top = {};
+for(let i = 0; i < show; ++i) {
+	top[[sorted_patterns[i]]] = count_by_pattern[sorted_patterns[i]];
+}
+
+const pretty = obj => {
+	const keys = Object.keys(obj);
+
+	let output = [];
+
+	for(let key of keys) {
+		let value = obj[key];
+		output.push(`${key}: ${value}`);
+	}
+
+	return output.join('\n');
+};
+
+const sub = substitue(minimized);
+const sub_url = `/shapeup/${sub}`;
 
 export const content = () => [
 	m(ShapeUp, {configuration: raw, size: 4}),
@@ -48,58 +93,10 @@ export const content = () => [
 	"Our url becomes:",
 	m('a', { style: { wordWrap: 'break-word' }, href: counter_url, target: '_blank' }, counter_url),
 	m('p', "The result is ", counter_url.length, " characters long, ", Math.round(compressed_url.length / counter_url.length * 100)/100, "x smaller than the version without counts and ", Math.round(example_url.length / counter_url.length * 100)/100, "x smaller than the original url."),
+	"The next thing I did was optimize every level I have, and look for common pairs that I can also replace with special characters.",
+	m('pre', { style: { wordWrap: 'break-word' } }, pretty(top)),
+	"There are two clear winners, 00 and $$. I will replace both of these with two new characters, @ and =, bringing the total to 72.",
+	m('p', sub_url.length, ' characters long! ', Math.round(counter_url.length / sub_url.length * 100)/100, 'x smaller than the previous url, ', Math.round(example_url.length / sub_url.length * 100)/100, "x smaller than the original url."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub_url, target: '_blank' }, sub_url),
 	"Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee!"
-
-	/*
-	"It's fine, I don't expect you to know what Shape Up even is, but if you just look up at the Crab Cyborg logo, or the other five crabs on screen, you should have a good idea of what we're trying to build today. There are going to be a few steps:",
-	m(
-		'ol',
-		[
-			'Loading configuration data to determine our main shape',
-			'Rendering that shape with Mithrl.js',
-			'Randomly determining how to fill in our shape with smaller shapes',
-			'Randomly determining a smaller shape as a search target',
-			'Rendering that search target, and detecting touch events'
-		].map(item => m('li', item))
-	),
-	m('h3', "Awesome, so what does the configuration look like?"),
-	"An array of integers with values from 0-255. The first two numbers represent width and height. The other numbers represent which blocks are filled and which are empty. One number can do this for 8 blocks.",
-	"The bigger the object, the more data this is going to take, so to keep the first example simple we will take a look at the configuration for a ruby.",
-	m(ShapeOnly, { configuration: shapes.RUBY }),
-	m('code', '[8,9, 62,63,191,255,247,241,240,112,16]'),
-	"8, by 9, check. But 62? 62 is the sum of 32+16+8+4+2, which as a binary octet looks like 00111110. The first two spaces (128,64) are empty, then 5 (32,16,8,4,2) are filled in, and the last space (1) is empty.",
-	m(Gist, {title: 'Computing ShapeUp Configuration Data', id: 'configuration-js', gistId: 'a5150d2d40cbc72f24d5b70814857537'}),
-	"This handy code (yes, it uses a bitwise AND operator) takes that configuration data and creates an array (rows) of arrays (cells) containing, at this moment, a color.",
-	m(Gist, {title: 'Rendering a Basic ShapeUp Object with Mithril', id: 'mithril-component-js', gistId: '0a04080738c84c6626c034fbde2af00e'}),
-	"Mithril makes it really simple to turn that data into a ton of divs, but it's sort of boring. Let's give it some life!",
-	m(Gist, {title: 'Render a ShapeUp Object with nested Shapes', id: 'shapeup-js', gistId: '83512d1e66d38821726e60101b8eb996'}),
-	"There are a lot of ways you could write this, and I encourage you to play with it yourself as well.",
-	"In my example, I try to fill in colors during initial loop where I'm also determining is a space should be filled. This means that the squares to the left and the top will be set, but any future cells are not yet accessible. I randomly pick to check up or left first in order to make my shape more random. As fewer colors become available, I increase the frequency that a color is matched to an adjacent cell, to avoid running out of colors. If I have run out of colors, I collect the unfilled cells and loop through them again, this time looking in all directions for a match.",
-	"Now we need to pick a target shape!",
-	m(Gist, {title: 'Target Shape Component', id: 'target-shape-js', gistId: '3873b0b78ebbc0e7588b583843fea796'}),
-	m('p', "processTargetShapeState() gets called when updateShapeUpComponent() is finished, the two components share a unique key (i), and the ShapeUp component is exposing details about one of its larger shape's colors that it has pre-determined for a Target Shape. This is a little incomplete as it also requires some additional updates to the ShapeUp component, so to get the full picture you might want to refer to ", m('i', '/components/ShapeUp.js'), " for the full implementation"),
-	"And then we just need to check for a click!",
-	m(Gist, {title: 'ShapeUp Component with Click Listener', id: 'click-listener-js', gistId: 'aefe56910f47c1fa5bdb064785ce2aeb'}),
-	"And we have a thing! Go on, click it!",
-	m(
-		'.relative',
-		m(ShapeUp, {i: 'jelly', size, configuration: shapes.JELLY, behaviour: 'click-target'}),
-		m(
-			'.absolute',
-			{
-				style: {
-					top: 0,
-					bottom: 0,
-					left: (shapes.JELLY[1]*size + 20)+'px',
-					width: (shapes.JELLY[1]*size)+'px',
-					border: '1px solid #efefef'
-				}
-			},
-			m(TargetShape, {i: 'jelly', size, style: { top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' }})
-		),
-		m(Score, {i: 'jelly', style: { position: 'absolute', left: (shapes.JELLY[1]*size*2 + 40)+'px' }})
-	),
-	m('h3', "What's Next?"),
-	m('p', "Check out ", m('i', '/shapeup/shapes'), " for other config files. There are over 100 shapes, and I'm definitely open to growing that number!")
-	*/
 ];
