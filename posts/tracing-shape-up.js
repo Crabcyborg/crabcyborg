@@ -1,8 +1,7 @@
 import m from 'mithril';
 import { vizsla } from '$app/assets';
-import { toLargerRects } from '$app/shapeup/svg-helper';
+import { toLargerRects, trace } from '$app/shapeup/svg-helper';
 import { optimize, substitute } from '$app/shapeup/optimization-helper';
-import { trace } from '$app/shapeup/trace-helper';
 
 export const title = 'Tracing a Shape Up Component';
 
