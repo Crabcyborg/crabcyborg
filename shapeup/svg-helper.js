@@ -185,6 +185,63 @@ export const toSquarePolygons = (cells, size) => cells.map(cell => ({
 export const xThenY = (a,b) => a[0]<b[0] || (a[0]==b[0] && a[1]<b[1]) ? -1 : 1;
 export const yThenX = (a,b) => a[1]<b[1] || (a[1]==b[1] && a[0]<b[0]) ? -1 : 1;
 
+export const pointsToPolygons = (points, size) => {
+	let edges_v = {}, edges_h = {};
+	const setEdges = (edges, cmp, e) => {
+		points.sort(cmp);
+		let edge_index = 0;
+		const length = points.length;
+		while(edge_index < length) {
+			const curr = points[edge_index][e];
+			do {
+				edges[points[edge_index]] = points[edge_index+1];
+				edges[points[edge_index+1]] = points[edge_index];
+				edge_index += 2
+			} while(edge_index < length && points[edge_index][e] == curr);
+		}
+	};
+	setEdges(edges_v, xThenY, 0);
+	setEdges(edges_h, yThenX, 1);
+	
+	let polygon = [], keys;
+	while((keys = Object.keys(edges_h)).length) {
+		const [ key ] = keys;
+		delete edges_h[key];
+		
+		const first_vertex = new V2(key);
+		let previous = [first_vertex.toArray(), 0];
+		let vertices = [first_vertex];
+
+		while(1) {
+			const [edge_index, edge] = previous;
+			const edges = [edges_v, edges_h][edge];
+			const next_vertex = new V2(edges[edge_index]);
+			const next = [next_vertex.toArray(), 1-edge];
+			delete edges[edge_index];
+
+			if(first_vertex.compare(next_vertex)) {
+				break;
+			}
+
+			vertices.push(next_vertex);
+			previous = next;
+		}
+
+		let scaled_vertices = [];
+		for(let vertex of vertices) {
+			scaled_vertices.push(vertex.scale(size).toArray());
+
+			const edge_index = vertex.toArray();
+			delete edges_v[edge_index];
+			delete edges_h[edge_index];
+		}
+
+		polygon.push(scaled_vertices);
+	}
+
+	return polygon;
+};
+
 export const toPolygons = (cells, size) => {
 	let points_by_color_index = {};
 	for(let cell of cells) {
@@ -205,60 +262,7 @@ export const toPolygons = (cells, size) => {
 	let output = [];
 	for(let color_index of color_indices) {
 		const points = Object.values(points_by_color_index[color_index]);
-
-		let edges_v = {}, edges_h = {};
-		const setEdges = (edges, cmp, e) => {
-			points.sort(cmp);
-			let edge_index = 0;
-			const length = points.length;
-			while(edge_index < length) {
-				const curr = points[edge_index][e];
-				do {
-					edges[points[edge_index]] = points[edge_index+1];
-					edges[points[edge_index+1]] = points[edge_index];
-					edge_index += 2
-				} while(edge_index < length && points[edge_index][e] == curr);
-			}
-		};
-		setEdges(edges_v, xThenY, 0);
-		setEdges(edges_h, yThenX, 1);
-		
-		let polygon = [], keys;
-		while((keys = Object.keys(edges_h)).length) {
-			const [ key ] = keys;
-			delete edges_h[key];
-			
-			const first_vertex = new V2(key);
-			let previous = [first_vertex.toArray(), 0];
-			let vertices = [first_vertex];
-
-			while(1) {
-				const [edge_index, edge] = previous;
-				const edges = [edges_v, edges_h][edge];
-				const next_vertex = new V2(edges[edge_index]);
-				const next = [next_vertex.toArray(), 1-edge];
-				delete edges[edge_index];
-
-				if(first_vertex.compare(next_vertex)) {
-					break;
-				}
-
-				vertices.push(next_vertex);
-				previous = next;
-			}
-
-			let scaled_vertices = [];
-			for(let vertex of vertices) {
-				scaled_vertices.push(vertex.scale(size).toArray());
-
-				const edge_index = vertex.toArray();
-				delete edges_v[edge_index];
-				delete edges_h[edge_index];
-			}
-  
-			polygon.push(scaled_vertices);
-		}
-		
+		const polygon = pointsToPolygons(points, size);		
 		output.push({points: polygon, fill: colors[color_index]});
 	}
 

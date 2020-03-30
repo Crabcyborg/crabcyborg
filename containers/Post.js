@@ -25,6 +25,10 @@ export var Post = {
 			v.state.previous && m(GoToPost, {prepend: 'Previous: ', key: v.state.previous}),
 			m('h2', v.state.title),
 			(typeof v.state.content === 'function' ? v.state.content() : v.state.content).map(item => {
+				if(!item) {
+					return false;
+				}
+				
 				if(typeof item === 'string') {
 					return m('p', item);
 				}

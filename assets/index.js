@@ -76,3 +76,6 @@ export { default as porcupine_spine } from './porcupine-spine.png';
 // backgrounds
 export { default as beach } from './beach.jpg';
 export { default as cliff } from './cliff.jpg';
+
+// shape up trace subjects
+export { default as vizsla } from './vizsla.png';

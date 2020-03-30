@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize, substitue, unsub } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitute, unsub } from '$app/shapeup/optimization-helper';
 
 export const title = 'Minimizing a Shape Up Component';
 
@@ -63,7 +63,7 @@ const pretty = obj => {
 	return output.join('\n');
 };
 
-const sub = substitue(minimized);
+const sub = substitute(minimized);
 const sub_url = `/shapeup/${sub}`;
 
 export const content = () => [

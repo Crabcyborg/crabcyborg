@@ -126,7 +126,7 @@ export const decompress = compressed => {
 	return decompressed;
 };
 
-export const substitue = optimized => optimized.replace(/00/g, '@').replace(/\$\$/g, '=');
+export const substitute = optimized => optimized.replace(/00/g, '@').replace(/\$\$/g, '=');
 export const unsub = subbed => subbed.replace(/\@/g, '00').replace(/\=/g, '$$$');
 
 export const optimize = raw => counter(compress(raw));
