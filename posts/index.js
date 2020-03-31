@@ -7,15 +7,22 @@ import * as shape_up from './shape-up';
 import * as shape_up_anime from './shape-up-anime';
 import * as minimizing_shape_up from './minimizing-shape-up';
 import * as tracing_shape_up from './tracing-shape-up';
+import * as shape_up_text from './shape-up-text';
 
-export var posts = {
-	'putting-together-animal-body-parts-with-mithril-js': putting_together_animal_body_parts_with_mithril_js,
-	'animating-your-amalgamation-of-animal-appendages': animating_your_amalgamation_of_animal_parts,
-	'flappy-tiger': flappy_tiger,
-	'a-challenger-appears': a_challenger_appears,
-	'using-anime-js': using_anime_js,
-	'shape-up': shape_up,
-	'shape-up-anime': shape_up_anime,
-	'minimizing-shape-up': minimizing_shape_up,
-	'tracing-shape-up': tracing_shape_up
+const imports = {
+	putting_together_animal_body_parts_with_mithril_js,
+	animating_your_amalgamation_of_animal_parts,
+	flappy_tiger,
+	a_challenger_appears,
+	using_anime_js,
+	shape_up,
+	shape_up_anime,
+	minimizing_shape_up,
+	tracing_shape_up,
+	shape_up_text
 };
+
+export const posts = Object.keys(imports).reduce(function(posts, key) {
+	posts[key.replace(/_/g, '-')] = imports[key];
+	return posts;
+}, []);
