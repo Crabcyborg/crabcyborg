@@ -19,11 +19,10 @@ export var Logo = {
 					'.absolute',
 					{
 						style: {
-							top: 0,
+							top: '30px',
 							bottom: 0,
-							left: (shapes.LOGO[1]*logo_size + 10)+'px',
-							width: (shapes.LOGO[1]*target_size*.6)+'px',
-							border: '1px solid #efefef'
+							left: (shapes.LOGO[1]*logo_size - 80)+'px',
+							width: (shapes.LOGO[1]*target_size*.6)+'px'
 						}
 					},
 					m(TargetShape, {i: 'logo', size: target_size, style: { top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' }})

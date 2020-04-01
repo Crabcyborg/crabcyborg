@@ -128,7 +128,7 @@ const ShapeUpText = {
 
 export const content = () => [
 	m(ShapeUpText, {message: 'Hi Earth.', style: { marginRight: `${spacing}px`, marginBottom: '2rem' }}),
-	m('div', m(ShapeUpText, {message: 'DuE to SPacE rEStrictionS not all charactErS arE SuPPortEd.', style: { marginRight: `${spacing}px`, marginBottom: '1rem' }})),
+	m('div', m(ShapeUpText, {message: 'DuE to SPacE not all lEttErS havE SuPPort.', style: { marginRight: `${spacing}px`, marginBottom: '1rem' }})),
 	m('.mt3', m(ShapeUpText, {message: 'ABCD EFGH JIKL NOPR ST UVX YZ012 3456 7890 >< -! ?+.a bcdf hijk lnop qrtu vxy', style: { marginRight: `${size}px` }})),
 	m('p', 'Unsupported characters include: M W Q e g m s w z'),
 	"When I originally made Shape Up I started with a subtractive strategy. Since a lot of shapes were mostly full, I would just maintain an array of the indices to subtract from a full block. While this method wasn't ideal for large objects, it works very well for rendering text on the fly."

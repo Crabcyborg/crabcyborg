@@ -66,7 +66,7 @@ const Canvas = {
 			height: dimensions.height * normalized_size
 		};
 
-		rects = toLargerRects(cells, 4);
+		rects = toLargerRects(cells, 3.25);
 
 		setTimeout(m.redraw, 0);
 	},

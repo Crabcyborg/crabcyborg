@@ -1,5 +1,5 @@
 import * as putting_together_animal_body_parts_with_mithril_js from './putting-together-animal-body-parts-with-mithril-js';
-import * as animating_your_amalgamation_of_animal_parts from './animating-your-amalgamation-of-animal-appendages';
+import * as animating_your_amalgamation_of_animal_appendages from './animating-your-amalgamation-of-animal-appendages';
 import * as flappy_tiger from './flappy-tiger';
 import * as a_challenger_appears from './a-challenger-appears';
 import * as using_anime_js from './using-anime-js';
@@ -12,7 +12,7 @@ import * as tracing_shape_up_font from './tracing-shape-up-font';
 
 const imports = {
 	putting_together_animal_body_parts_with_mithril_js,
-	animating_your_amalgamation_of_animal_parts,
+	animating_your_amalgamation_of_animal_appendages,
 	flappy_tiger,
 	a_challenger_appears,
 	using_anime_js,

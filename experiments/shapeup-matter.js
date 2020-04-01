@@ -8,8 +8,8 @@ let matter_loaded = false;
 let engine;
 let rects;
 
-const circleSize = 10;
-const options = {width: 800, height: 400, wireframes: false, background: '#fff'};
+const circleSize = 6;
+const options = {width: 400, height: 400, wireframes: false, background: '#fff'};
 const particleOptions = {friction: 0.05, frictionStatic: 0.1, render: { visible: true }};
 const constraintOptions = {render: { visible: false }};
 const wallOptions = {isStatic: true, render: { fillStyle: '#fff' }};
