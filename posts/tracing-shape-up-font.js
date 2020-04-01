@@ -66,11 +66,11 @@ const Canvas = {
 			height: dimensions.height * normalized_size
 		};
 
-		rects = toLargerRects(cells, normalized_size);
+		rects = toLargerRects(cells, 4);
 
 		setTimeout(m.redraw, 0);
 	},
-	view: v => m('canvas#target', canvas_dimensions)
+	view: v => m('canvas#target', { style: { maxWidth: '100%' }, ...canvas_dimensions})
 };
 
 export const content = () => [
