@@ -3,7 +3,7 @@ import { ShapeUp } from '$app/components';
 
 export const title = 'Using a Shape Up Component as a Font';
 
-const size = 8;
+const size = 7;
 const spacing = size*4;
 
 const wordToConfiguration = word => {

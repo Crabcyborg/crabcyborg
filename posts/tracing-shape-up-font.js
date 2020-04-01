@@ -9,7 +9,7 @@ let svg_dimensions = false;
 let rects = [];
 let try_me = '';
 
-const font = '88px Tahoma';
+const font = '91px Arial';
 // joins with a hair space to add spacing between characters
 // http://www.fileformat.info/info/unicode/char/200a/index.htm
 const message = 'Hello World'.split('').join(String.fromCharCode(8202));
