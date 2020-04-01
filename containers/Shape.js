@@ -13,5 +13,13 @@ export var Shape = {
 			v.state.configuration = shape.split(',');
 		}
 	},
-	view: v => m(ShapeUp, {size: 10, configuration: v.state.configuration, behaviour: 'blink', blink_delay: 500})
+	view: v => m(
+		ShapeUp,
+		{
+			size: Math.min(10, Math.floor(600 / v.state.configuration[1])),
+			configuration: v.state.configuration,
+			behaviour: 'blink',
+			blink_delay: 500
+		}
+	)
 };

@@ -4,10 +4,15 @@ import { optimize, substitute } from '$app/shapeup/optimization-helper';
 
 export const title = 'Tracing a Font as a Shape Up Component';
 
-let canvas_dimensions = { width: 525, height: 95 };
+let canvas_dimensions = false;
 let svg_dimensions = false;
 let rects = [];
 let try_me = '';
+
+const font = '88px Tahoma';
+// joins with a hair space to add spacing between characters
+// http://www.fileformat.info/info/unicode/char/200a/index.htm
+const message = 'Hello World'.split('').join(String.fromCharCode(8202));
 
 const flatten = (image, background) => {
 	for(let i = 0; i < image.data.length; i += 4) {
@@ -22,12 +27,30 @@ const flatten = (image, background) => {
 	return image;
 }
 
+const Measure = {
+	oncreate: v => {
+		const context = document.getElementById('measure').getContext('2d');		
+		context.font = font;
+		
+		const measure = context.measureText(v.attrs.message);
+		canvas_dimensions = {
+			width: measure.width,
+			height: measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent
+		};
+
+		setTimeout(m.redraw, 0);
+	},
+	view: v => m('canvas#measure', { width: 0, height: 0 })
+};
+
 const Canvas = {
 	oncreate: v => {
 		const context = document.getElementById('target').getContext('2d');		
-		context.font = '100px Arial';
-		context.fillText('Hello World', 5, 85);
-		
+		context.font = font;
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillText(message, canvas_dimensions.width / 2, canvas_dimensions.height / 2);
+
 		let d = context.getImageData(0, 0, canvas_dimensions.width, canvas_dimensions.height);
 		d = flatten(d, [ 0xff, 0xff, 0xff ]);
 
@@ -51,7 +74,8 @@ const Canvas = {
 };
 
 export const content = () => [
-	m(Canvas),
+	m(Measure, { message }),
+	canvas_dimensions && m(Canvas),
 	svg_dimensions && m(
 		'svg.mr3',
 		{ style: { verticalAlign: 'top' }, ...svg_dimensions },
