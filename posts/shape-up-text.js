@@ -24,48 +24,48 @@ const wordToConfiguration = word => {
 
 		switch(word[i]) {
 			case 'A': remove.push(++ix4+cols, ix4+cx2, ix4+cx4, ++ix4); break;
-			case 'B': remove.push(++ix4+cols, ix4+cx3, ix4+cx2+1); break;
+			case 'B': remove.push(++ix4+cols, ix4+cx3, ++ix4+cx2); break;
 			case 'C': remove.push(++ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cols, ix4+cx2, ix4+cx3); break;
 			case 'D': remove.push(++ix4+cols, ix4+cx2, ix4+cx3, ++ix4, ix4+cx4); break;
 			case 'E': remove.push(++ix4+cols, ix4+cx3, ++ix4+cols, ix4+cx2, ix4+cx3); break;
 			case 'F': remove.push(++ix4+cols, ix4+cx3, ix4+cx4, ++ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
 			case 'G': remove.push(++ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cols, ix4+cx2); break;
 			case 'H': remove.push(++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
-			case 'I': remove.push(ix4+cols, ix4+cx2, ix4+cx3, ( ix4 += 2 )+cols, ix4+cx2, ix4+cx3); break;
+			case 'I': remove.push(ix4+cols, ix4+cx2, ix4+cx3, (ix4 += 2)+cols, ix4+cx2, ix4+cx3); break;
 			case 'J': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cols, ix4+cx2, ix4+cx3); break;
-			case 'K': remove.push(++ix4, ix4+cols, ix4+cx3, ix4+cx4, ix4+cx2+1); break;
+			case 'K': remove.push(++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4+cx2); break;
 			case 'L': remove.push(++ix4, ix4+cols, ix4+cx2, ix4+cx3, ++ix4, ix4+cols, ix4+cx2, ix4+cx3); break;
 			case 'N': remove.push(++ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
-			case 'O': remove.push(ix4, ++ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4+1); break;
+			case 'O': remove.push(ix4, ++ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cx4); break;
 			case 'P': remove.push(++ix4+cols, ix4+cx2, ix4+cx4, ++ix4, ix4+cx4); break;
 			case 'R': remove.push(++ix4+cols, ix4+cx2, ix4+cx4, ++ix4, ix4+cx3); break;
 			case 'S': remove.push(ix4, ix4+cx3, ++ix4+cols, ix4+cx3, ++ix4+cols, ix4+cx4); break;
-			case 'T': remove.push(ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ( ix4 += 2 )+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case 'T': remove.push(ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, (ix4 += 2)+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
 			case 'U': remove.push(++ix4, ix4+cols, ix4+cx2, ix4+cx3); break;
-			case 'V': remove.push(ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4+1); break;
-			case 'X': remove.push(ix4+cx2, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ix4+cx2+1); break;
+			case 'V': remove.push(ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cx4); break;
+			case 'X': remove.push(ix4+cx2, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4+cx2); break;
 			case 'Y': remove.push(ix4+cx3, ++ix4, ix4+cols, ix4+cx3, ++ix4); break;
 			case 'Z': remove.push(ix4+cols, ix4+cx2, ++ix4+cols, ix4+cx3, ++ix4+cx2, ix4+cx3); break;
-			case 'a': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cx2+1, ix4+cx3, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'b': remove.push(ix4+1, ix4+2, ix4+cols+2, ix4+cx2+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'c': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cx2+1, ix4+cx2+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'd': remove.push(ix4, ix4+1, ix4+cx2+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'f': remove.push(ix4, ix4+cols+1, ix4+cols+2, ix4+cx2+2, ix4+cx3+1, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'h': remove.push(ix4+1, ix4+2, ix4+cols+1, ix4+cols+2, ix4+cx2+2, ix4+cx3+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'i': remove.push(ix4, ix4+2, ix4+cols, ix4+cols+1, ix4+cols+2, ix4+cx2, ix4+cx2+2, ix4+cx3, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'j': remove.push(ix4, ix4+1, ix4+cols, ix4+cols+1, ix4+cols+2, ix4+cx2, ix4+cx2+1, ix4+cx3+1, ix4+cx4, ix4+cx4+2); break;
-			case 'k': remove.push(ix4+1, ix4+2, ix4+cols+1, ix4+cx2+2, ix4+cx3+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'l': remove.push(ix4, ix4+2, ix4+cols, ix4+cols+2, ix4+cx2, ix4+cx2+2, ix4+cx3, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'n': remove.push(ix4, ix4+1, ix4+2, ix4+cols+2, ix4+cx2+1, ix4+cx3+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'o': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cols+2, ix4+cx2+1, ix4+cx3, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'p': remove.push(ix4, ix4+1, ix4+2, ix4+cols+2, ix4+cx2+1, ix4+cx3+2, ix4+cx4+1, ix4+cx4+2); break;
-			case 'q': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cols+2, ix4+cx2+1, ix4+cx3, ix4+cx4, ix4+cx4+1); break;
-			case 'r': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cols+2, ix4+cx2+1, ix4+cx3+1, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 't': remove.push(ix4, ix4+2, ix4+cx2, ix4+cx2+2, ix4+cx3, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'u': remove.push(ix4, ix4+1, ix4+2, ix4+cols+1, ix4+cx2+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'v': remove.push(ix4, ix4+1, ix4+2, ix4+cols+1, ix4+cx2+1, ix4+cx3, ix4+cx3+2, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'x': remove.push(ix4, ix4+1, ix4+2, ix4+cols+1, ix4+cx2, ix4+cx2+2, ix4+cx3+1, ix4+cx4, ix4+cx4+1, ix4+cx4+2); break;
-			case 'y': remove.push(ix4, ix4+1, ix4+2, ix4+cols+1, ix4+cx2, ix4+cx3, ix4+cx3+1, ix4+cx4, ix4+cx4+2); break;
+			case 'a': remove.push(ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cx4); break;
+			case 'b': remove.push(ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cols, ix4+cx4); break;
+			case 'c': remove.push(ix4, ix4+cols, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4); break;
+			case 'd': remove.push(ix4, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4+cx4); break;
+			case 'f': remove.push(ix4, ix4+cx4, ++ix4+cols, ix4+cx3, ix4+cx4, ++ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case 'h': remove.push(ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx4); break;
+			case 'i': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4+cols, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case 'j': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ++ix4+cols, ix4+cx4); break;
+			case 'k': remove.push(ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4); break;
+			case 'l': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case 'n': remove.push(ix4, ix4+cx4, ++ix4, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx4); break;
+			case 'o': remove.push(ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
+			case 'p': remove.push(ix4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
+			case 'q': remove.push(ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cols); break;
+			case 'r': remove.push(ix4, ix4+cols, ix4+cx4, ++ix4, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
+			case 't': remove.push(ix4, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4+cx4, ++ix4, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case 'u': remove.push(ix4, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx4, ++ix4, ix4+cx4); break;
+			case 'v': remove.push(ix4, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx4, ++ix4, ix4+cx3, ix4+cx4); break;
+			case 'x': remove.push(ix4, ix4+cx2, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx2, ix4+cx4); break;
+			case 'y': remove.push(ix4, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ++ix4, ix4+cx4); break;
 			case ' ': break;
 			case '0': remove.push(++ix4+cols, ix4+cx2, ix4+cx3); break;
 			case '1': remove.push(ix4+cols, ix4+cx2, ix4+cx3, ix4 += 2, ix4+cols, ix4+cx2, ix4+cx3); break;
@@ -82,8 +82,8 @@ const wordToConfiguration = word => {
 			case '-': remove.push(ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
 			case '!': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4+cx3, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
 			case '+': remove.push(ix4, ix4+cols, ix4+cx3, ix4+cx4, ++ix4, ix4+cx4, ++ix4, ix4+cols, ix4+cx3, ix4+cx4); break;
-			case '.': remove.push(ix4, ix4+1, ix4+2, ix4+cols, ix4+cols+1, ix4+cols+2, ix4+cx2, ix4+cx2+1, ix4+cx2+2, ix4+cx3, ix4+cx3+1, ix4+cx3+2, ix4+cx4, ix4+cx4+2); break;
-			case '?': remove.push(ix4+cols, ix4+cols+1, ix4+cx2, ix4+cx3, ix4+cx3+1, ix4+cx3+2, ix4+cx4, ix4+cx4+2);
+			case '.': remove.push(ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ++ix4, ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4); break;
+			case '?': remove.push(ix4+cols, ix4+cx2, ix4+cx3, ix4+cx4, ++ix4+cols, ix4+cx3, ++ix4+cx3, ix4+cx4); break;
 		}
 	}
 
@@ -130,5 +130,6 @@ export const content = () => [
 	m(ShapeUpText, {message: 'Hi Earth.', style: { marginRight: `${spacing}px`, marginBottom: '2rem' }}),
 	m('div', m(ShapeUpText, {message: 'DuE to SPacE rEStrictionS not all charactErS arE SuPPortEd.', style: { marginRight: `${spacing}px`, marginBottom: '1rem' }})),
 	m('.mt3', m(ShapeUpText, {message: 'ABCD EFGH JIKL NOPR ST UVX YZ012 3456 7890 >< -! ?+.a bcdf hijk lnop qrtu vxy', style: { marginRight: `${size}px` }})),
-	m('p', 'Those include: M W Q e g m s w z')
+	m('p', 'Unsupported characters include: M W Q e g m s w z'),
+	"When I originally made Shape Up I started with a subtractive strategy. Since a lot of shapes were mostly full, I would just maintain an array of the indices to subtract from a full block. While this method wasn't ideal for large objects, it works very well for rendering text on the fly."
 ];

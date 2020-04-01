@@ -277,16 +277,14 @@ export const trace = d => {
 	let cells = [];
 	for(let i = 0, j = 0; i < l; i += 4, j++) {
 		if(0.2126 * d.data[i] + 0.7153 * d.data[i + 1] + 0.0721 * d.data[i + 2] < 128) {
-			let y = Math.floor(j / width);
-			let x = j % width;
+			let y = Math.floor(j / width), x = j % width;
 			cells.push({ x, y });
 		}
 	}
 
 	let points = {};
 	for(let cell of cells) {
-		const { x, y } = cell;
-		const x1 = x, y1 = y, x2 = x1+1, y2 = y1+1;
+		const { x, y } = cell, x1 = x, y1 = y, x2 = x1+1, y2 = y1+1;
 		for(let point of [[x1,y1], [x2,y1], [x2,y2], [x1,y2]]) {
 			if(points[point] !== undefined) {
 				delete points[point];
@@ -295,7 +293,6 @@ export const trace = d => {
 			}
 		}
 	}
-
 	points = Object.values(points);
 	points.sort(xThenY);
 

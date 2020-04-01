@@ -8,6 +8,7 @@ import * as shape_up_anime from './shape-up-anime';
 import * as minimizing_shape_up from './minimizing-shape-up';
 import * as tracing_shape_up from './tracing-shape-up';
 import * as shape_up_text from './shape-up-text';
+import * as tracing_shape_up_font from './tracing-shape-up-font';
 
 const imports = {
 	putting_together_animal_body_parts_with_mithril_js,
@@ -19,7 +20,8 @@ const imports = {
 	shape_up_anime,
 	minimizing_shape_up,
 	tracing_shape_up,
-	shape_up_text
+	shape_up_text,
+	tracing_shape_up_font
 };
 
 export const posts = Object.keys(imports).reduce(function(posts, key) {
