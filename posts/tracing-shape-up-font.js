@@ -9,7 +9,9 @@ let svg_dimensions = false;
 let rects = [];
 let try_me = '';
 
-const font = '91px Arial';
+// TODO Android doesn't support Arial
+
+const font = '54px Tahoma';
 // joins with a hair space to add spacing between characters
 // http://www.fileformat.info/info/unicode/char/200a/index.htm
 const message = 'Hello World'.split('').join(String.fromCharCode(8202));
@@ -66,7 +68,7 @@ const Canvas = {
 			height: dimensions.height * normalized_size
 		};
 
-		rects = toLargerRects(cells, 3.25);
+		rects = toLargerRects(cells, 4);
 
 		setTimeout(m.redraw, 0);
 	},
@@ -76,10 +78,10 @@ const Canvas = {
 export const content = () => [
 	m(Measure, { message }),
 	canvas_dimensions && m(Canvas),
-	svg_dimensions && m(
+	svg_dimensions && m('div', m(
 		'svg.mr3',
 		{ style: { verticalAlign: 'top' }, ...svg_dimensions },
 		rects.map(rect => m('rect', {...rect, stroke: rect.fill}))
-	),
+	)),
 	try_me && m('.mt2', m('a', { href: try_me, target: '_blank', style: { fontSize: '.75rem', wordWrap: 'break-word' } }, try_me))
 ];

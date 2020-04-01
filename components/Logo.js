@@ -27,7 +27,7 @@ export var Logo = {
 					},
 					m(TargetShape, {i: 'logo', size: target_size, style: { top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' }})
 				),
-				m(Score, {i: 'logo', style: { position: 'absolute', left: (shapes.LOGO[1]*(logo_size+target_size*.6) + 20)+'px' }})
+				m(Score, {i: 'logo', style: { position: 'absolute', left: (shapes.LOGO[1]*(logo_size+target_size*.6) - 60)+'px' }})
 			]
 		);
 	}
