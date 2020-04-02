@@ -11,7 +11,7 @@ let try_me = '';
 
 // TODO Android doesn't support Arial
 
-const font = '54px Tahoma';
+const font = '48px sans-serif';
 // joins with a hair space to add spacing between characters
 // http://www.fileformat.info/info/unicode/char/200a/index.htm
 const message = 'Hello World'.split('').join(String.fromCharCode(8202));
@@ -61,14 +61,14 @@ const Canvas = {
 		configuration = substitute(optimize(configuration));
 		try_me = `/shapeup/${configuration}`;
 
-		const normalized_size = d.width / Math.max(dimensions.width, dimensions.height);
+		const normalized_size = Math.round(d.width / Math.max(dimensions.width, dimensions.height));
 
 		svg_dimensions = {
 			width: dimensions.width * normalized_size,
 			height: dimensions.height * normalized_size
 		};
 
-		rects = toLargerRects(cells, 4);
+		rects = toLargerRects(cells, normalized_size);
 
 		setTimeout(m.redraw, 0);
 	},

@@ -2,6 +2,17 @@ import { Rect, V2 } from '$app/helpers';
 import { refactorColors } from '$app/shapeup/colors';
 const colors = refactorColors('#ffffff');
 
+const onlyUnique = (value, index, self) => {
+	let item_index = 0;
+	for(let item of self) {
+		if(item[0] === value[0] && item[1] === value[1]) {
+			return index === item_index;;
+		}
+
+		++item_index;
+	}
+};
+
 export const cellsToIslands = (cells, meta) => {
 	let visited = {}, indexed = {}, islands = [];
 
@@ -324,7 +335,11 @@ export const trace = d => {
 		size = half;
 	}
 
-	points = points.map(point => [ Math.round(point[0]/size),  Math.round(point[1]/size) ]);
+	max = Math.round(Math.min(width/10, height/10));
+	size > max && (size = max);
+
+	const round = point => [ Math.round(point[0]/size), Math.round(point[1]/size) ];
+	points = points.map(round).filter(onlyUnique);
 
 	let minx = width/size, miny = height/size, maxx = 0, maxy = 0;
 	for(let point of points) {
@@ -337,11 +352,14 @@ export const trace = d => {
 
 	const dimensions = { width: maxx-minx, height: maxy-miny };
 
+	console.log(size, points, dimensions, maxy, miny);
+
 	cells = [];
 	let target_index = 0, value = 0, configuration = [dimensions.height, dimensions.width];
+	half = size/2 * 4;
 	for(let y = miny * size; y < maxy * size; y += size) {
 		for(let x = minx * size; x < maxx * size; x += size) {
-			let index = y * width + x, data_index = index * 4;
+			let index = y * width + x, data_index = index * 4 + half;
 
 			if(d.data[data_index] < white_threshold || d.data[data_index+1] < white_threshold || d.data[data_index+2] < white_threshold) {
 				cells.push({
