@@ -9,8 +9,6 @@ let svg_dimensions = false;
 let rects = [];
 let try_me = '';
 
-// TODO Android doesn't support Arial
-
 const font = '48px sans-serif';
 // joins with a hair space to add spacing between characters
 // http://www.fileformat.info/info/unicode/char/200a/index.htm

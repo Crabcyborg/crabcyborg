@@ -338,8 +338,7 @@ export const trace = d => {
 	max = Math.round(Math.min(width/10, height/10));
 	size > max && (size = max);
 
-	const round = point => [ Math.round(point[0]/size), Math.round(point[1]/size) ];
-	points = points.map(round).filter(onlyUnique);
+	points = points.map(point => point.map(c => Math.round(c/size))).filter(onlyUnique);
 
 	let minx = width/size, miny = height/size, maxx = 0, maxy = 0;
 	for(let point of points) {
@@ -351,8 +350,6 @@ export const trace = d => {
 	}
 
 	const dimensions = { width: maxx-minx, height: maxy-miny };
-
-	console.log(size, points, dimensions, maxy, miny);
 
 	cells = [];
 	let target_index = 0, value = 0, configuration = [dimensions.height, dimensions.width];
