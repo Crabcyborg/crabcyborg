@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize, substitute, unsub } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4 } from '$app/shapeup/optimization-helper';
 
 export const title = 'Minimizing a Shape Up Component';
 
@@ -21,34 +21,99 @@ const counter_url = `/shapeup/${minimized}`;
 const small = [255,255,255];
 const long = [255,255,255,255,255,255];
 
-const count_by_pattern = {};
-let max = false;
-let max_pattern;
+let count_by_pattern = {};
+let count_by_pattern_subbed = {};
+//let count_pattern_sub2 = {};
 const keys = Object.keys(optimized);
 for(let key of keys) {
 	const shape = optimized[key];
-
 	for(let i = 0; i < shape.length-1; ++i) {
 		const pattern = shape[i] + shape[i+1];
-		count_by_pattern[pattern] = count_by_pattern[pattern] !== undefined ? count_by_pattern[pattern] + 1 : 1;
+		count_by_pattern[pattern] = (count_by_pattern[pattern] || 0) + 1;
+	}
 
-		if(!max || count_by_pattern[pattern] > max) {
-			max = count_by_pattern[pattern];
-			max_pattern = pattern;
+	const subbed = substitute(shape);
+	for(let i = 0; i < subbed.length-1; ++i) {
+		const pattern = subbed[i] + subbed[i+1];
+		count_by_pattern_subbed[pattern] = (count_by_pattern_subbed[pattern] || 0) + 1;
+	}
+
+	/*
+	const sub2d = sub4(sub3(sub2(subbed)));
+
+	const other_patterns = [
+		'***',
+		'****',
+		'** *',
+		'* **',
+		'* * *',
+		'*  **',
+		'**  *',
+		'* *  *',
+		'*  *  *',
+		'**   *',
+		'*  * *'
+	];
+	for(let pattern of other_patterns) {
+		let length = pattern.length;
+
+		for(let i = 0; i < sub2d.length-length; ++i) {
+			let current_pattern = '';
+			for(let j = 0; j < length; ++j) {
+				let index = i+j;
+				let c = pattern[j];
+
+				if(c === '*') {
+					current_pattern += sub2d[index];
+				} else {
+					current_pattern += '/';
+				}
+			}
+
+			count_pattern_sub2[current_pattern] = (count_pattern_sub2[current_pattern] || 0) + 1;
 		}
 	}
+	*/
 }
 
-const sorted_patterns = Object.keys(count_by_pattern).sort(function(a, b) {
-	return count_by_pattern[b] - count_by_pattern[a];
+const sortPatterns = counts => Object.keys(counts).sort(function(a, b) {
+	return counts[b] - counts[a];
 });
 
-const show = 10;
+const getTop = (sorted, counts, show = 10) => {
+	let top = {};
 
-let top = {};
-for(let i = 0; i < show; ++i) {
-	top[[sorted_patterns[i]]] = count_by_pattern[sorted_patterns[i]];
-}
+	for(let i = 0; i < show; ++i) {
+		top[[sorted[i]]] = counts[sorted[i]];
+	}
+
+	return top;
+};
+
+const sorted_patterns = sortPatterns(count_by_pattern);
+const sorted_patterns_subbed = sortPatterns(count_by_pattern_subbed);
+//const sorted_sub2 = sortPatterns(count_pattern_sub2);
+
+let top = getTop(sorted_patterns, count_by_pattern);
+let top_subbed = getTop(sorted_patterns_subbed, count_by_pattern_subbed);
+//let top_sub2 = getTop(sorted_sub2, count_pattern_sub2, 73);
+
+const sub = substitute(minimized);
+const sub_url = `/shapeup/${sub}`;
+
+const sub2d = sub2(sub);
+const sub2_url = `/shapeup/${sub2d}`;
+
+const sub3d = sub3(sub2d);
+const sub3_url = `/shapeup/${sub3d}`;
+
+const sub4d = sub4(sub3d);
+const sub4_url = `/shapeup/${sub4d}`;
+
+// $ $ $ pattern
+console.log('A$1$2$A');
+console.log(sub4('A$1$2$A'));
+console.log(unsub4('A"I12A'));
 
 const pretty = obj => {
 	const keys = Object.keys(obj);
@@ -63,8 +128,19 @@ const pretty = obj => {
 	return output.join('\n');
 };
 
-const sub = substitute(minimized);
-const sub_url = `/shapeup/${sub}`;
+const pretty2 = obj => {
+	const keys = Object.keys(obj);
+
+	let output = [];
+	let length = keys[0].length;
+
+	for(let key of keys) {
+		let value = obj[key];
+		output.push(`${key}: ${value} `+(sub2d.indexOf(key) >= 0 ? '*' : ''));
+	}
+
+	return output.join('\n');
+};
 
 export const content = () => [
 	m(ShapeUp, {configuration: raw, size: 4}),
@@ -72,7 +148,7 @@ export const content = () => [
 	m('p', "I've implemented a simple Shape Up Editor on my ", m('a', {href: 'https://flutter.crabcyb.org/#/', target: '_blank'}, 'Flutter page'), ', that passes data back to my site without any backend, passing all of the data for a Shape Up component. But the size of my component can be pretty wordy.'),
 	"For example, the url to load this bumble bee is:",
 	m('a', { style: { wordWrap: 'break-word' }, href: example_url, target: '_blank' }, example_url),
-	m('p', "That's ", example_url.length, " characters long and not exactly a pretty url."),
+	m('p', "The data payload is ", raw_csv.length, " characters long. Surely this can be made smaller!"),
 	m('p', "So how do we make it smaller? ", m('strong', 'Introduce a larger variety of characters!'), " Right now I'm only taking advantage of 0-9 and the comma."),
 	"Since I'm trying to use this data in a url param, I've picked a very standard set of common url friendly characters to add to my arsenal (a-z A-Z ! $) introducing 54 additional characters to our 0-9, bringing the count up to 64.",
 	m('h3', "Why 64?"),
@@ -80,8 +156,8 @@ export const content = () => [
 	m('p', "I can skip on the comma by guaranteeing that all 4 characters are always present instead of truncating any 0s on the left hand side so 255,255,255,255,255,255 is still only ", compress(long), ", 23 characters become 8."),
 	"Our bumble bee's url becomes:",
 	m('a', { style: { wordWrap: 'break-word' }, href: compressed_url, target: '_blank' }, compressed_url),
-	m('p', compressed_url.length, ' characters long! ', Math.round(example_url.length / compressed_url.length * 100)/100, 'x smaller than the larger url.'),
-	m('p', compress(long), " can be optimized further. To reduce repeating sets of values, I am going to introduce an additional 6 characters (^*-_~`) to represent counts. ", compress(long), " becomes ", optimize(long), "."),
+	m('p', 'Our payload is down to ', compressed.length, ' characters, now ', Math.round(raw_csv.length / compressed.length * 100)/100, 'x smaller than the original. That\'s great!'),
+	m('p', 'But ', compress(long), " can be optimized further. To reduce repeating sets of values, I am going to introduce an additional 6 characters (^*-_~`) to represent counts. ", compress(long), " becomes ", optimize(long), "."),
 	"Since there wouldn't be any savings for counting occurences less than 3, it only requires 6 characters to support x3-8.",
 	m('p', '$$ ', counter('$$')),
 	m('p', '$$$ ', counter('$$$')),	
@@ -92,11 +168,22 @@ export const content = () => [
 	m('p', '$$$$$$$$ ', counter('$$$$$$$$')),
 	"Our url becomes:",
 	m('a', { style: { wordWrap: 'break-word' }, href: counter_url, target: '_blank' }, counter_url),
-	m('p', "The result is ", counter_url.length, " characters long, ", Math.round(compressed_url.length / counter_url.length * 100)/100, "x smaller than the version without counts and ", Math.round(example_url.length / counter_url.length * 100)/100, "x smaller than the original url."),
+	m('p', "The result is ", minimized.length, " characters long, ", Math.round(compressed.length / minimized.length * 100)/100, "x smaller than the version without counts and ", Math.round(raw_csv.length / counter_url.length * 100)/100, "x smaller than the original."),
 	"The next thing I did was optimize every level I have, and look for common pairs that I can also replace with special characters.",
 	m('pre', { style: { wordWrap: 'break-word' } }, pretty(top)),
 	"There are two clear winners, 00 and $$. I will replace both of these with two new characters, @ and =, bringing the total to 72.",
-	m('p', sub_url.length, ' characters long! ', Math.round(counter_url.length / sub_url.length * 100)/100, 'x smaller than the previous url, ', Math.round(example_url.length / sub_url.length * 100)/100, "x smaller than the original url."),
+	m('p', sub.length, ' characters long! ', Math.round(minimized.length / sub.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub_url, target: '_blank' }, sub_url),
+	"If we check for common occurences again, a lot of the runners up were knocked off of the list because they shared a 0 or a $. The new winner, is 0^. So I'm introducing a 73rd character, ', to replace this pattern.",
+	m('pre', { style: { wordWrap: 'break-word' } }, pretty(top_subbed)),
+	m('p', sub2d.length, ' characters long. ', Math.round(sub.length / sub2d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub2d.length * 100)/100, "x smaller than the original."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub2_url, target: '_blank' }, sub2_url),
+//	m('pre', { style: { wordWrap: 'break-word' } }, pretty2(top_sub2)),
+	"Why stop there though? I'm introducting a 74th character, \", that always has a trailing character to represent a common pattern's index. I've identified 46 patterns with a length of 3 that occur more than 5 times across my library of puzzles.",
+	m('p', sub3d.length, ' characters long. ', Math.round(sub2d.length / sub3d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub3d.length * 100)/100, "x smaller than the original."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub3_url, target: '_blank' }, sub3_url),
+	m('p', "46 patterns doesn't totally cover every possible index, so I decided to look for new types of patterns, not just *** but patterns like * * *, ** *, * **, and so on. After adding 26 additional patterns, my string is ", sub4d.length, ' characters long. ', Math.round(sub3d.length / sub4d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub4d.length * 100)/100, "x smaller than the original."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub4_url, target: '_blank' }, sub4_url),
+	m('p', "Not a huge gain, but every little bit counts. We're still down ", sub3d.length - sub4d.length, " characters and we didn't have to introduce any new characters."),
 	"Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee!"
 ];
