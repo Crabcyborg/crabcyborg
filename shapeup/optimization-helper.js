@@ -1,7 +1,8 @@
 const table = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!$';
 const counterTable = '^*-_~`'; // x3-8
 const base = table.length;
-const fullTable = table + counterTable + '@=\'"';
+const fullTable = table + counterTable + '@=\'";:';
+const sub6Table = '<>()[]';
 
 String.prototype.replaceAt = function(index, replacement, remove) {
     return this.substr(0, index) + replacement + this.substr(index + (remove === undefined ? replacement.length : remove));
@@ -237,7 +238,145 @@ export const unsub3 = optimized => {
 	return output;
 };
 
-export const optimize = raw => counter(compress(raw));
-export const raw = optimized => decompress(decounter(unsub(unsub2(unsub3(unsub4(optimized))))));
+const sortPatterns = counts => Object.keys(counts).sort(function(a, b) {
+	return counts[b] - counts[a];
+});
 
-export const minimize = raw => sub4(sub3(sub2(substitute(optimize(raw)))));
+export const subTopPattern = (optimized, character) => {
+	let counts = {};
+	for(let i = 0; i < optimized.length-1; ++i) {
+		const pattern = optimized[i] + optimized[i+1];
+		counts[pattern] = (counts[pattern] || 0) + 1;
+	}
+
+	const sort = sortPatterns(counts);
+	const top = sort[0];
+
+	if(counts[top] <= 2) {
+		return optimized;
+	}
+
+	const first_index = optimized.indexOf(top);
+	return optimized.substr(0, first_index) + character + top + optimized.substr(first_index+2).replace(new RegExp(top.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), character);
+};
+
+export const sub5 = input => subTopPattern(subTopPattern(input, ';'), ':');
+
+export const unsubPattern = (input, character) => {
+	let first_index = input.indexOf(character);
+
+	if(first_index === -1) {
+		return input;
+	}
+
+	const pattern = input[first_index+1] + input[first_index+2];
+	return input.replace(character+pattern, pattern).replace(new RegExp(character, 'g'), pattern);
+};
+
+export const unsub5 = input => unsubPattern(unsubPattern(input, ':'), ';');
+
+const number_of_rules = 6;
+
+const ruleAdjustment = (pattern, rule_index) => {
+	switch(rule_index) {
+		case 0: return pattern; // do nothing											<
+		case 1: return pattern[1] + pattern[2] + pattern[0]; // shift left 1			>
+		case 2: return pattern[2] + pattern[0] + pattern[1]; // shift right 1			(
+		case 3: return pattern[1] + pattern[0] + pattern[2]; // swap first 2			)
+		case 4: return pattern[0] + pattern[2] + pattern[1]; // swap last 2				[
+		case 5: return pattern[2] + pattern[1] + pattern[0]; // flip					]
+	}
+};
+
+const patternMatches = (pattern, optimized) => {
+	let adjusted_patterns = [];
+	for(let rule_index = 0; rule_index < number_of_rules; ++rule_index) {
+		adjusted_patterns.push(ruleAdjustment(pattern, rule_index));
+	}
+
+	let matches = {};
+	let number = 0;
+	for(let rule_index = 0; rule_index < number_of_rules; ++rule_index) {
+		const adjusted_pattern = adjusted_patterns[rule_index];
+
+		for(let i = 0; i < optimized.length-2; ++i) {
+			const comparison = optimized[i] + optimized[i+1] + optimized[i+2];
+
+			if(comparison === adjusted_pattern) {
+				matches[rule_index] = rule_index;
+				++number;
+			}
+		}
+	}
+
+	return { matches: Object.values(matches), number };
+};
+
+const numberOfPatternMatches = (pattern, optimized) => patternMatches(pattern, optimized).number;
+
+export const permutations = input => {
+	let adjusted_patterns = [];
+	for(let rule_index = 0; rule_index < number_of_rules; ++rule_index) {
+		adjusted_patterns.push(ruleAdjustment(input, rule_index));
+	}
+
+	return adjusted_patterns;
+};
+
+export const subTopPattern2 = (optimized) => {
+	let counts = {};
+	for(let i = 0; i < optimized.length-2; ++i) {
+		const pattern = optimized[i] + optimized[i+1] + optimized[i+2];
+		counts[pattern] = numberOfPatternMatches(pattern, optimized);
+	}
+
+	const sort = sortPatterns(counts);
+	const top = sort[0];
+
+	if(counts[top] <= 2) {
+		return optimized;
+	}
+
+	const first_index = optimized.indexOf(top);
+	let result = optimized.substr(0, first_index) + sub6Table[0] + top;
+	const matches = patternMatches(top, optimized).matches;
+	let remaining_portion = optimized.substr(first_index+3);
+
+	for(let rule_index of matches) {
+		let comparison = ruleAdjustment(top, rule_index).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		remaining_portion = remaining_portion.replace(new RegExp(comparison, 'g'), () => sub6Table[rule_index]);
+	}
+
+	return result + remaining_portion;
+};
+
+export const unsubPattern2 = (input) => {
+	let first_index = input.indexOf(sub6Table[0]);
+
+	if(first_index === -1) {
+		return input;
+	}
+
+	const pattern = input[first_index+1] + input[first_index+2] + input[first_index+3];
+	let result = input.substr(0, first_index) + pattern;
+	let remaining = input.substr(first_index+4);
+
+	for(let rule_index = number_of_rules-1; rule_index >= 0; --rule_index) {
+		var check = sub6Table[rule_index];
+
+		if(remaining.indexOf(check) >= 0) {
+			let adjusted_pattern = ruleAdjustment(pattern, rule_index);
+			remaining = remaining.replace(new RegExp(check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => adjusted_pattern);
+		}
+	}
+
+	return result + remaining;
+};
+
+export const sub6 = input => subTopPattern2(input);
+export const unsub6 = input => unsubPattern2(input);
+
+export const optimize = raw => counter(compress(raw));
+export const raw = input => decompress(decounter(unsub(unsub2(unsub3(unsub4(unsub5(unsub6(input))))))));
+
+export const minimize = raw => sub6(sub5(sub4(sub3(sub2(substitute(optimize(raw)))))));

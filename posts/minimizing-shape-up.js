@@ -2,7 +2,9 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4 } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations } from '$app/shapeup/optimization-helper';
+
+// permutations https://initjs.org/all-permutations-of-a-set-f1be174c79f8
 
 export const title = 'Minimizing a Shape Up Component';
 
@@ -23,7 +25,7 @@ const long = [255,255,255,255,255,255];
 
 let count_by_pattern = {};
 let count_by_pattern_subbed = {};
-//let count_pattern_sub2 = {};
+let count_pattern_sub2 = {};
 const keys = Object.keys(optimized);
 for(let key of keys) {
 	const shape = optimized[key];
@@ -76,6 +78,12 @@ for(let key of keys) {
 	*/
 }
 
+let sub4d = sub4(sub3(sub2(substitute(minimized))));
+for(let i = 0; i < sub4d.length-1; ++i) {
+	const pattern = sub4d[i] + sub4d[i+1];
+	count_pattern_sub2[pattern] = (count_pattern_sub2[pattern] || 0) + 1;
+}
+
 const sortPatterns = counts => Object.keys(counts).sort(function(a, b) {
 	return counts[b] - counts[a];
 });
@@ -92,11 +100,11 @@ const getTop = (sorted, counts, show = 10) => {
 
 const sorted_patterns = sortPatterns(count_by_pattern);
 const sorted_patterns_subbed = sortPatterns(count_by_pattern_subbed);
-//const sorted_sub2 = sortPatterns(count_pattern_sub2);
+const sorted_sub2 = sortPatterns(count_pattern_sub2);
 
 let top = getTop(sorted_patterns, count_by_pattern);
 let top_subbed = getTop(sorted_patterns_subbed, count_by_pattern_subbed);
-//let top_sub2 = getTop(sorted_sub2, count_pattern_sub2, 73);
+let top_sub2 = sorted_sub2[0];
 
 const sub = substitute(minimized);
 const sub_url = `/shapeup/${sub}`;
@@ -107,13 +115,16 @@ const sub2_url = `/shapeup/${sub2d}`;
 const sub3d = sub3(sub2d);
 const sub3_url = `/shapeup/${sub3d}`;
 
-const sub4d = sub4(sub3d);
+sub4d = sub4(sub3d);
 const sub4_url = `/shapeup/${sub4d}`;
 
-// $ $ $ pattern
-console.log('A$1$2$A');
-console.log(sub4('A$1$2$A'));
-console.log(unsub4('A"I12A'));
+const sub5d = sub5(sub4d);
+const sub5_url = `/shapeup/${sub5d}`;
+
+const sub6d = sub6(sub5d);
+const sub6_url = `/shapeup/${sub6d}`;
+
+const sub5example = '0130101401';
 
 const pretty = obj => {
 	const keys = Object.keys(obj);
@@ -178,12 +189,19 @@ export const content = () => [
 	m('pre', { style: { wordWrap: 'break-word' } }, pretty(top_subbed)),
 	m('p', sub2d.length, ' characters long. ', Math.round(sub.length / sub2d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub2d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub2_url, target: '_blank' }, sub2_url),
-//	m('pre', { style: { wordWrap: 'break-word' } }, pretty2(top_sub2)),
 	"Why stop there though? I'm introducting a 74th character, \", that always has a trailing character to represent a common pattern's index. I've identified 46 patterns with a length of 3 that occur more than 5 times across my library of puzzles.",
 	m('p', sub3d.length, ' characters long. ', Math.round(sub2d.length / sub3d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub3d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub3_url, target: '_blank' }, sub3_url),
 	m('p', "46 patterns doesn't totally cover every possible index, so I decided to look for new types of patterns, not just *** but patterns like * * *, ** *, * **, and so on. After adding 26 additional patterns, my string is ", sub4d.length, ' characters long. ', Math.round(sub3d.length / sub4d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub4d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub4_url, target: '_blank' }, sub4_url),
 	m('p', "Not a huge gain, but every little bit counts. We're still down ", sub3d.length - sub4d.length, " characters and we didn't have to introduce any new characters."),
-	"Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee!"
+	m('p', "I'm not out of ideas yet. I want to implement another new character to introduce another new technique that isn't about identifying common patterns across all puzzles, but one that specifically looks for common patterns in our current puzzle. If I put our new character, ;, before the first occurence of this 2 character pattern, I can replace all future occurences with our new character. As an example, ", sub5example, " would become ", sub5(sub5example)),
+	m('p', "For our bumble bee the pattern ", top_sub2, " appears ", count_pattern_sub2[top_sub2], " times. If we can designate one character to replace these ", count_pattern_sub2[top_sub2], " patterns, we'll cut off ", count_pattern_sub2[top_sub2]-2, " characters. And if we target another common pattern, 'f with another new character, :, we can cut off ", count_pattern_sub2["'f"]-2, " more. If no pattern appears more than twice, we can avoid this technique altogether as it doesn't help us at all."),
+	m('p', sub5d.length, ' characters long. ', Math.round(sub4d.length / sub5d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub5d.length * 100)/100, "x smaller than the original."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub5_url, target: '_blank' }, sub5_url),
+	"Next I can't help but notice that my bumble bee still has the pattern 403 repeating twice. I also see 043, which is so close as well. I'm introducting 6 new characters, <>()[], to handle all of the permutations of a 3 character pattern.",
+	m('p', "A 3 letter pattern, at most, has 6 permutations, hence the 6 new characters. The permutations for 403 are: ", permutations('403').join(' '), "."),
+	m('p', sub6d.length, ' characters long. ', Math.round(sub5d.length / sub6d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub6d.length * 100)/100, "x smaller than the original."),	
+	m('a', { style: { wordWrap: 'break-word' }, href: sub6_url, target: '_blank' }, sub6_url),
+	"Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my goal of under 150 characters and under a 30% compression ratio."
 ];
