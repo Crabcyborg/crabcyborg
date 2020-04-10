@@ -192,8 +192,8 @@ export const content = () => [
 	m('p', "A 3 character pattern, at most, has 6 permutations, hence the 6 new characters. The permutations for 403 are: ", permutations('403').join(' '), "."),
 	m('p', sub6d.length, ' characters long. ', Math.round(sub5d.length / sub6d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub6d.length * 100)/100, "x smaller than the original."),	
 	m('a', { style: { wordWrap: 'break-word' }, href: sub6_url, target: '_blank' }, sub6_url),
-	"We may as well add in {} to replace the most active 2 character patterns and their one other permutation (the only thing you can do with the 2 characters is flip them).",
-	m('p', sub7d.length, " characters long. In this particular case, we substituted $* 3 times, finding 0 matches for *$, saving one more character. Our final result is ", Math.round(sub6d.length / sub7d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub7d.length * 100)/100, "x smaller than the original."),
+	m('p', "We may as well add in {} to replace the most active 2 character patterns and their one other permutation (the only thing you can do with the 2 characters is flip them). But just matching for one other permutation doesn't cast a really big net, so I'm introducing 2 more characters, + and |, to replace instances where this pattern appears with another character in between the two. For instance, in this puzzle, 0-8, 80, 068, and 08 all appear. Minimized, 0-8 80 068 08 this becomes ", sub7('0-8 80 068 08'), ", down 2 characters."),
+	m('p', sub7d.length, " characters long. Our final result is ", Math.round(sub6d.length / sub7d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub7d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub7_url, target: '_blank' }, sub7_url),
 	m('p', "Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my target goal: get the payload to 150(", sub7d.length,") characters, achieve a compression ratio of under 30(", Math.round(sub7d.length / raw_csv.length * 10000)/100,")%.")
 ];

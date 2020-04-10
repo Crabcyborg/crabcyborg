@@ -3,11 +3,13 @@ const counterTable = '^*-_~`'; // x3-8
 const base = table.length;
 const fullTable = table + counterTable + '@=\'";:';
 const sub6Table = '<>()[]';
-const sub7Table = '{}';
+const sub7Table = '{}+|';
 
 String.prototype.replaceAt = function(index, replacement, remove) {
     return this.substr(0, index) + replacement + this.substr(index + (remove === undefined ? replacement.length : remove));
 };
+
+const escape = string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const toBase = number => {
 	var r = number % base;
@@ -380,8 +382,13 @@ export const unsub6 = input => unsubPattern2(input);
 export const subTopPattern3 = (optimized) => {
 	let counts = {};
 	for(let i = 0; i < optimized.length-1; ++i) {
-		const pattern = [optimized[i] + optimized[i+1]].sort().join('');
+		let pattern = [optimized[i] + optimized[i+1]].sort().join('');
 		counts[pattern] = (counts[pattern] || 0) + 1;
+
+		if(i < optimized.length-2) {
+			pattern = [optimized[i] + optimized[i+2]].sort().join('');
+			counts[pattern] = (counts[pattern] || 0) + 1;
+		}
 	}
 
 	const sort = sortPatterns(counts);
@@ -391,35 +398,111 @@ export const subTopPattern3 = (optimized) => {
 		return optimized;
 	}
 
-	const first_index = optimized.indexOf(top);
-	let result = optimized.substr(0, first_index) + sub7Table[0] + top;
-	let remaining_portion = optimized.substr(first_index+2);
+	const flip = top[1] + top[0];
+
+	let first_index, first_character, first_pattern;
+	for(let char_index = 0; char_index < optimized.length-1; ++char_index) {
+		let current = optimized[char_index] + optimized[char_index+1];
+		if(current === top || current === flip) {
+			first_index = char_index;
+			first_character = current === top ? sub7Table[0] : sub7Table[1];
+			first_pattern = current;
+			break;
+		}
+
+		if(char_index < optimized.length-2) {
+			current = optimized[char_index] + optimized[char_index+2];
+			if(current === top || current === flip) {
+				first_index = char_index;
+				first_character = current === top ? sub7Table[2] : sub7Table[3];
+				first_pattern = optimized[char_index] + optimized[char_index+1] + optimized[char_index+2];
+				break;
+			}
+		}
+	}
+
+	let result = optimized.substr(0, first_index) + first_character + first_pattern;
+	let remaining_portion = optimized.substr(first_index+first_pattern.length);
 
 	for(let c of sub7Table) {
-		let comparison = c === '{' ? top : top[1] + top[0];
-		remaining_portion = remaining_portion.replace(new RegExp(comparison.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => c);
+		let comparison;
+		let replace;
+
+
+		switch(c) {
+			case sub7Table[0]: comparison = escape(top); replace = c; break;
+			case sub7Table[1]: comparison = escape(top[1] + top[0]); replace = c; break;
+			case sub7Table[2]: comparison = '(' + escape(top[0]) + ')([^]{1})(' + escape(top[1]) + ')'; replace = c + "$2"; break;
+			case sub7Table[3]: comparison = '(' + escape(top[1]) + ')([^]{1})(' + escape(top[0]) + ')'; replace = c + "$2"; break;
+		}
+
+		remaining_portion = remaining_portion.replace(new RegExp(`${comparison}`, 'g'), replace);
 	}
 
 	return result + remaining_portion;
 };
 
 export const unsubPattern3 = (input) => {
-	let first_index = input.indexOf(sub7Table[0]);
+	let first_index = -1;
+	let first_character;
+
+	for(let rule_index = 0; rule_index < sub7Table.length; ++rule_index) {
+		let index = input.indexOf(sub7Table[rule_index]);
+
+		if(index !== -1 && (first_index === -1 || index < first_index)) {
+			first_index = index;
+			first_character = sub7Table[rule_index];
+		}
+	}
 
 	if(first_index === -1) {
 		return input;
 	}
 
-	const pattern = input[first_index+1] + input[first_index+2];
-	let result = input.substr(0, first_index) + pattern;
-	let remaining = input.substr(first_index+3);
+	let trailing = input.substr(first_index+1, 3);
+	let characters = '';
+	let result = input.substr(0, first_index);
+	let step;
 
-	for(let c of sub7Table) {
+	switch(first_character) {
+		case sub7Table[0]:
+			characters += trailing[0] + trailing[1];
+			result += trailing.substr(0, 2);
+			step = 3;
+		break;
+
+		case sub7Table[2]:
+			characters += trailing[0] + trailing[2];
+			result += trailing;
+			step = 4;
+		break;
+	}
+
+	console.log('first character', first_character);
+	console.log('the pattern is', characters);
+	console.log('result', result);
+
+	let remaining = input.substr(first_index+step);
+
+	for(let char_index = sub7Table.length-1; char_index >= 0; --char_index) {
+		const c = sub7Table[char_index];
+
 		if(remaining.indexOf(c) >= 0) {
-			let adjusted_pattern = c === '{' ? pattern : pattern[1] + pattern[0];
-			remaining = remaining.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => adjusted_pattern);
+			let comparison;
+			let replace;
+
+			switch(c) {
+				case sub7Table[0]: comparison = escape(sub7Table[0]); replace = () => characters; break;
+				case sub7Table[1]: comparison = escape(sub7Table[1]); replace = () => characters[1] + characters[0]; break;
+				case sub7Table[2]: comparison = '('+escape(sub7Table[2])+')([^]{1})'; replace = characters[0] + "$2" + characters[1]; break;
+				case sub7Table[3]: comparison = '('+escape(sub7Table[3])+')([^]{1})'; replace = characters[1] + "$2" + characters[0]; break;
+			}
+
+			remaining = remaining.replace(new RegExp(comparison, 'g'), replace);
 		}
 	}
+
+	console.log(result + remaining);
 
 	return result + remaining;
 };
