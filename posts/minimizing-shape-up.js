@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations, sub7 } from '$app/shapeup/optimization-helper';
 
 // permutations https://initjs.org/all-permutations-of-a-set-f1be174c79f8
 
@@ -124,6 +124,9 @@ const sub5_url = `/shapeup/${sub5d}`;
 const sub6d = sub6(sub5d);
 const sub6_url = `/shapeup/${sub6d}`;
 
+const sub7d = sub7(sub6d);
+const sub7_url = `/shapeup/${sub7d}`;
+
 const sub5example = '0130101401';
 
 const pretty = obj => {
@@ -134,20 +137,6 @@ const pretty = obj => {
 	for(let key of keys) {
 		let value = obj[key];
 		output.push(`${key}: ${value}`);
-	}
-
-	return output.join('\n');
-};
-
-const pretty2 = obj => {
-	const keys = Object.keys(obj);
-
-	let output = [];
-	let length = keys[0].length;
-
-	for(let key of keys) {
-		let value = obj[key];
-		output.push(`${key}: ${value} `+(sub2d.indexOf(key) >= 0 ? '*' : ''));
 	}
 
 	return output.join('\n');
@@ -200,8 +189,11 @@ export const content = () => [
 	m('p', sub5d.length, ' characters long. ', Math.round(sub4d.length / sub5d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub5d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub5_url, target: '_blank' }, sub5_url),
 	"Next I can't help but notice that my bumble bee still has the pattern 403 repeating twice. I also see 043, which is so close as well. I'm introducting 6 new characters, <>()[], to handle all of the permutations of a 3 character pattern.",
-	m('p', "A 3 letter pattern, at most, has 6 permutations, hence the 6 new characters. The permutations for 403 are: ", permutations('403').join(' '), "."),
+	m('p', "A 3 character pattern, at most, has 6 permutations, hence the 6 new characters. The permutations for 403 are: ", permutations('403').join(' '), "."),
 	m('p', sub6d.length, ' characters long. ', Math.round(sub5d.length / sub6d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub6d.length * 100)/100, "x smaller than the original."),	
 	m('a', { style: { wordWrap: 'break-word' }, href: sub6_url, target: '_blank' }, sub6_url),
-	"Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my goal of under 150 characters and under a 30% compression ratio."
+	"We may as well add in {} to replace the most active 2 character patterns and their one other permutation (the only thing you can do with the 2 characters is flip them).",
+	m('p', sub7d.length, " characters long. In this particular case, we substituted $* 3 times, finding 0 matches for *$, saving one more character. Our final result is ", Math.round(sub6d.length / sub7d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub7d.length * 100)/100, "x smaller than the original."),
+	m('a', { style: { wordWrap: 'break-word' }, href: sub7_url, target: '_blank' }, sub7_url),
+	m('p', "Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my target goal: get the payload to 150(", sub7d.length,") characters, achieve a compression ratio of under 30(", Math.round(sub7d.length / raw_csv.length * 10000)/100,")%.")
 ];

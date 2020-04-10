@@ -3,6 +3,7 @@ const counterTable = '^*-_~`'; // x3-8
 const base = table.length;
 const fullTable = table + counterTable + '@=\'";:';
 const sub6Table = '<>()[]';
+const sub7Table = '{}';
 
 String.prototype.replaceAt = function(index, replacement, remove) {
     return this.substr(0, index) + replacement + this.substr(index + (remove === undefined ? replacement.length : remove));
@@ -376,7 +377,57 @@ export const unsubPattern2 = (input) => {
 export const sub6 = input => subTopPattern2(input);
 export const unsub6 = input => unsubPattern2(input);
 
-export const optimize = raw => counter(compress(raw));
-export const raw = input => decompress(decounter(unsub(unsub2(unsub3(unsub4(unsub5(unsub6(input))))))));
+export const subTopPattern3 = (optimized) => {
+	let counts = {};
+	for(let i = 0; i < optimized.length-1; ++i) {
+		const pattern = [optimized[i] + optimized[i+1]].sort().join('');
+		counts[pattern] = (counts[pattern] || 0) + 1;
+	}
 
-export const minimize = raw => sub6(sub5(sub4(sub3(sub2(substitute(optimize(raw)))))));
+	const sort = sortPatterns(counts);
+	const top = sort[0];
+
+	if(counts[top] <= 2) {
+		return optimized;
+	}
+
+	const first_index = optimized.indexOf(top);
+	let result = optimized.substr(0, first_index) + sub7Table[0] + top;
+	let remaining_portion = optimized.substr(first_index+2);
+
+	for(let c of sub7Table) {
+		let comparison = c === '{' ? top : top[1] + top[0];
+		remaining_portion = remaining_portion.replace(new RegExp(comparison.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => c);
+	}
+
+	return result + remaining_portion;
+};
+
+export const unsubPattern3 = (input) => {
+	let first_index = input.indexOf(sub7Table[0]);
+
+	if(first_index === -1) {
+		return input;
+	}
+
+	const pattern = input[first_index+1] + input[first_index+2];
+	let result = input.substr(0, first_index) + pattern;
+	let remaining = input.substr(first_index+3);
+
+	for(let c of sub7Table) {
+		if(remaining.indexOf(c) >= 0) {
+			let adjusted_pattern = c === '{' ? pattern : pattern[1] + pattern[0];
+			remaining = remaining.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => adjusted_pattern);
+		}
+	}
+
+	return result + remaining;
+};
+
+export const sub7 = input => subTopPattern3(input);
+export const unsub7 = input => unsubPattern3(input);
+
+export const optimize = raw => counter(compress(raw));
+export const raw = input => decompress(decounter(unsub(unsub2(unsub3(unsub4(unsub5(unsub6(unsub7(input)))))))));
+
+export const minimize = raw => sub7(sub6(sub5(sub4(sub3(sub2(substitute(optimize(raw))))))));
