@@ -350,7 +350,8 @@ export const subTopPattern2 = (optimized) => {
 		remaining_portion = remaining_portion.replace(new RegExp(comparison, 'g'), () => sub6Table[rule_index]);
 	}
 
-	return result + remaining_portion;
+	result += remaining_portion;
+	return result.length < optimized.length ? result : optimized;
 };
 
 export const unsubPattern2 = (input) => {
@@ -392,7 +393,7 @@ export const subTopPattern3 = (optimized) => {
 	}
 
 	const sort = sortPatterns(counts);
-	const top = sort[0];
+	let top = sort[0];
 
 	if(counts[top] <= 2) {
 		return optimized;
@@ -404,8 +405,12 @@ export const subTopPattern3 = (optimized) => {
 	for(let char_index = 0; char_index < optimized.length-1; ++char_index) {
 		let current = optimized[char_index] + optimized[char_index+1];
 		if(current === top || current === flip) {
+			if(current === flip) {
+				top = flip;
+			}
+
 			first_index = char_index;
-			first_character = current === top ? sub7Table[0] : sub7Table[1];
+			first_character = sub7Table[0];
 			first_pattern = current;
 			break;
 		}
@@ -413,8 +418,12 @@ export const subTopPattern3 = (optimized) => {
 		if(char_index < optimized.length-2) {
 			current = optimized[char_index] + optimized[char_index+2];
 			if(current === top || current === flip) {
+				if(current === flip) {
+					top = flip;
+				}
+
 				first_index = char_index;
-				first_character = current === top ? sub7Table[2] : sub7Table[3];
+				first_character = sub7Table[2];
 				first_pattern = optimized[char_index] + optimized[char_index+1] + optimized[char_index+2];
 				break;
 			}
@@ -478,10 +487,6 @@ export const unsubPattern3 = (input) => {
 		break;
 	}
 
-	console.log('first character', first_character);
-	console.log('the pattern is', characters);
-	console.log('result', result);
-
 	let remaining = input.substr(first_index+step);
 
 	for(let char_index = sub7Table.length-1; char_index >= 0; --char_index) {
@@ -501,8 +506,6 @@ export const unsubPattern3 = (input) => {
 			remaining = remaining.replace(new RegExp(comparison, 'g'), replace);
 		}
 	}
-
-	console.log(result + remaining);
 
 	return result + remaining;
 };

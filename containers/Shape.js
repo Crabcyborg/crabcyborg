@@ -16,7 +16,7 @@ export var Shape = {
 	view: v => m(
 		ShapeUp,
 		{
-			size: Math.min(10, Math.floor(360 / v.state.configuration[1])),
+			size: Math.min(8, Math.floor(320 / v.state.configuration[1])),
 			configuration: v.state.configuration,
 			behaviour: 'blink',
 			blink_delay: 500

@@ -4,8 +4,6 @@ import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations, sub7, patterns, other_patterns } from '$app/shapeup/optimization-helper';
 
-// permutations https://initjs.org/all-permutations-of-a-set-f1be174c79f8
-
 export const title = 'Minimizing a Shape Up Component';
 
 const key = 'BUZZ';
