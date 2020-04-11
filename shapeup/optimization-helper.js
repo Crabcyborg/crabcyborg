@@ -141,7 +141,7 @@ export const unsub = subbed => subbed.replace(/\@/g, '00').replace(/\=/g, '$$$')
 export const sub2 = optimized => optimized.replace(/0\^/g, '\'');
 export const unsub2 = optimized => optimized.replace(/'/g, '0^');
 
-const patterns = [
+export const patterns = [
 	'3\\$0', 'Y0\\$', 'M0\\*', '!f\\$', '@20', '080', '0Y0', '0f0', '\\$`\\$',
 	'3w0', 'fYf', '0fU', '"23', 'c01', 'Y07', '0fY', '!3\\$', '020', '3M3',
 	'Y@f', '0fM', '\\$"3', '\\$\\^Y', '640', '030', '1Y0', '1M0', 'Yf=', '@3w',
@@ -158,7 +158,7 @@ export const sub3 = optimized => {
 	return output;
 };
 
-const other_patterns = [
+export const other_patterns = [
 	'$ $ $', '"  "  "', '$M  $', '01  0', '= $  $', '01  \'', 'M f  0',
 	'0 "  0', '0 "  "', '0  "  0', 'M " M', '3 0 "', 'M  0  "', 'm  q  G',
 	'$  $  f', 'Y $ Y', '"  f  "', '1w0', '0  " "', '$^ $', '1 "V',

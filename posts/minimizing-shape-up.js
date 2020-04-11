@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations, sub7 } from '$app/shapeup/optimization-helper';
+import { compress, decompress, counter, decounter, optimize, substitute, unsub, sub2, sub3, sub4, unsub4, sub5, sub6, permutations, sub7, patterns, other_patterns } from '$app/shapeup/optimization-helper';
 
 // permutations https://initjs.org/all-permutations-of-a-set-f1be174c79f8
 
@@ -179,9 +179,11 @@ export const content = () => [
 	m('p', sub2d.length, ' characters long. ', Math.round(sub.length / sub2d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub2d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub2_url, target: '_blank' }, sub2_url),
 	"Why stop there though? I'm introducting a 74th character, \", that always has a trailing character to represent a common pattern's index. I've identified 46 patterns with a length of 3 that occur more than 5 times across my library of puzzles.",
+	m('p', patterns.join(', ').replace(/\\/g, '')),
 	m('p', sub3d.length, ' characters long. ', Math.round(sub2d.length / sub3d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub3d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub3_url, target: '_blank' }, sub3_url),
 	m('p', "46 patterns doesn't totally cover every possible index, so I decided to look for new types of patterns, not just *** but patterns like * * *, ** *, * **, and so on. After adding 26 additional patterns, my string is ", sub4d.length, ' characters long. ', Math.round(sub3d.length / sub4d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub4d.length * 100)/100, "x smaller than the original."),
+	m('p', other_patterns.join(', ').replace(/\\/g, '')),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub4_url, target: '_blank' }, sub4_url),
 	m('p', "Not a huge gain, but every little bit counts. We're still down ", sub3d.length - sub4d.length, " characters and we didn't have to introduce any new characters."),
 	m('p', "I'm not out of ideas yet. I want to implement another new character to introduce another new technique that isn't about identifying common patterns across all puzzles, but one that specifically looks for common patterns in our current puzzle. If I put our new character, ;, before the first occurence of this 2 character pattern, I can replace all future occurences with our new character. As an example, ", sub5example, " would become ", sub5(sub5example)),
@@ -192,7 +194,7 @@ export const content = () => [
 	m('p', "A 3 character pattern, at most, has 6 permutations, hence the 6 new characters. The permutations for 403 are: ", permutations('403').join(' '), "."),
 	m('p', sub6d.length, ' characters long. ', Math.round(sub5d.length / sub6d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub6d.length * 100)/100, "x smaller than the original."),	
 	m('a', { style: { wordWrap: 'break-word' }, href: sub6_url, target: '_blank' }, sub6_url),
-	m('p', "We may as well add in {} to replace the most active 2 character patterns and their one other permutation (the only thing you can do with the 2 characters is flip them). But just matching for one other permutation doesn't cast a really big net, so I'm introducing 2 more characters, + and |, to replace instances where this pattern appears with another character in between the two. For instance, in this puzzle, 0-8, 80, 068, and 08 all appear. Minimized, 0-8 80 068 08 this becomes ", sub7('0-8 80 068 08'), ", down 2 characters."),
+	m('p', "We may as well add in {} to replace the most active 2 character patterns and their one other permutation (the only thing you can do with the 2 characters is flip them). But just matching for one other permutation doesn't cast a really big net, so I'm introducing 2 more characters, + and |, to replace instances where this pattern appears with another character in between the two. For instance, in this puzzle, 0-8, 80, 068, and 08 all appear. Minimized, 0-8 80 068 08 becomes ", sub7('0-8 80 068 08'), ", down 2 characters."),
 	m('p', sub7d.length, " characters long. Our final result is ", Math.round(sub6d.length / sub7d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub7d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub7_url, target: '_blank' }, sub7_url),
 	m('p', "Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my target goal: get the payload to 150(", sub7d.length,") characters, achieve a compression ratio of under 30(", Math.round(sub7d.length / raw_csv.length * 10000)/100,")%.")

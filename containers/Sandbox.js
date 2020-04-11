@@ -1,7 +1,8 @@
 import m from 'mithril';
+import { shapes } from '$app/shapeup/shapes';
+import { injectScript } from '$app/helpers';
 
 const oninit = v => {
-
 
 };
 
