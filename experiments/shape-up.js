@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { ShapeUp, TargetShape, Score, Trigger } from '$app/components';
 import { shapes } from '$app/shapeup/shapes-optimized';
-import { raw } from '$app/shapeup/optimization-helper';
+import { min } from 'min-string';
 
 const configuration_keys = Object.keys(shapes);
 var configuration_index = 0;
@@ -37,7 +37,7 @@ export var experiment = {
 				ShapeUp,
 				{
 					i: 'shapeup',
-					configuration: () => raw(shapes[configuration_keys[configuration_index]]),
+					configuration: () => min.decompress(shapes[configuration_keys[configuration_index]]),
 					size: shape_size,
 					behaviour: 'click-target',
 					blink_delay: 1000,
@@ -50,14 +50,14 @@ export var experiment = {
 					style: {
 						top: 0,
 						bottom: 0,
-						left: (raw(shapes[configuration_keys[configuration_index]])[1]*shape_size + 60)+'px',
-						width: (raw(shapes[configuration_keys[configuration_index]])[1]*target_size) * 1.25+'px',
+						left: (min.decompress(shapes[configuration_keys[configuration_index]])[1]*shape_size + 60)+'px',
+						width: (min.decompress(shapes[configuration_keys[configuration_index]])[1]*target_size) * 1.25+'px',
 						border: '1px solid #efefef'
 					}
 				},
 				m(TargetShape, {i: 'shapeup', size: target_size, style: { top: '50%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' }})
 			),
-			m(Score, {i: 'shapeup', style: { position: 'absolute', left: (raw(shapes[configuration_keys[configuration_index]])[1]*(shape_size+target_size*1.25) + 80)+'px' }}),
+			m(Score, {i: 'shapeup', style: { position: 'absolute', left: (min.decompress(shapes[configuration_keys[configuration_index]])[1]*(shape_size+target_size*1.25) + 80)+'px' }}),
 			m(
 				Trigger,
 				{

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { vizsla } from '$app/assets';
 import { toLargerRects, trace } from '$app/shapeup/svg-helper';
-import { minimize } from '$app/shapeup/optimization-helper';
+import { min } from 'min-string';
 
 export const title = 'Tracing a Shape Up Component';
 
@@ -19,7 +19,11 @@ const Canvas = {
 
 		let { cells, configuration, dimensions } = trace(d);
 
-		configuration = minimize(configuration);
+		const raw = configuration;
+		console.log(raw.join(','));
+
+		configuration = min.compress(configuration);
+
 		try_me = `/shapeup/${configuration}`;
 
 		const normalized_size = d.width / Math.max(dimensions.width, dimensions.height);

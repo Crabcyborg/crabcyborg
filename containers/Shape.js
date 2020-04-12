@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { raw } from '$app/shapeup/optimization-helper';
+import { min } from 'min-string';
 
 export var Shape = {
 	oninit: v => {
@@ -8,7 +8,7 @@ export var Shape = {
 
 		if(shape.indexOf(',') === -1) {
 			// compressed
-			v.state.configuration = raw(shape);
+			v.state.configuration = min.decompress(shape);
 		} else {
 			v.state.configuration = shape.split(',');
 		}
