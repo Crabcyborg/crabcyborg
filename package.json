@@ -4,7 +4,7 @@
   "description": "Cracyborg",
   "dependencies": {
     "animejs": "^3.1.0",
-    "min-string": "^1.0.1",
+    "min-string": "^1.0.5",
     "mithril": "^1.1.6"
   },
   "devDependencies": {

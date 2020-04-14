@@ -20,7 +20,6 @@ const Canvas = {
 		let { cells, configuration, dimensions } = trace(d);
 
 		const raw = configuration;
-		console.log(raw.join(','));
 
 		configuration = min.compress(configuration);
 

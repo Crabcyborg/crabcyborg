@@ -6,6 +6,7 @@ import * as using_anime_js from './using-anime-js';
 import * as shape_up from './shape-up';
 import * as shape_up_anime from './shape-up-anime';
 import * as minimizing_shape_up from './minimizing-shape-up';
+import * as minimizing_large_shape_up from './minimizing-large-shape-up';
 import * as tracing_shape_up from './tracing-shape-up';
 import * as shape_up_text from './shape-up-text';
 import * as tracing_shape_up_font from './tracing-shape-up-font';
@@ -19,6 +20,7 @@ const imports = {
 	shape_up,
 	shape_up_anime,
 	minimizing_shape_up,
+	minimizing_large_shape_up,
 	tracing_shape_up,
 	shape_up_text,
 	tracing_shape_up_font

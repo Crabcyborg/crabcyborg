@@ -7,6 +7,7 @@ import * as shapeup_paperjs from './shapeup-paperjs';
 import * as shapeup_fillrect from './shapeup-fillrect';
 import * as shapeup_svg from './shapeup-svg';
 import * as shapeup_matter from './shapeup-matter';
+import * as min_string_string from './min-string-string';
 
 export var experiments = {	
 	'shape-up': shape_up,
@@ -17,5 +18,6 @@ export var experiments = {
 	'shapeup-paperjs': shapeup_paperjs,
 	'shapeup-fillrect': shapeup_fillrect,
 	'shapeup-svg': shapeup_svg,
-	'shapeup-matter': shapeup_matter
+	'shapeup-matter': shapeup_matter,
+	'min-string-string': min_string_string
 };
