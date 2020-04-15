@@ -8,7 +8,20 @@ const compress = min.compress, decompress = min.decompress;
 
 export const title = 'Minimizing a Large Shape Up Component';
 
-let data, url, first, second, third, alternative_url;
+let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
+
+const moreTopPatterns = input => {
+	for(let c of min.three_character_permutations_symbols) input = min.subTopPattern(input, c);
+	return input;
+};
+
+const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, min.topTwoPatterns, moreTopPatterns, min.twoCharacterPermutations);
+
+const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
+const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, min.topTwoPatterns, moreTopPatterns, min.twoCharacterPermutations);
+
+const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
+const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
 
 const meta = key => {
 	const raw = shapes[key];
@@ -23,17 +36,11 @@ const meta = key => {
 	const on_off_csv_length = on_off_csv.length;	
 	const on_off_compressed = compress(on_off);
 	const on_off_compressed_length = on_off_compressed.length;
-	return {raw, compressed, compressed_length, raw_length, raw_csv, raw_csv_length, on_off, on_off_length, on_off_csv, on_off_csv_length, on_off_compressed, on_off_compressed_length};
+	const on_off_max = Math.max(...on_off);
+	return {raw, compressed, compressed_length, raw_length, raw_csv, raw_csv_length, on_off, on_off_length, on_off_csv, on_off_csv_length, on_off_compressed, on_off_compressed_length, on_off_max};
 };
 
 const examples = ['DOG', 'NY', 'BUZZ'];
-
-const moreTopPatterns = input => {
-	for(let c of '^*-_~`') input = min.subTopPattern(input, c);
-	return input;
-};
-
-const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, min.topTwoPatterns, moreTopPatterns, min.twoCharacterPermutations);
 
 export const oninit = () => {
 	data = {};
@@ -43,8 +50,12 @@ export const oninit = () => {
 	third = data[examples[2]];
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
+	third.on_off_base49 = alternativeBase49(third.on_off);
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
+	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
+	base82 = toBase82(first.on_off);
+	alternative_base82_url = `/shapeup/*${base82}`;
 };
 
 export const content = () => [
@@ -89,4 +100,15 @@ export const content = () => [
 	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
 	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before."),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_url, target: '_blank' }, alternative_url)),
+	m('p', "To find a pattern, it always helps to see the data you're working with:"),
+	m('p', { style: { wordWrap: 'break-word' } }, third.on_off_csv),
+	m('p', 'No values ever exceed ', third.on_off_max, ', so I can get this a lot smaller if I drop support for values up to 255.'),
+	'If I treat each value as an index in my array of base 64 characters, I can support any gap up to 63 with just a single character, immediately reducing the size of our base 64 string by 25%.',
+	m('p', 'Our bumble bee is down to only ', third.on_off_base49.length, ' characters long, now ', Math.round(third.raw_csv_length / third.on_off_base49.length * 100)/100, 'x smaller than the original.'),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base49_url, target: '_blank' }, alternative_base49_url)),
+	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
+	m('p', { style: { wordWrap: 'break-word' } }, first.on_off_csv),
+	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base82_url, target: '_blank' }, alternative_base82_url)),
+	m('p', 'Our lean little pup is down to only ', base82.length, ' characters long, now ', Math.round(first.raw_csv_length / base82.length * 100)/100, 'x smaller than the original.')
 ];
