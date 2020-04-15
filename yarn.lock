@@ -2471,10 +2471,10 @@ mimic-fn@^2.0.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-min-string@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/min-string/-/min-string-1.0.5.tgz#074e2698bb677eb8de48cd8221b0f4f4903200d7"
-  integrity sha512-DG63rvEqLSTjyEf0bjg3LSQ/UbTx4EkMWkQ7cIVFwAzcwyMi+SE7nkRMfkwDoaVwP4ziJMcVXuJPUEZYCSUAgQ==
+min-string@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/min-string/-/min-string-1.0.6.tgz#2b0d27b4e32013d947b6a918e828563b24a5964b"
+  integrity sha512-8aqFmoeN4Zrixk9G7WtUKbydx7aL79G/fB624jHAy09SwkcmOqNFDI9gV07tXq5ZArEFpI2DqxN4iyBFsaOibQ==
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
