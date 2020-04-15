@@ -8,7 +8,7 @@ const compress = min.compress, decompress = min.decompress;
 
 export const title = 'Minimizing a Large Shape Up Component';
 
-let data, url, first, second, third;
+let data, url, first, second, third, alternative_url;
 
 const meta = key => {
 	const raw = shapes[key];
@@ -44,6 +44,7 @@ export const oninit = () => {
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
 	url = `/shapeup/|${first.on_off_compressed}`;
+	alternative_url = `/shapeup/}${first.alternative}`;
 };
 
 export const content = () => [
@@ -86,5 +87,6 @@ export const content = () => [
 	'Our bumble bee might have a fighting chance. The On/Off Array is smaller before it is compressed and larger after. The compressions are better configured for the original set of data so maybe we can tweak our min-string configuration and get a smaller payload here as well.',
 	m('p.mt0', 'Alternative Compressed On/Off Length: ', third.alternative.length),
 	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
-	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before.")
+	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before."),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_url, target: '_blank' }, alternative_url)),
 ];
