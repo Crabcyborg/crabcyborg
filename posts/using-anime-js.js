@@ -8,7 +8,7 @@ import * as assets from '$app/assets';
 
 export const title = 'Animating your Amalgamation with anime.js';
 
-export const oninit = () => {
+export const oncreate = () => {
 	wave('wave-target');
 	bounce('bounce-target');
 };

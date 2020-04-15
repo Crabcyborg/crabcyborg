@@ -5,7 +5,7 @@ import { wave } from '$app/animations/lady-tiger';
 
 export const title = 'Putting Together Animal Body Parts with Mithril';
 
-export const oninit = () => {
+export const oncreate = () => {
 	wave('wave-target');
 };
 

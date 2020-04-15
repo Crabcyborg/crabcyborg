@@ -203,7 +203,7 @@ export const fan = (id) => {
 	setTimeout(() => fan(id), 2300);
 };
 
-export const oninit = () => {
+export const oncreate = () => {
 	wave('wave-target');
 	walk('walk-target');
 	typetypetype('type-target');

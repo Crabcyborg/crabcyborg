@@ -109,7 +109,7 @@ const wordToConfiguration = word => {
 	return configuration;
 };
 
-const oninit = v => {
+const oncreate = v => {
 	const { message } = v.attrs;
 	const words = message.split(' ');
 
@@ -122,7 +122,7 @@ const oninit = v => {
 }
 
 const ShapeUpText = {
-	oninit,
+	oncreate,
 	view: v => v.state.shapes.map(configuration => m(ShapeUp, {configuration, size, style: v.attrs.style, behaviour: 'blink', blink_delay: 500}))
 };
 

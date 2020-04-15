@@ -42,7 +42,7 @@ const gravity = (id) => {
 	}, 10);
 };
 
-export const oninit = () => {
+export const oncreate = () => {
 	gravity('flap-target');
 
 	let last_flap = false;

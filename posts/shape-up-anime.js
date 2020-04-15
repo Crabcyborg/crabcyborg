@@ -7,7 +7,7 @@ export const previous = 'shape-up';
 
 export const title = 'Animating Shape Up with anime.js';
 
-export const oninit = () => {
+export const oncreate = () => {
 	let grid;
 	
 	grid = [11,63];

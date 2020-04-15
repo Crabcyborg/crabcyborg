@@ -198,7 +198,7 @@ export const attack = (id) => {
 
 export const title = 'A Challenger Appears';
 
-export const oninit = () => {
+export const oncreate = () => {
 	wave('wave-target');
 	headbang('headbang-target');
 	walk('walk-target');

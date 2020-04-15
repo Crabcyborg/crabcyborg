@@ -37,7 +37,7 @@ const Canvas = {
 	view: v => m('canvas#target', canvas_dimensions)
 };
 
-export const oninit = () => {
+export const oncreate = () => {
 	img = new Image();
 	img.crossOrigin = 'anonymous';
 	img.onload = function() {

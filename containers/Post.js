@@ -16,7 +16,11 @@ export var Post = {
 			next: post.next || false
 		};
 	
-		post.oninit && setTimeout(post.oninit, 0);
+		post.oninit && post.oninit(v);
+	},
+	oncreate: v => {
+		const post = posts[v.state.postId];
+		post.oncreate && post.oncreate(v);
 	},
 	view: v => [
 		m(Logo),
