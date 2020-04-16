@@ -33,7 +33,6 @@ const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, u
 export var Shape = {
 	oninit: v => {
 		let { shape } = v.attrs;
-
 		const alternative = shape[0] === '}';
 		const alternative_base49 = shape[0] === '^';
 		const alternative_base82 = shape[0] === '*';
@@ -50,15 +49,11 @@ export var Shape = {
 			configuration = base82ToDecimal(shape);
 		} else if(reposition_base49) {
 			configuration = repositionDecompressBase49(shape);
-			console.log('here', configuration);
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}
 		
 		v.state.configuration = on_off ? offOn(configuration) : configuration;
-
-		console.log(repositionOnOff([10,10,0,1,0,1,0,1]));
-		console.log(repositionOffOn([10,10,0,0,0,1,1,1]));
 	},
 	view: v => m(
 		ShapeUp,

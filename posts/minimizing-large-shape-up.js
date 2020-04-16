@@ -8,7 +8,7 @@ const compress = min.compress, decompress = min.decompress;
 
 export const title = 'Minimizing a Large Shape Up Component';
 
-let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
+let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url, ruby;
 
 const topPatterns = (input, symbols) => {
 	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
@@ -44,7 +44,7 @@ const meta = key => {
 	return {raw, compressed, compressed_length, raw_length, raw_csv, raw_csv_length, on_off, on_off_length, on_off_csv, on_off_csv_length, on_off_compressed, on_off_compressed_length, on_off_max};
 };
 
-const examples = ['DOG', 'NY', 'BUZZ'];
+const examples = ['DOG', 'CLEF', 'BUZZ'];
 
 export const oninit = () => {
 	data = {};
@@ -57,10 +57,16 @@ export const oninit = () => {
 	third.alternative = alternative(third.on_off);
 	third.on_off_base49 = alternativeBase49(third.on_off);
 
-	third.repositioned_on_off = repositionOnOff(third.on_off);
+	second.repositioned_base49 = repositionBase49(second.on_off);
+	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 
+	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
+
+	ruby = {raw: shapes.RUBY};
+	ruby.compressed = min.compress(ruby.raw);
+	ruby.repositioned = repositionBase49(onOff(ruby.raw));
 	
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
@@ -94,7 +100,7 @@ export const content = () => [
 		m('p.mb0', 'Compressed Length: ', second.compressed_length),
 		m('p.mt0', 'Compressed On/Off Length: ', second.on_off_compressed_length)
 	),
-	'Our empire state building switches on and off too often.',
+	'Our treble clef switches on and off too often.',
 	m(ShapeUp, {configuration: third.raw, size: 4}),
 	m(
 		'.dib',
@@ -121,9 +127,11 @@ export const content = () => [
 	m('p', { style: { wordWrap: 'break-word' } }, third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
+	m('p', "At the time of writing this, 42 shapes were smaller using this method and 66 shapes were larger. 6 had identical lengths with both methods. Our treble clef, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p', { style: { wordWrap: 'break-word' } }, first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base82_url, target: '_blank' }, alternative_base82_url)),
-	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters. This is good for now."),
+	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters. This is good for now.")
 ];
