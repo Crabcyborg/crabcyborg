@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, offOn } from '$app/shapeup/optimization-helper';
+import { onOff, offOn, repositionOnOff } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 
@@ -10,16 +10,19 @@ export const title = 'Minimizing a Large Shape Up Component';
 
 let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
 
-const topPatterns = input => {
-	const symbols = min.three_character_permutations_symbols + min.counter_symbols;
+const topPatterns = (input, symbols) => {
+	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
 	for(let c of symbols) input = min.subTopPattern(input, c);
 	return input;
 };
+
+const repositionTopPatterns = input => topPatterns(input, min.three_character_permutations_symbols);
 
 const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 
 const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
 const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
+const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, min.twoMostCommonPatterns, repositionTopPatterns, min.twoCharacterPermutations);
 
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
 const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
@@ -53,6 +56,12 @@ export const oninit = () => {
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
 	third.on_off_base49 = alternativeBase49(third.on_off);
+
+	third.repositioned_on_off = repositionOnOff(third.on_off);
+
+	third.repositioned_base49 = repositionBase49(third.on_off);
+	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
+	
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
@@ -108,9 +117,13 @@ export const content = () => [
 	'If I treat each value as an index in my array of base 64 characters, I can support any gap up to 63 with just a single character, immediately reducing the size of our base 64 string by 25%.',
 	m('p', 'Our bumble bee is down to only ', third.on_off_base49.length, ' characters long, now ', Math.round(third.raw_csv_length / third.on_off_base49.length * 100)/100, 'x smaller than the original.'),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base49_url, target: '_blank' }, alternative_base49_url)),
+	m('p', "It's also easier to find patterns if we put our on values beside other on values and off values beside other off values:"),
+	m('p', { style: { wordWrap: 'break-word' } }, third.repositioned_on_off.join(',')),
+	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p', { style: { wordWrap: 'break-word' } }, first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base82_url, target: '_blank' }, alternative_base82_url)),
-	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters. This is good for now.")
+	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters. This is good for now."),
 ];
