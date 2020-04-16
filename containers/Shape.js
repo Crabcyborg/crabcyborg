@@ -4,13 +4,13 @@ import { offOn } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = input => {
-	let symbols = min.three_character_permutations_symbols.split('');
+	let symbols = (min.three_character_permutations_symbols + min.counter_symbols).split('');
 	symbols.reverse();
 	for(let c of symbols) input = min.unsubPattern(input, c);
 	return input;
 };
 
-const alternativeDecompress = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTopTwoPatterns, min.unsubTwoMostCommonPatterns, min.toDecimal);
+const alternativeDecompress = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTwoMostCommonPatterns, min.toDecimal);
 
 const base49ToDecimal = input => input.split('').map(character => min.base64_symbols.indexOf(character));
 

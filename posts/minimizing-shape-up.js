@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
+import { Caption, Gist, ShapeUp, TargetShape, Score, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { min } from 'min-string';
@@ -161,5 +161,5 @@ export const content = () => [
 	m('p', sub7d.length, " characters long. Our final result is ", Math.round(sub6d.length / sub7d.length * 100)/100, 'x smaller and ', Math.round(raw_csv.length / sub7d.length * 100)/100, "x smaller than the original."),
 	m('a', { style: { wordWrap: 'break-word' }, href: sub7_url, target: '_blank' }, sub7_url),
 	m('p', "Sure, the url is still pretty big, but we're storing every piece of data required for our entire bumble bee! I've reached my target goal: get the payload to 150(", sub7d.length,") characters, achieve a compression ratio of under 30(", Math.round(sub7d.length / raw_csv.length * 10000)/100,")%."),
-	m('p', "By the way, I've made this minimization technique into a standalone package available ", m('a', {href: min_string_url, target: '_blank'}, 'on github'), '.')
+	m('p', "By the way, I've made this minimization technique into a standalone package available ", m('a', {href: min_string_url, target: '_blank'}, 'on github'), '. I also found a better way to describe this data in ', m(GoToPost, {key: 'minimizing-large-shape-up'}), ' where I get the size down to 116 characters (', Math.round(116 / raw_csv.length * 10000)/100,'%).')
 ];

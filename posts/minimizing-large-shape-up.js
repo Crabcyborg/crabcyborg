@@ -10,15 +10,16 @@ export const title = 'Minimizing a Large Shape Up Component';
 
 let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
 
-const moreTopPatterns = input => {
-	for(let c of min.three_character_permutations_symbols) input = min.subTopPattern(input, c);
+const topPatterns = input => {
+	const symbols = min.three_character_permutations_symbols + min.counter_symbols;
+	for(let c of symbols) input = min.subTopPattern(input, c);
 	return input;
 };
 
-const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, min.topTwoPatterns, moreTopPatterns, min.twoCharacterPermutations);
+const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 
 const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
-const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, min.topTwoPatterns, moreTopPatterns, min.twoCharacterPermutations);
+const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
 const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
@@ -48,6 +49,7 @@ export const oninit = () => {
 	first = data[examples[0]];
 	second = data[examples[1]];
 	third = data[examples[2]];
+	first.off_on = offOn(first.on_off);
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
 	third.on_off_base49 = alternativeBase49(third.on_off);
@@ -60,7 +62,7 @@ export const oninit = () => {
 
 export const content = () => [
 	m(ShapeUp, {configuration: first.raw, size: 2}),
-	m(ShapeUp, {configuration: offOn(first.on_off), size: 2}),
+	m(ShapeUp, {configuration: first.off_on, size: 2}),
 	m('p', "It turns out that once our data becomes larger like our adorable 94x89 vizsla, it can be much more efficient at times to just count how many cells in a row are on, then how many are off."),
 	m('p.mb0', 'Raw Array Length: ', first.raw_length),
 	m('p.mt0.mb0', 'Raw CSV Length: ', first.raw_csv_length),
@@ -97,7 +99,7 @@ export const content = () => [
 	),
 	'Our bumble bee might have a fighting chance. The On/Off Array is smaller before it is compressed and larger after. The compressions are better configured for the original set of data so maybe we can tweak our min-string configuration and get a smaller payload here as well.',
 	m('p.mt0', 'Alternative Compressed On/Off Length: ', third.alternative.length),
-	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
+	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters and three character permutations to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
 	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before."),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_url, target: '_blank' }, alternative_url)),
 	m('p', "To find a pattern, it always helps to see the data you're working with:"),
