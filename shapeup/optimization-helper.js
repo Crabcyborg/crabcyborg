@@ -62,7 +62,7 @@ export const repositionOnOff = input => {
 export const repositionOffOn = input => {
 	let output = [ input[0], input[1] ];
 
-	const half = Math.ceil((input.length - 2) / 2), to = half+1;
+	const half = Math.ceil((input.length - 2) / 2), to = half+2;
 	for(let i = 2; i < to; ++i) {
 		output.push(input[i]);
 		output.push(input[half+i]);
