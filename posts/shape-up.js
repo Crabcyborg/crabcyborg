@@ -17,7 +17,7 @@ export const Cell = {
 };
 
 const ShapeOnly = {
-	oncreate: v => {
+	oninit: v => {
 		const [ height, width ] = v.attrs.configuration;
 
 		let x = -1, y = -1, data_index = 2, target_index = 0, grid = [];

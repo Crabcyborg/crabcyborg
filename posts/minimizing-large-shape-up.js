@@ -110,5 +110,5 @@ export const content = () => [
 	m('p', { style: { wordWrap: 'break-word' } }, first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: alternative_base82_url, target: '_blank' }, alternative_base82_url)),
-	m('p', 'Our lean little pup is down to only ', base82.length, ' characters long, now ', Math.round(first.raw_csv_length / base82.length * 100)/100, 'x smaller than the original.')
+	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters. This is good for now.")
 ];
