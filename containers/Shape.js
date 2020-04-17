@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, repositionOnOff, repositionOffOn } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, repositionOnOff, repositionOffOn } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -37,8 +37,9 @@ export var Shape = {
 		const alternative_base49 = shape[0] === '^';
 		const alternative_base82 = shape[0] === '*';
 		const reposition_base49 = shape[0] === '-';
+		const vertical_base49 = shape[0] === '_';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		on_off && (shape = shape.substr(1));
+		(on_off || vertical_base49) && (shape = shape.substr(1));
 
 		let configuration;
 		if(alternative) {
@@ -49,6 +50,8 @@ export var Shape = {
 			configuration = base82ToDecimal(shape);
 		} else if(reposition_base49) {
 			configuration = repositionDecompressBase49(shape);
+		} else if(vertical_base49) {
+			configuration = offOnVertical(repositionDecompressBase49(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}

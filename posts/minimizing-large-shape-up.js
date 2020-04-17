@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, offOn, repositionOnOff } from '$app/shapeup/optimization-helper';
+import { onOff, offOn, onOffVertical, repositionOnOff } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 
@@ -44,7 +44,7 @@ const meta = key => {
 	return {raw, compressed, compressed_length, raw_length, raw_csv, raw_csv_length, on_off, on_off_length, on_off_csv, on_off_csv_length, on_off_compressed, on_off_compressed_length, on_off_max};
 };
 
-const examples = ['DOG', 'CLEF', 'BUZZ'];
+const examples = ['DOG', 'PARIS', 'BUZZ'];
 
 export const oninit = () => {
 	data = {};
@@ -59,6 +59,9 @@ export const oninit = () => {
 
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
+
+	second.vertical = repositionBase49(onOffVertical(second.raw));
+	second.vertical_url = `/shapeup/_${second.vertical}`;
 
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
@@ -100,7 +103,7 @@ export const content = () => [
 		m('p.mb0', 'Compressed Length: ', second.compressed_length),
 		m('p.mt0', 'Compressed On/Off Length: ', second.on_off_compressed_length)
 	),
-	'Our treble clef switches on and off too often.',
+	'Our eiffel tower switches on and off too often.',
 	m(ShapeUp, {configuration: third.raw, size: 4}),
 	m(
 		'.dib',
@@ -127,8 +130,11 @@ export const content = () => [
 	m('p', { style: { wordWrap: 'break-word' } }, third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
-	m('p', "At the time of writing this, 42 shapes were smaller using this method and 66 shapes were larger. 6 had identical lengths with both methods. Our treble clef, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
+	m('p', "At the time of writing this, 41 shapes were smaller using this method and 66 shapes were larger. 6 had identical lengths with both methods. Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
 	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
+	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: second.vertical_url, target: '_blank' }, second.vertical_url)),
+	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p', { style: { wordWrap: 'break-word' } }, first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
