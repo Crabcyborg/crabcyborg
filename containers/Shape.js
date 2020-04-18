@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, offOnVertical, repositionOnOff, repositionOffOn } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, offOnLimit, repositionOnOff, repositionOffOn } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -12,7 +12,6 @@ const unsubPatterns = (input, symbols) => {
 };
 
 const alternativeDecompress = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTwoMostCommonPatterns, min.toDecimal);
-
 const base49ToDecimal = input => input.split('').map(character => min.base64_symbols.indexOf(character));
 
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
@@ -23,12 +22,12 @@ const base82ToDecimal = input => {
 		split[1],
 		...split[2].split('').map(character => base82_symbols.indexOf(character))
 	];
-} ;
+};
 
 const alternativeDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTopTwoPatterns, min.unsubTwoMostCommonPatterns, base49ToDecimal);
-
 const unsubRepositionPatterns = input => unsubPatterns(input, min.three_character_permutations_symbols);
 const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, repositionOffOn);
+const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
 export var Shape = {
 	oninit: v => {
@@ -38,8 +37,9 @@ export var Shape = {
 		const alternative_base82 = shape[0] === '*';
 		const reposition_base49 = shape[0] === '-';
 		const vertical_base49 = shape[0] === '_';
+		const limited_base49 = shape[0] === '~';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		(on_off || vertical_base49) && (shape = shape.substr(1));
+		(on_off || vertical_base49 || limited_base49) && (shape = shape.substr(1));
 
 		let configuration;
 		if(alternative) {
@@ -52,6 +52,8 @@ export var Shape = {
 			configuration = repositionDecompressBase49(shape);
 		} else if(vertical_base49) {
 			configuration = offOnVertical(repositionDecompressBase49(shape));
+		} else if(limited_base49) {
+			configuration = offOnVertical(repositionDecompressBase49Limit(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}

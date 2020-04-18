@@ -25,7 +25,7 @@ export const onOff = input => {
 export const onOffVertical = input => {
 	let flat = [];
 	const length = input.length;
-	for(let index = 2; index < length; ++index) {
+	for(let index = 2; index <= length; ++index) {
 		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
 	}
 
@@ -125,3 +125,33 @@ export const repositionOffOn = input => {
 
 	return output;
 };
+
+export const onOffLimit = (input, limit) => {
+	let output = [];
+	for(let value of input) {
+		if(value <= limit) {
+			output.push(value);
+		} else {
+			while(value > limit) {
+				output.push(limit, 0);
+				value -= limit;
+			}
+
+			value > 0 && output.push(value);
+		}
+	}
+
+	return output;
+};
+
+export const offOnLimit = input => {
+	let output = [];
+	for(let index = 0, to = input.length; index < to; ++index) {
+		let current = 0;
+		do current += input[index];
+		while (input[index+1] == 0 && (index += 2) < to);
+		output.push(current);
+	}
+
+	return output;
+}
