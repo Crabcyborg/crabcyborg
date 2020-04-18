@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, offOn, onOffVertical, repositionOnOff, onOffLimit, offOnLimit, offOnVertical } from '$app/shapeup/optimization-helper';
+import { onOff, offOn, onOffVertical, repositionOnOff, onOffLimit, onOffSpiral, offOnSpiral } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 
@@ -74,6 +74,10 @@ export const oninit = () => {
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 	base82 = toBase82(first.on_off);
 	alternative_base82_url = `/shapeup/*${base82}`;
+
+	second.on_off_spiral = onOffSpiral(second.raw);
+	second.spiral_minimized = repositionBase49Limit(onOffSpiral(second.raw));
+	second.spiral_url = `/shapeup/\`${second.spiral_minimized}`;
 };
 
 export const content = () => [
@@ -135,6 +139,9 @@ export const content = () => [
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
 	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
+	'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I am going to try another method, that draws a spiral around the perimeter',
+	m('div.mt2', m('a.break', { href: second.spiral_url, target: '_blank' }, second.spiral_url)),
+	m('p.break', 'As it turns out our eiffel tower is ', second.spiral_minimized.length, ' characters long with a spiral search, down ', second.vertical.length - second.spiral_minimized.length, ' more characters.'),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p.break', first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
@@ -143,7 +150,7 @@ export const content = () => [
 	"What does vizsla look like with a vertical scan?",
 	m('p.break', first.on_off_vertical.join(',')),
 	m('p', "This is quite a bit smaller, but the max goes all the way up to ", Math.max(...first.on_off_vertical), ". But we can easily enforce a limit of 63 with the on/off strategy, converting 100 for example to ", onOffLimit([100], 63).join(','), '.'),
-	m('p', 'Our limited array now has ', first.limited.length, ' values over the previous ', first.on_off_vertical.length, ' but it is still lower than the horizontally scanned set of data at ', first.on_off.length, ', and the limit is now only 63 which means we have the additional characters available to identify patterns again.'),
+	m('p', 'Our limited array now has ', first.limited.length, ' values, more than the previous ', first.on_off_vertical.length, ' but it is still lower than the horizontally scanned set of data at ', first.on_off.length, ', and the limit is now only 63 which means we have the additional characters available to identify patterns again.'),
 	m('p', 'Our new compressed string is down to ', first.vertical.length, ' characters, ', Math.round(first.raw_csv_length / first.vertical.length * 100)/100, 'x smaller than the original.'),
 	m('div.mt2', m('a.break', { href: first.vertical_url, target: '_blank' }, first.vertical_url))
 ];
