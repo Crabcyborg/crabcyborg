@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, offOnVertical, offOnSpiral, offOnLimit, repositionOnOff, repositionOffOn } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -24,7 +24,7 @@ const base82ToDecimal = input => {
 	];
 };
 
-const alternativeDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTopTwoPatterns, min.unsubTwoMostCommonPatterns, base49ToDecimal);
+const alternativeDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTopTwoPatterns, base49ToDecimal);
 const unsubRepositionPatterns = input => unsubPatterns(input, min.three_character_permutations_symbols);
 const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, repositionOffOn);
 const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
@@ -32,6 +32,12 @@ const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutatio
 export var Shape = {
 	oninit: v => {
 		let { shape } = v.attrs;
+
+		let mirror_even = shape[0] === ')';
+		let mirror_odd = shape[0] === '[';
+		let mirrored = mirror_even || mirror_odd;
+		mirrored && (shape = shape.substr(1));
+
 		const alternative = shape[0] === '}';
 		const alternative_base49 = shape[0] === '^';
 		const alternative_base82 = shape[0] === '*';
@@ -39,8 +45,9 @@ export var Shape = {
 		const vertical_base49 = shape[0] === '_';
 		const limited_base49 = shape[0] === '~';
 		const spiral = shape[0] === '`';
+		const diagonal = shape[0] === '>';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		(on_off || vertical_base49 || limited_base49 || spiral) && (shape = shape.substr(1));
+		(on_off || vertical_base49 || limited_base49 || spiral || diagonal) && (shape = shape.substr(1));
 
 		let configuration;
 		if(alternative) {
@@ -57,11 +64,16 @@ export var Shape = {
 			configuration = offOnVertical(repositionDecompressBase49Limit(shape));
 		} else if(spiral) {
 			configuration = offOnSpiral(repositionDecompressBase49Limit(shape));
+		} else if(diagonal) {
+			configuration = offOnDiagonal(repositionDecompressBase49Limit(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}
 		
-		v.state.configuration = on_off ? offOn(configuration) : configuration;
+		if(on_off) configuration = offOn(configuration);
+		if(mirrored) configuration = mirror(configuration, mirror_odd);
+
+		v.state.configuration = configuration;
 	},
 	view: v => m(
 		ShapeUp,

@@ -167,7 +167,7 @@ export const onOffSpiral = input => {
 	let output = [ height, width ], previous = 0, count = 0;
 
 	let x = 0, y = 0, dx = 1, dy = 0, remaining = flat.length, maxx = width, maxy = height, minx = -1, miny = -1;
-	while(remaining) {
+	while(remaining--) {
 		let index = y*width + x, current = flat[index];
 	
 		if(current == previous) {
@@ -212,8 +212,6 @@ export const onOffSpiral = input => {
 			dy = 0;
 			maxx--;
 		}
-
-		--remaining;
 	}
 
 	output.push(count);
@@ -231,7 +229,7 @@ export const offOnSpiral = input => {
 	const [ height, width ] = input;
 
 	let keyed = {}, points = [], x = 0, y = 0, dx = 1, dy = 0, remaining = values.length, maxx = width, maxy = height, minx = -1, miny = -1;
-	while(remaining) {
+	while(remaining--) {
 		points.push([x,y]);
 
 		x += dx;
@@ -268,8 +266,6 @@ export const offOnSpiral = input => {
 			dy = 0;
 			maxx--;
 		}
-
-		--remaining;
 	}
 	
 	let index = 0;
@@ -294,5 +290,173 @@ export const offOnSpiral = input => {
 		}
 	}
 
+	return output;
+};
+
+export const onOffDiagonal = input => {
+	let flat = [];
+	const length = input.length;
+	for(let index = 2; index <= length; ++index) {
+		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
+	}
+
+	const [ height, width ] = input;
+	let output = [ height, width ], previous = 0, count = 0;
+
+	let x = 0, y = height-1, remaining = flat.length;
+	while(remaining) {
+		let index = y*width + x, current = flat[index];
+	
+		if(current == previous) {
+			++count;
+		} else {
+			output.push(count);
+			count = 1;
+			previous = current;
+		}
+
+		x += 1;
+		y += 1;
+
+		if(x == width || y == height) {
+			y -= x + 1;
+			x = 0;
+		}
+
+		while(y < 0) {
+			++y;
+			++x;
+		}
+
+		--remaining;
+	}
+
+	output.push(count);
+	return output;
+};
+
+export const offOnDiagonal = input => {
+	let values = [], previous = 0;
+	for(let index = 2; index < input.length; ++index) {
+		let value = input[index];
+		for(let i = 0; i < value; ++i) values.push(previous);
+		previous = 1-previous;
+	}
+
+	const [ height, width ] = input;
+
+	let keyed = {}, points = [], x = 0, y = height-1, remaining = values.length;
+	while(remaining--) {
+		points.push([x,y]);
+
+		x += 1;
+		y += 1;
+
+		if(x == width || y == height) {
+			y -= x + 1;
+			x = 0;
+		}
+
+		while(y < 0) {
+			++y;
+			++x;
+		}
+	}
+	
+	let index = 0;
+	for(let point of points) {
+		let [x,y] = point;
+		keyed[point] = values[index++];
+	}
+
+	let rotated_values = [];
+	for(let y = 0; y <= height; ++y) {
+		for(let x = 0; x < width; ++x) rotated_values.push(keyed[[x,y]]);
+	}
+	values = rotated_values;
+
+	let target_index = 0, current = 0, output = [ height, width ];
+	for(let value of values) {
+		if(value) current += targets[target_index];
+
+		if(++target_index == 8) {
+			output.push(current);
+			target_index = current = 0;
+		}
+	}
+
+	return output;
+};
+
+export const mirror = (input, odd) => {
+	odd === undefined && (odd = false);
+
+	let flat = [];
+	const length = input.length;
+	for(let index = 2; index <= length; ++index) {
+		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
+	}
+
+	let [ height, original_width ] = input;	
+
+	let width = original_width * 2;
+	odd && --width;
+
+	let mirrored = [];
+	for(let y = 0; y < height; ++y) {
+		for(let x = 0; x < original_width; ++x) {
+			let index = y * original_width + x;
+			mirrored.push(flat[index]);
+		}
+
+		for(let x = original_width - (odd ? 2 : 1); x >= 0; --x) {
+			let index = y * original_width + x;
+			mirrored.push(flat[index]);
+		}
+	}
+
+	let target_index = 0, current = 0, output = [ height, width ];
+	for(let value of mirrored) {
+		if(value) current += targets[target_index];
+
+		if(++target_index == 8) {
+			output.push(current);
+			target_index = current = 0;
+		}
+	}
+
+	output.push(current);
+	return output;
+};
+
+export const half = input => {
+	let flat = [];
+	const length = input.length;
+	for(let index = 2; index <= length; ++index) {
+		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
+	}
+
+	const [ height, width ] = input;
+
+	let to = Math.ceil(width / 2);
+	let halved = [];
+	for(let y = 0; y < height; ++y) {
+		for(let x = 0; x < to; ++x) {
+			let index = y * width + x;
+			halved.push(flat[index]);
+		}
+	}
+
+	let target_index = 0, current = 0, output = [ height, to ];
+	for(let value of halved) {
+		if(value) current += targets[target_index];
+
+		if(++target_index == 8) {
+			output.push(current);
+			target_index = current = 0;
+		}
+	}
+
+	output.push(current);
 	return output;
 };

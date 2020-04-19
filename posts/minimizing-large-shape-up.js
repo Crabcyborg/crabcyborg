@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, offOn, onOffVertical, repositionOnOff, onOffLimit, onOffSpiral, offOnSpiral } from '$app/shapeup/optimization-helper';
+import { onOff, offOn, onOffVertical, onOffDiagonal, repositionOnOff, onOffLimit, onOffSpiral, offOnDiagonal } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 
@@ -20,8 +20,8 @@ const repositionTopPatterns = input => topPatterns(input, min.three_character_pe
 const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
 const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
-const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, min.twoMostCommonPatterns, repositionTopPatterns, min.twoCharacterPermutations);
-const repositionBase49Limit = min.pipe(repositionOnOff, input => onOffLimit(input, 63), toBase49, min.counter, min.twoMostCommonPatterns, repositionTopPatterns, min.twoCharacterPermutations);
+const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
+const repositionBase49Limit = min.pipe(repositionOnOff, input => onOffLimit(input, 63), toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
 const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
 
@@ -78,6 +78,21 @@ export const oninit = () => {
 	second.on_off_spiral = onOffSpiral(second.raw);
 	second.spiral_minimized = repositionBase49Limit(onOffSpiral(second.raw));
 	second.spiral_url = `/shapeup/\`${second.spiral_minimized}`;
+
+	/*
+	const shape = shapes.PARIS;
+	console.log(shape);
+	console.log(onOff(shape));
+	console.log(onOffVertical(shape));
+	console.log(onOffSpiral(shape));
+	console.log(onOffDiagonal(shape));
+	console.log(offOnDiagonal(onOffDiagonal(shape)));
+	console.log('compress ', min.compress(shape), min.compress(shape).length);
+	console.log('horizontal ', repositionBase49Limit(onOff(shape)), repositionBase49Limit(onOff(shape)).length);
+	console.log('vertical ', repositionBase49Limit(onOffVertical(shape)), repositionBase49Limit(onOffVertical(shape)).length);
+	console.log('spiral ', repositionBase49Limit(onOffSpiral(shape)), repositionBase49Limit(onOffSpiral(shape)).length);
+	console.log('diagonal ', repositionBase49Limit(onOffDiagonal(shape)), repositionBase49Limit(onOffDiagonal(shape)).length);
+	*/
 };
 
 export const content = () => [
@@ -134,7 +149,7 @@ export const content = () => [
 	m('p.break', third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a.break', { href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
-	m('p', "At the time of writing this, 41 shapes were smaller using this method and 66 shapes were larger. 6 had identical lengths with both methods. Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
+	m('p', "Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
 	m('div.mt2', m('a.break', { href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
@@ -142,6 +157,7 @@ export const content = () => [
 	'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I am going to try another method, that draws a spiral around the perimeter',
 	m('div.mt2', m('a.break', { href: second.spiral_url, target: '_blank' }, second.spiral_url)),
 	m('p.break', 'As it turns out our eiffel tower is ', second.spiral_minimized.length, ' characters long with a spiral search, down ', second.vertical.length - second.spiral_minimized.length, ' more characters.'),
+	m('p', "I've also implemented a diagonal scan. I've played with a few other alternatives but none of the others have had better results. At the time of writing this, the original method yielded the best results for 46 shapes. Vertical scanning took second place, with 25 shapes, then spiral with 21, horizontal with 20, and diagonal with 2."),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p.break', first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
@@ -149,7 +165,7 @@ export const content = () => [
 	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters."),
 	"What does vizsla look like with a vertical scan?",
 	m('p.break', first.on_off_vertical.join(',')),
-	m('p', "This is quite a bit smaller, but the max goes all the way up to ", Math.max(...first.on_off_vertical), ". But we can easily enforce a limit of 63 with the on/off strategy, converting 100 for example to ", onOffLimit([100], 63).join(','), '.'),
+	m('p', "This is quite a bit smaller, but the max goes all the way up to ", Math.max(...first.on_off_vertical), ". It's actually really easy to enforce a limit of 63 with the on/off strategy, converting 100 for example to ", onOffLimit([100], 63).join(','), '.'),
 	m('p', 'Our limited array now has ', first.limited.length, ' values, more than the previous ', first.on_off_vertical.length, ' but it is still lower than the horizontally scanned set of data at ', first.on_off.length, ', and the limit is now only 63 which means we have the additional characters available to identify patterns again.'),
 	m('p', 'Our new compressed string is down to ', first.vertical.length, ' characters, ', Math.round(first.raw_csv_length / first.vertical.length * 100)/100, 'x smaller than the original.'),
 	m('div.mt2', m('a.break', { href: first.vertical_url, target: '_blank' }, first.vertical_url))
