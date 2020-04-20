@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, onOffVertical, onOffDiagonal, onOffDiagonal2, repositionOnOff, onOffLimit, onOffSpiral, offOnDiagonal, mirror, half } from '$app/shapeup/optimization-helper';
+import { onOffVertical, repositionOnOff, onOffLimit, mirror, half } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const topPatterns = (input, symbols) => {

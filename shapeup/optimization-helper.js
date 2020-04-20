@@ -1,5 +1,14 @@
 const targets = [128,64,32,16,8,4,2,1];
 
+export const flatten = input => {
+	let flat = [];
+	const length = input.length;
+	for(let index = 2; index <= length; ++index) {
+		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
+	}
+	return flat;
+}
+
 export const onOff = input => {
 	let output = [ input[0], input[1] ], previous = 0, count = 0;
 	for(let index = 2; index < input.length; ++index) {
@@ -23,13 +32,9 @@ export const onOff = input => {
 };
 
 export const onOffVertical = input => {
-	let flat = [];
-	const length = input.length;
-	for(let index = 2; index <= length; ++index) {
-		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
-	}
-
 	const [ height, width ] = input;
+	const flat = flatten(input);
+
 	let output = [ height, width ], previous = 0, count = 0;
 	for(let y = 0, x = 0; x < width; ++y) {
 		if(y == height) {
@@ -157,13 +162,9 @@ export const offOnLimit = input => {
 }
 
 export const onOffSpiral = input => {
-	let flat = [];
-	const length = input.length;
-	for(let index = 2; index <= length; ++index) {
-		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
-	}
-
 	const [ height, width ] = input;
+	const flat = flatten(input);
+
 	let output = [ height, width ], previous = 0, count = 0;
 
 	let x = 0, y = 0, dx = 1, dy = 0, remaining = flat.length, maxx = width, maxy = height, minx = -1, miny = -1;
@@ -294,15 +295,10 @@ export const offOnSpiral = input => {
 };
 
 export const onOffDiagonal = input => {
-	let flat = [];
-	const length = input.length;
-	for(let index = 2; index <= length; ++index) {
-		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
-	}
-
 	const [ height, width ] = input;
-	let output = [ height, width ], previous = 0, count = 0;
+	const flat = flatten(input);
 
+	let output = [ height, width ], previous = 0, count = 0;
 	let x = 0, y = height-1, remaining = flat.length;
 	while(remaining) {
 		let index = y*width + x, current = flat[index];
@@ -391,13 +387,8 @@ export const offOnDiagonal = input => {
 export const mirror = (input, odd) => {
 	odd === undefined && (odd = false);
 
-	let flat = [];
-	const length = input.length;
-	for(let index = 2; index <= length; ++index) {
-		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
-	}
-
 	let [ height, original_width ] = input;	
+	const flat = flatten(input);
 
 	let width = original_width * 2;
 	odd && --width;
@@ -430,13 +421,8 @@ export const mirror = (input, odd) => {
 };
 
 export const half = input => {
-	let flat = [];
-	const length = input.length;
-	for(let index = 2; index <= length; ++index) {
-		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
-	}
-
 	const [ height, width ] = input;
+	const flat = flatten(input);
 
 	let to = Math.ceil(width / 2);
 	let halved = [];
@@ -459,4 +445,21 @@ export const half = input => {
 
 	output.push(current);
 	return output;
+};
+
+export const isSymmetrical = input => {
+	const [ height, width ] = input;
+	const flat = flatten(input);
+
+	let to = Math.floor(width / 2);
+	for(let y = 0; y < height; ++y) {
+		let row_index = y * width, right_index = row_index + width - 1;
+		for(let x = 0; x < to; ++x) {
+			if(flat[row_index + x] != flat[right_index - x]) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 };
