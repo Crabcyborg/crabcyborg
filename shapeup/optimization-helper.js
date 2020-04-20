@@ -1,3 +1,5 @@
+import { min } from 'min-string';
+
 const targets = [128,64,32,16,8,4,2,1];
 
 export const flatten = input => {
@@ -463,3 +465,63 @@ export const isSymmetrical = input => {
 
 	return true;
 };
+
+export const topPatterns = (input, symbols) => {
+	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
+	for(let c of symbols) input = min.subTopPattern(input, c);
+	return input;
+};
+
+export const repositionTopPatterns = input => topPatterns(input, min.three_character_permutations_symbols);
+
+export const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
+
+export const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
+
+export const repositionBase49Limit = min.pipe(repositionOnOff, input => onOffLimit(input, 63), toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
+
+let prefix_by_key = {
+	compressed: '',
+	horizontal: '-',
+	vertical: '~',
+	spiral: '`',
+	diagonal: '>'
+};
+
+export const bestMethod = (shape, mirrored) => {
+	mirrored === undefined && (mirrored = false);
+
+	let compressed = min.compress(shape);
+	let horizontal = repositionBase49Limit(onOff(shape));
+	let vertical = repositionBase49Limit(onOffVertical(shape));
+	let spiral = repositionBase49Limit(onOffSpiral(shape));
+	let diagonal = repositionBase49Limit(onOffDiagonal(shape));
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal };
+	let key_by_value = {
+		[compressed.length]: 'compressed',
+		[horizontal.length]: 'horizontal',
+		[vertical.length]: 'vertical',
+		[spiral.length]: 'spiral',
+		[diagonal.length]: 'diagonal'
+	};
+	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
+	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length);
+	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
+	let length = parseInt(swapped[key_by_value[smallest]]);
+
+	if(!mirrored && isSymmetrical(shape)) {
+		const best_half = bestMethod(half(shape), true);
+
+		if(best_half.length < length) {
+			best_half.string = (shape[1] % 2 === 1 ? '[' : ')') + best_half.string;
+			return best_half;
+		}
+	}
+
+	const string = prefix_by_key[method] + string_by_key[method];
+	return { method, length, string, mirrored };
+};
+
+const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
+
+export const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');

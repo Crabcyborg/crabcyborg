@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, offOn, onOffVertical, onOffDiagonal, repositionOnOff, onOffLimit, onOffSpiral, offOnDiagonal, half } from '$app/shapeup/optimization-helper';
+import { onOff, onOffVertical, onOffDiagonal, repositionOnOff, onOffLimit, onOffSpiral, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 
@@ -10,20 +10,8 @@ export const title = 'Minimizing a Large Shape Up Component';
 
 let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
 
-const topPatterns = (input, symbols) => {
-	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
-	for(let c of symbols) input = min.subTopPattern(input, c);
-	return input;
-};
-
-const repositionTopPatterns = input => topPatterns(input, min.three_character_permutations_symbols);
 const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
-const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
 const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
-const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
-const repositionBase49Limit = min.pipe(repositionOnOff, input => onOffLimit(input, 63), toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
-const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
-const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
 
 const meta = key => {
 	const raw = shapes[key];
@@ -50,57 +38,34 @@ export const oninit = () => {
 	first = data[examples[0]];
 	second = data[examples[1]];
 	third = data[examples[2]];
-	first.off_on = offOn(first.on_off);
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
 	third.on_off_base49 = alternativeBase49(third.on_off);
-
 	first.on_off_vertical = onOffVertical(first.raw);
 	first.limited = onOffLimit(first.on_off_vertical, 63);
 	first.vertical = repositionBase49Limit(first.on_off_vertical);
 	first.vertical_url = `/shapeup/~${first.vertical}`;
-
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 	second.vertical = repositionBase49(onOffVertical(second.raw));
 	second.vertical_url = `/shapeup/_${second.vertical}`;
-
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
-
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 	base82 = toBase82(first.on_off);
 	alternative_base82_url = `/shapeup/*${base82}`;
-
 	second.on_off_spiral = onOffSpiral(second.raw);
 	second.spiral_minimized = repositionBase49Limit(onOffSpiral(second.raw));
 	second.spiral_url = `/shapeup/\`${second.spiral_minimized}`;
-
 	second.half = repositionBase49Limit(onOffSpiral(half(second.raw)));
 	second.half_url = `/shapeup/[\`${second.half}`;
-
-	/*
-	const shape = shapes.PARIS;
-	console.log(shape);
-	console.log(onOff(shape));
-	console.log(onOffVertical(shape));
-	console.log(onOffSpiral(shape));
-	console.log(onOffDiagonal(shape));
-	console.log(offOnDiagonal(onOffDiagonal(shape)));
-	console.log('compress ', min.compress(shape), min.compress(shape).length);
-	console.log('horizontal ', repositionBase49Limit(onOff(shape)), repositionBase49Limit(onOff(shape)).length);
-	console.log('vertical ', repositionBase49Limit(onOffVertical(shape)), repositionBase49Limit(onOffVertical(shape)).length);
-	console.log('spiral ', repositionBase49Limit(onOffSpiral(shape)), repositionBase49Limit(onOffSpiral(shape)).length);
-	console.log('diagonal ', repositionBase49Limit(onOffDiagonal(shape)), repositionBase49Limit(onOffDiagonal(shape)).length);
-	*/
 };
 
 export const content = () => [
 	m(ShapeUp, {configuration: first.raw, size: 2}),
-	m(ShapeUp, {configuration: first.off_on, size: 2}),
 	m('p', "It turns out that once our data becomes larger like our adorable 94x89 vizsla, it can be much more efficient at times to just count how many cells in a row are on, then how many are off."),
 	m('p.mb0', 'Raw Array Length: ', first.raw_length),
 	m('p.mt0.mb0', 'Raw CSV Length: ', first.raw_csv_length),
