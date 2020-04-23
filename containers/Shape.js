@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -46,8 +46,9 @@ export var Shape = {
 		const limited_base49 = shape[0] === '~';
 		const spiral = shape[0] === '`';
 		const diagonal = shape[0] === '>';
+		const diamond = shape[0] === ']';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		(on_off || vertical_base49 || limited_base49 || spiral || diagonal) && (shape = shape.substr(1));
+		(on_off || vertical_base49 || limited_base49 || spiral || diagonal || diamond) && (shape = shape.substr(1));
 
 		let configuration;
 		if(alternative) {
@@ -66,6 +67,8 @@ export var Shape = {
 			configuration = offOnSpiral(repositionDecompressBase49Limit(shape));
 		} else if(diagonal) {
 			configuration = offOnDiagonal(repositionDecompressBase49Limit(shape));
+		} else if(diamond) {
+			configuration = offOnDiamond(repositionDecompressBase49Limit(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}

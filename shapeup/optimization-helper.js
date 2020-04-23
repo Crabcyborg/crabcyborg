@@ -11,6 +11,16 @@ export const flatten = input => {
 	return flat;
 }
 
+export const spread = input => {
+	let values = [], previous = 0;
+	for(let index = 2; index < input.length; ++index) {
+		let value = input[index];
+		for(let i = 0; i < value; ++i) values.push(previous);
+		previous = 1-previous;
+	}
+	return values;
+};
+
 export const onOff = input => {
 	let output = [ input[0], input[1] ], previous = 0, count = 0;
 	for(let index = 2; index < input.length; ++index) {
@@ -26,7 +36,7 @@ export const onOff = input => {
 				count = 1;
 				previous = current;
 			}
-		}	
+		}
 	}
 
 	output.push(count);
@@ -59,12 +69,7 @@ export const onOffVertical = input => {
 };
 
 export const offOn = input => {
-	let values = [], previous = 0;
-	for(let index = 2; index < input.length; ++index) {
-		let value = input[index];
-		for(let i = 0; i < value; ++i) values.push(previous);
-		previous = 1-previous;
-	}
+	const values = spread(input);
 
 	let target_index = 0, current = 0, output = [ input[0], input[1] ];
 	for(let value of values) {
@@ -80,12 +85,7 @@ export const offOn = input => {
 };
 
 export const offOnVertical = input => {
-	let values = [], previous = 0;
-	for(let index = 2; index < input.length; ++index) {
-		let value = input[index];
-		for(let i = 0; i < value; ++i) values.push(previous);
-		previous = 1-previous;
-	}
+	const values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -222,12 +222,7 @@ export const onOffSpiral = input => {
 };
 
 export const offOnSpiral = input => {
-	let values = [], previous = 0;
-	for(let index = 2; index < input.length; ++index) {
-		let value = input[index];
-		for(let i = 0; i < value; ++i) values.push(previous);
-		previous = 1-previous;
-	}
+	const values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -334,12 +329,7 @@ export const onOffDiagonal = input => {
 };
 
 export const offOnDiagonal = input => {
-	let values = [], previous = 0;
-	for(let index = 2; index < input.length; ++index) {
-		let value = input[index];
-		for(let i = 0; i < value; ++i) values.push(previous);
-		previous = 1-previous;
-	}
+	const values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -383,6 +373,177 @@ export const offOnDiagonal = input => {
 		}
 	}
 
+	return output;
+};
+
+export const onOffDiamond = (height, width) => {
+	let spike_height = Math.ceil((width-2)/2);
+	let spike_width = Math.ceil((height-2)/2);
+	let diamond_height = height + spike_height*2;
+	let diamond_width = width + spike_width*2;
+	let diamond = Array(diamond_height);
+	let base_x = 0, x = base_x, base_y = Math.floor((diamond_height-1)/2), y = base_y;
+	let index = 0;
+	let keyed = {};
+	let dir = 'ne';	
+	let limit = 4;
+	let miny = 0;
+
+	const triangleSize = length => {
+		let size = 0;
+		while(length > 0) {
+			size += length;
+			length -= 2;
+		}
+		return size;
+	};
+	const diamond_size = height * width + triangleSize(height-2) * 2 + triangleSize(width-2) * 2;
+
+	keyed[[x,y]] = index++;
+
+	while(index < diamond_size) {
+		switch(dir) {
+			case 'ne': {
+				while(x + 1 < diamond_width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
+					++x;
+					--y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x+1,y]] !== undefined) break;
+				}
+
+				dir = 'se';
+				if(diamond_width % 2 === 0) --y;
+			} break;
+
+			case 'se': {
+				while(x + 1 < diamond_width && y + 1 < diamond_height && keyed[[x+1,y+1]] === undefined) {
+					++x;
+					++y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x,y+1]] !== undefined) break;
+				}
+
+				dir = 'sw';
+				if(diamond_height % 2 === 0) ++x;
+			} break;
+
+			case 'sw': {
+				while(x - 1 >= 0 && y + 1 < diamond_height && keyed[[x-1,y+1]] === undefined) {
+					--x;
+					++y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x-1,y]] !== undefined) break;
+				}
+
+				dir = 'nw';
+				if(diamond_width % 2 === 0) ++y;
+			} break;
+
+			case 'nw': {
+				while(x - 1 >= 0 && y - 1 >= 0 && keyed[[x-1,y-1]] === undefined) {
+					--x;
+					--y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x,y-1]] !== undefined) break;
+				}
+
+				dir = 'ne';
+				x = base_x++;
+				y = base_y+1;
+			} break;
+		}
+	}
+
+	for(let y = 0; y < diamond_height; ++y) {
+		let row = Array(diamond_width);
+
+		for(let x = 0; x < diamond_width; ++x) {
+			if(keyed[[x,y]] !== undefined) {
+				row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
+			} else {
+				if(x >= spike_width && x < diamond_width-spike_width && y >= spike_height && y < diamond_height-spike_height) {
+					row.push('__');
+				} else {
+					row.push('  ');
+				}
+			}
+		}
+
+		diamond.push(row.join(' '));
+	}
+
+//	console.log(diamond.join('\n'));
+
+	// trim the edges
+	let trimmed = [];
+	let indices = [];
+	for(let y = spike_height; y < height+spike_height; ++y) {
+		let row = [];
+		for(let x = spike_width; x < width+spike_width; ++x) {
+			row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
+			indices.push(parseInt(keyed[[x,y]]));
+		}
+
+		trimmed.push(row.join(' '));
+	}
+//	console.log(trimmed.join('\n'));
+
+	indices.sort((a,b) => a-b);
+
+	let reduced = [];
+	let points = Array(width * height);
+	for(let y = spike_height; y < height+spike_height; ++y) {
+		for(let x = spike_width; x < width+spike_width; ++x) {
+			let index = indices.indexOf(keyed[[x,y]]);
+			reduced.push(index);
+			points[index] = [x - spike_width, y - spike_height];
+		}
+	}
+
+	return { points, indices, reduced };
+};
+
+export const applyOnOffDiamond = input => {
+	const [ height, width ] = input;
+	const flat = flatten(input);
+	const details = onOffDiamond(height, width);
+
+	let output = [ height, width ], previous = 0, count = 0;
+	for(let point of details.points) {
+		let [x,y] = point;
+		let index = y * width + x;
+
+		let current = flat[index];
+
+		if(current == previous) {
+			++count;
+		} else {
+			output.push(count);
+			count = 1;
+			previous = current;
+		}
+	}
+
+	output.push(count);
+	return output;
+};
+
+export const offOnDiamond = input => {
+	const [ height, width ] = input;
+	const values = spread(input);
+	const details = onOffDiamond(height, width);
+
+	let target_index = 0, current = 0, output = [ height, width ];
+	for(let index of details.reduced) {
+		if(values[index]) current += targets[target_index];
+
+		if(++target_index == 8) {
+			output.push(current);
+			target_index = current = 0;
+		}
+	}
+
+	output.push(current);
 	return output;
 };
 
@@ -485,7 +646,8 @@ let prefix_by_key = {
 	horizontal: '-',
 	vertical: '~',
 	spiral: '`',
-	diagonal: '>'
+	diagonal: '>',
+	diamond: ']'
 };
 
 export const bestMethod = (shape, mirrored) => {
@@ -496,16 +658,18 @@ export const bestMethod = (shape, mirrored) => {
 	let vertical = repositionBase49Limit(onOffVertical(shape));
 	let spiral = repositionBase49Limit(onOffSpiral(shape));
 	let diagonal = repositionBase49Limit(onOffDiagonal(shape));
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal };
+	let diamond = repositionBase49Limit(applyOnOffDiamond(shape));
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
 		[vertical.length]: 'vertical',
 		[spiral.length]: 'spiral',
-		[diagonal.length]: 'diagonal'
+		[diagonal.length]: 'diagonal',
+		[diamond.length]: 'diamond'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length);
+	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
 
@@ -519,7 +683,7 @@ export const bestMethod = (shape, mirrored) => {
 	}
 
 	const string = prefix_by_key[method] + string_by_key[method];
-	return { method, length, string, mirrored };
+	return { method, length, string, mirrored, swapped };
 };
 
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
