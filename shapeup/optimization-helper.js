@@ -471,13 +471,57 @@ export const onOffDiamond = (height, width) => {
 		}
 	}
 
-	return { indices, points, reduced, keyed, diamond_height, diamond_width, diamond_size, spike_height, spike_width };
+	return { points, keyed, indices, reduced, keyed, diamond_height, diamond_width, diamond_size, spike_height, spike_width };
 };
 
-export const applyOnOffDiamond = input => {
+export const onOffSnake = (height, width) => {
+	let dir = 's';
+	let remaining = height * width;
+	let x = 0, y = 0, keyed = {}, points = Array(width * height), index = 0, reduced = [];
+	while(remaining) {
+		if(x >= 0 && x < width && y >= 0 && y < height) {
+			--remaining;
+			reduced.push(index);
+			keyed[[x,y]] = index;
+			points[y * width + x] = [x,y];
+			++index;
+		}
+
+		switch(dir) {
+			case 's':
+				++y;
+				dir = 'e1';
+			break;
+
+			case 'e1':
+				++x;
+				dir = 'n';
+			break;
+
+			case 'n':
+				--y;
+				dir = 'e2';
+			break;
+
+			case 'e2':
+				++x;
+				dir = 's';
+
+				if(x >= width) {
+					x = 0;
+					y += 2;
+				}
+			break;
+		}
+	}
+
+	return { points, keyed, reduced };
+};
+
+export const applyOnOff = (input, fn) => {
 	const [ height, width ] = input;
 	const flat = flatten(input);
-	const details = onOffDiamond(height, width);
+	const details = fn(height, width);
 
 	let output = [ height, width ], previous = 0, count = 0;
 	for(let point of details.points) {
@@ -496,8 +540,11 @@ export const applyOnOffDiamond = input => {
 	return output;
 };
 
-export const offOnDiamond = input => {
-	const [ height, width ] = input, values = spread(input), details = onOffDiamond(height, width);
+export const applyOnOffDiamond = input => applyOnOff(input, onOffDiamond);
+export const applyOnOffSnake = input => applyOnOff(input, onOffSnake);
+
+export const applyOffOn = (input, fn) => {
+	const [ height, width ] = input, values = spread(input), details = fn(height, width);
 
 	let target_index = 0, current = 0, output = [ height, width ];
 	for(let index of details.reduced) {
@@ -511,7 +558,11 @@ export const offOnDiamond = input => {
 
 	output.push(current);
 	return output;
+
 };
+
+export const offOnDiamond = input => applyOffOn(input, onOffDiamond);
+export const offOnSnake = input => applyOffOn(input, onOffSnake);
 
 export const mirror = (input, odd) => {
 	odd === undefined && (odd = false);
@@ -613,7 +664,8 @@ let prefix_by_key = {
 	vertical: '~',
 	spiral: '`',
 	diagonal: '>',
-	diamond: ']'
+	diamond: ']',
+	snake: '__'
 };
 
 export const bestMethod = (shape, mirrored) => {
@@ -625,17 +677,19 @@ export const bestMethod = (shape, mirrored) => {
 	let spiral = repositionBase49Limit(onOffSpiral(shape));
 	let diagonal = repositionBase49Limit(onOffDiagonal(shape));
 	let diamond = repositionBase49Limit(applyOnOffDiamond(shape));
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond };
+	let snake = repositionBase49Limit(applyOnOffSnake(shape));
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
 		[vertical.length]: 'vertical',
 		[spiral.length]: 'spiral',
 		[diagonal.length]: 'diagonal',
-		[diamond.length]: 'diamond'
+		[diamond.length]: 'diamond',
+		[snake.length]: 'snake'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length);
+	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
 	let ratio = Math.round(length / shape.join(',').length * 10000) / 100;

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, onOffDiamond, applyOnOffDiamond, repositionBase49Limit } from '$app/shapeup/optimization-helper';
+import { bestMethod, onOffDiamond, onOffSnake, offOnSnake, applyOnOffDiamond, applyOnOffSnake, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const size = 5;
@@ -9,19 +9,15 @@ const size = 5;
 export const title = 'Traversing Shape Up Components';
 
 let examples = {
-    diamond: 'RUBY',
+    diamond: 'UP',
     spiral: 'SPADE',
     vertical: 'HEEL',
     horizontal: 'TITAN',
-    diagonal: 'KNIFE'
+    diagonal: 'KNIFE',
+    snake: 'PINK'
 };
 let bests = {};
-let horizontal, vertical, diagonal, spiral, diamond;
-
-/*
-let raw = min.decompress('20A9zMYe!fLL23zU');
-console.log('A Diamond', bestMethod(raw));
-*/
+let horizontal, vertical, diagonal, spiral, diamond, snake;
 
 export const oninit = () => {
     let keys = Object.values(examples);
@@ -190,6 +186,33 @@ export const oninit = () => {
     diamond.actual_on_off_diamond = applyOnOffDiamond(diamond.actual_diamond_configuration);
     diamond.actual_diamond_compressed = repositionBase49Limit(diamond.actual_on_off_diamond);
     diamond.actual_diamond_url = `/shapeup/]${diamond.actual_diamond_compressed}`;
+
+    let snake_width = 7;
+    let snake_height = 6;
+    snake = onOffSnake(snake_height, snake_width);
+
+    snake.visualization = ((height, width) => {
+        let output = [];
+        for(let y = 0; y < height; ++y) {
+            let row = [];
+            for(let x = 0; x < width; ++x) {
+                let index = snake.keyed[[x,y]];
+                row.push(`${index}`.padStart(2, '0'));
+            }
+            output.push(row.join(' '));
+        }
+
+        return output.join('\n');
+    })(snake_height, snake_width);
+
+    /*
+    keys = Object.keys(shapes);
+	for(let key_index = 0; key_index < keys.length; ++key_index) {
+		let key = keys[key_index];
+		let shape = shapes[key];
+        console.log({key, ...bestMethod(shape)});
+    }
+    */
 };
 
 const Best = {
@@ -237,7 +260,12 @@ export const content = () => [
     "It works really well if you want to make a diamond:",
     m(ShapeUp, { configuration: diamond.actual_diamond_configuration, size: 10 }),
     m('p', 'The entire url for this diamond is ', m('a.break', { href: diamond.actual_diamond_url, target: '_blank' }, diamond.actual_diamond_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', diamond.actual_on_off_diamond.join(','), '.'),
-    "It is also the best way to traverse a ruby:",
+    "It is also the best way to traverse our balloon:",
     m(ShapeUp, { configuration: shapes[examples.diamond], size }),
-    m(Best, { best: bests[examples.diamond] })
+    m(Best, { best: bests[examples.diamond] }),
+    m('h3', 'Snake'),
+    'The snake method works like the horizontal pattern but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. This works well with large empty areas and large filled areas. As our flamingo has a lot of white space the snake method works best.',
+    m('pre.mono', snake.visualization),
+    m(ShapeUp, { configuration: shapes[examples.snake], size }),
+    m(Best, { best: bests[examples.snake] })
 ];
