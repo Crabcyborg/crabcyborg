@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
+import { Gist, ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { onOff, onOffVertical, onOffDiagonal, repositionOnOff, onOffLimit, onOffSpiral, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
@@ -122,11 +122,9 @@ export const content = () => [
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
 	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
-	'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I am going to try another method, that draws a spiral around the perimeter',
+	m('p', 'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I have also implemented methods that traverse in a spiral, diagonally, and in a diamond. It turns out that the eiffel tower works best with the spiral method at ', second.spiral_minimized.length, ' characters.'),
 	m('div.mt2', m('a.break', { href: second.spiral_url, target: '_blank' }, second.spiral_url)),
-	m('p.break', 'As it turns out our eiffel tower is ', second.spiral_minimized.length, ' characters long with a spiral search, down ', second.vertical.length - second.spiral_minimized.length, ' more characters.'),
 	m('p.f7', 'Oh by the way, the eiffel tower is symmetrical so I can drop half of the data and take our payload down to ', second.half.length, ' characters ', m('a.break.f7', { href: second.half_url, target: '_blank' }, second.half_url)),
-	m('p', "I've also implemented a diagonal scan. At the time of writing this, the original method yielded the best results for 46 shapes. Vertical scanning took second place, with 25 shapes, then spiral with 21, horizontal with 20, and diagonal with 2."),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p.break', first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),

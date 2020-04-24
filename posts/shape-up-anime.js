@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp } from '$app/components';
+import { Gist, ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import anime from 'animejs/lib/anime.es.js';
 

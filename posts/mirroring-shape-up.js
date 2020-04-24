@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
+import { Gist, ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { onOffVertical, repositionOnOff, onOffLimit, mirror, half } from '$app/shapeup/optimization-helper';

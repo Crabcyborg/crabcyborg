@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Caption, Gist, ShapeUp, TargetShape, Score } from '$app/components';
+import { Gist, ShapeUp, TargetShape, Score } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 
 export const title = 'Recreating Shape Up with Mithril';

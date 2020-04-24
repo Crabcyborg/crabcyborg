@@ -85,7 +85,7 @@ export const offOn = input => {
 };
 
 export const offOnVertical = input => {
-	const values = spread(input);
+	let values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -222,7 +222,7 @@ export const onOffSpiral = input => {
 };
 
 export const offOnSpiral = input => {
-	const values = spread(input);
+	let values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -329,7 +329,7 @@ export const onOffDiagonal = input => {
 };
 
 export const offOnDiagonal = input => {
-	const values = spread(input);
+	let values = spread(input);
 
 	const [ height, width ] = input;
 
@@ -385,8 +385,7 @@ export const onOffDiamond = (height, width) => {
 	let base_x = 0, x = base_x, base_y = Math.floor((diamond_height-1)/2), y = base_y;
 	let index = 0;
 	let keyed = {};
-	let dir = 'ne';	
-	let limit = 4;
+	let dir = 'ne';
 	let miny = 0;
 
 	const triangleSize = length => {
@@ -400,7 +399,6 @@ export const onOffDiamond = (height, width) => {
 	const diamond_size = height * width + triangleSize(height-2) * 2 + triangleSize(width-2) * 2;
 
 	keyed[[x,y]] = index++;
-
 	while(index < diamond_size) {
 		switch(dir) {
 			case 'ne': {
@@ -454,44 +452,17 @@ export const onOffDiamond = (height, width) => {
 		}
 	}
 
-	for(let y = 0; y < diamond_height; ++y) {
-		let row = Array(diamond_width);
-
-		for(let x = 0; x < diamond_width; ++x) {
-			if(keyed[[x,y]] !== undefined) {
-				row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
-			} else {
-				if(x >= spike_width && x < diamond_width-spike_width && y >= spike_height && y < diamond_height-spike_height) {
-					row.push('__');
-				} else {
-					row.push('  ');
-				}
-			}
-		}
-
-		diamond.push(row.join(' '));
-	}
-
-//	console.log(diamond.join('\n'));
-
 	// trim the edges
-	let trimmed = [];
 	let indices = [];
 	for(let y = spike_height; y < height+spike_height; ++y) {
-		let row = [];
 		for(let x = spike_width; x < width+spike_width; ++x) {
-			row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
 			indices.push(parseInt(keyed[[x,y]]));
 		}
-
-		trimmed.push(row.join(' '));
 	}
-//	console.log(trimmed.join('\n'));
 
 	indices.sort((a,b) => a-b);
 
-	let reduced = [];
-	let points = Array(width * height);
+	let reduced = [], points = Array(width * height);
 	for(let y = spike_height; y < height+spike_height; ++y) {
 		for(let x = spike_width; x < width+spike_width; ++x) {
 			let index = indices.indexOf(keyed[[x,y]]);
@@ -500,7 +471,7 @@ export const onOffDiamond = (height, width) => {
 		}
 	}
 
-	return { points, indices, reduced };
+	return { indices, points, reduced, keyed, diamond_height, diamond_width, diamond_size, spike_height, spike_width };
 };
 
 export const applyOnOffDiamond = input => {
@@ -510,10 +481,7 @@ export const applyOnOffDiamond = input => {
 
 	let output = [ height, width ], previous = 0, count = 0;
 	for(let point of details.points) {
-		let [x,y] = point;
-		let index = y * width + x;
-
-		let current = flat[index];
+		let [x,y] = point, index = y * width + x, current = flat[index];
 
 		if(current == previous) {
 			++count;
@@ -529,9 +497,7 @@ export const applyOnOffDiamond = input => {
 };
 
 export const offOnDiamond = input => {
-	const [ height, width ] = input;
-	const values = spread(input);
-	const details = onOffDiamond(height, width);
+	const [ height, width ] = input, values = spread(input), details = onOffDiamond(height, width);
 
 	let target_index = 0, current = 0, output = [ height, width ];
 	for(let index of details.reduced) {
@@ -672,6 +638,7 @@ export const bestMethod = (shape, mirrored) => {
 	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
+	let ratio = Math.round(length / shape.join(',').length * 10000) / 100;
 
 	if(!mirrored && isSymmetrical(shape)) {
 		const best_half = bestMethod(half(shape), true);
@@ -683,7 +650,7 @@ export const bestMethod = (shape, mirrored) => {
 	}
 
 	const string = prefix_by_key[method] + string_by_key[method];
-	return { method, length, string, mirrored, swapped };
+	return { method, length, string, mirrored, swapped, ratio };
 };
 
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
