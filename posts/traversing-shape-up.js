@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, onOffDiamond, onOffSnake, offOnSnake, applyOnOffDiamond, applyOnOffSnake, repositionBase49Limit } from '$app/shapeup/optimization-helper';
+import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const size = 5;
@@ -9,15 +9,15 @@ const size = 5;
 export const title = 'Traversing Shape Up Components';
 
 let examples = {
-    diamond: 'UP',
+    diamond: 'LUNAR',
     spiral: 'SPADE',
     vertical: 'HEEL',
-    horizontal: 'TITAN',
+    horizontal: 'DINO',
     diagonal: 'KNIFE',
     snake: 'PINK'
 };
 let bests = {};
-let horizontal, vertical, diagonal, spiral, diamond, snake;
+let horizontal, vertical, diagonal, spiral, diamond, snake, triangle;
 
 export const oninit = () => {
     let keys = Object.values(examples);
@@ -145,42 +145,50 @@ export const oninit = () => {
     const diamond_size = 7;
     diamond = onOffDiamond(diamond_size, diamond_size);
 
-    const { keyed, indices, diamond_height, diamond_width, spike_height, spike_width } = diamond;
+    diamond.visualization = (() => {
+        let { keyed, indices, diamond_height, diamond_width, spike_height, spike_width } = diamond;
 
-    let visualization = []
-    for(let y = 0; y < diamond_height; ++y) {
-        let row = [];    
-        for(let x = 0; x < diamond_width; ++x) {
-            if(keyed[[x,y]] !== undefined) {
-                row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
-            } else {
-                if(x >= spike_width && x < diamond_width-spike_width && y >= spike_height && y < diamond_height-spike_height) {
-                    row.push('__');
+        let visualization = []
+        for(let y = 0; y < diamond_height; ++y) {
+            let row = [];    
+            for(let x = 0; x < diamond_width; ++x) {
+                if(keyed[[x,y]] !== undefined) {
+                    row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
                 } else {
-                    row.push('  ');
+                    if(x >= spike_width && x < diamond_width-spike_width && y >= spike_height && y < diamond_height-spike_height) {
+                        row.push('__');
+                    } else {
+                        row.push('  ');
+                    }
                 }
             }
+        
+            visualization.push(row.join(' '));
         }
+
+        return visualization.join('\n');
+    })();
+
+    diamond.trimmed = (() => {
+        let { keyed, indices, diamond_height, diamond_width, spike_height, spike_width } = diamond;
+        
+        let trimmed = [], reduced = [];
+        for(let y = spike_height; y < diamond_size+spike_height; ++y) {
+            let row = [], reduced_row = [];
+            for(let x = spike_width; x < diamond_size+spike_width; ++x) {
+                row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
+                
+                let index = indices.indexOf(keyed[[x,y]]);
+                reduced_row.push(`${index}`.padStart(2,'0'));
+            }
     
-        visualization.push(row.join(' '));
-    }
-    diamond.visualization = visualization.join('\n');
-
-    let trimmed = [], reduced = [];
-    for(let y = spike_height; y < diamond_size+spike_height; ++y) {
-        let row = [], reduced_row = [];
-        for(let x = spike_width; x < diamond_size+spike_width; ++x) {
-            row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
-            
-            let index = indices.indexOf(keyed[[x,y]]);
-            reduced_row.push(`${index}`.padStart(2,'0'));
+            trimmed.push(row.join(' '));
+            reduced.push(reduced_row.join(' '));
         }
 
-        trimmed.push(row.join(' '));
-        reduced.push(reduced_row.join(' '));
-    }
-    diamond.trimmed = trimmed.join('\n');
-    diamond.reduced = reduced.join('\n');
+        diamond.reduced = reduced.join('\n');
+        return trimmed.join('\n');
+    })();
 
     diamond.actual_diamond_configuration = [9,9,8,14,15,143,239,251,248,248,56,8];
     diamond.actual_on_off_diamond = applyOnOffDiamond(diamond.actual_diamond_configuration);
@@ -188,7 +196,7 @@ export const oninit = () => {
     diamond.actual_diamond_url = `/shapeup/]${diamond.actual_diamond_compressed}`;
 
     let snake_width = 7;
-    let snake_height = 6;
+    let snake_height = 7;
     snake = onOffSnake(snake_height, snake_width);
 
     snake.visualization = ((height, width) => {
@@ -204,6 +212,62 @@ export const oninit = () => {
 
         return output.join('\n');
     })(snake_height, snake_width);
+
+    let triangle_size = 7;
+
+    triangle = onOffTriangle(triangle_size, triangle_size);
+
+    triangle.visualization = (() => {
+        let { keyed, indices, triangle_height, triangle_width, spike_height, spike_width } = triangle;
+
+        let visualization = []
+        for(let y = 0; y < triangle_height; ++y) {
+            let row = [];    
+            for(let x = 0; x < triangle_width; ++x) {
+                if(keyed[[x,y]] !== undefined) {
+                    row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
+                } else {
+                    if(x >= spike_width && x < triangle_width-spike_width && y >= spike_height && y < triangle_height-spike_height) {
+                        row.push('__');
+                    } else {
+                        row.push('  ');
+                    }
+                }
+            }
+        
+            visualization.push(row.join(' '));
+        }
+
+        return visualization.join('\n');
+    })();
+
+    triangle.trimmed = (() => {
+        let { keyed, indices, triangle_height, triangle_width, spike_height, spike_width } = triangle;
+        
+        let trimmed = [], reduced = [];
+        for(let y = spike_height; y < triangle_size+spike_height; ++y) {
+            let row = [], reduced_row = [];
+            for(let x = spike_width; x < triangle_size+spike_width; ++x) {
+                row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
+                
+                let index = indices.indexOf(keyed[[x,y]]);
+                reduced_row.push(`${index}`.padStart(2,'0'));
+            }
+    
+            trimmed.push(row.join(' '));
+            reduced.push(reduced_row.join(' '));
+        }
+
+        triangle.reduced = reduced.join('\n');
+        return trimmed.join('\n');
+    })();
+
+    triangle.actual_triangle_configuration = [9,17,0,128,0,224,0,248,0,254,0,255,128,255,224,255,248,255,254,255,255,128];
+    triangle.actual_on_off_triangle = applyOnOffTriangle(triangle.actual_triangle_configuration);
+    triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
+    triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
+
+    console.log(bestMethod(triangle.actual_triangle_configuration));
 
     /*
     keys = Object.keys(shapes);
@@ -230,7 +294,7 @@ export const content = () => [
     m('h3', 'Horizontal'),
     "The most common way to traverse an array.",
     m('pre.mono', horizontal.visualization),
-    "It is the best way to traverse the titanic:",
+    "It is the best way to traverse our triceratops:",
     m(ShapeUp, { configuration: shapes[examples.horizontal], size }),
     m(Best, { best: bests[examples.horizontal] }),
     m('h3', 'Vertical'),
@@ -260,12 +324,23 @@ export const content = () => [
     "It works really well if you want to make a diamond:",
     m(ShapeUp, { configuration: diamond.actual_diamond_configuration, size: 10 }),
     m('p', 'The entire url for this diamond is ', m('a.break', { href: diamond.actual_diamond_url, target: '_blank' }, diamond.actual_diamond_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', diamond.actual_on_off_diamond.join(','), '.'),
-    "It is also the best way to traverse our balloon:",
+    "It is also the best way to traverse our moon:",
     m(ShapeUp, { configuration: shapes[examples.diamond], size }),
     m(Best, { best: bests[examples.diamond] }),
     m('h3', 'Snake'),
     'The snake method works like the horizontal pattern but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. This works well with large empty areas and large filled areas. As our flamingo has a lot of white space the snake method works best.',
     m('pre.mono', snake.visualization),
     m(ShapeUp, { configuration: shapes[examples.snake], size }),
-    m(Best, { best: bests[examples.snake] })
+    m(Best, { best: bests[examples.snake] }),
+    m('h3', 'Triangle'),
+    'The triangle method is pretty similar to the diamond method:',
+    m('pre.mono', triangle.visualization),
+    'Trimmed:',
+    m('pre.mono', triangle.trimmed),
+    'And reduced:',
+    m('pre.mono', triangle.reduced),
+    'It works better than anything else if your shape is this exact type of triangle',
+    m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 10 }),
+    m('p', 'The entire url for this triangle is ', m('a.break', { href: triangle.actual_triangle_url, target: '_blank' }, triangle.actual_triangle_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', triangle.actual_on_off_triangle.join(','), '.'),
+    'However none of the shapes in my library are smallest using this method.'
 ];

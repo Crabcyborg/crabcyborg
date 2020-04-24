@@ -381,7 +381,6 @@ export const onOffDiamond = (height, width) => {
 	let spike_width = Math.ceil((height-2)/2);
 	let diamond_height = height + spike_height*2;
 	let diamond_width = width + spike_width*2;
-	let diamond = Array(diamond_height);
 	let base_x = 0, x = base_x, base_y = Math.floor((diamond_height-1)/2), y = base_y;
 	let index = 0;
 	let keyed = {};
@@ -518,6 +517,90 @@ export const onOffSnake = (height, width) => {
 	return { points, keyed, reduced };
 };
 
+export const onOffTriangle = (height, width) => {
+	let spike_height = Math.ceil((width-2)/2);
+	let spike_width = height-1;
+	let triangle_height = height + spike_height;
+	let triangle_width = width + spike_width*2;
+	let base_x = 0, x = base_x, base_y = triangle_height-1, y = base_y;
+	let index = 0;
+	let keyed = {};
+	let dir = 'ne';
+	let miny = 0;
+
+	// for this style of triangle only:
+	//   X
+	// X X X
+	const triangleSize = length => {
+		let size = 0;
+		while(length > 0) size += length, length -= 2;
+		return size;
+	};
+
+	// for thie style of triangle only:
+	// X
+	// X X
+	// X X X
+	const rightAngleTriangleSize = length => {
+		let size = 0;
+		while(length > 0) size += length--;
+		return size;
+	};
+
+	const triangle_size = height * width + rightAngleTriangleSize(height-1) * 2 + triangleSize(width-2);
+
+	keyed[[x,y]] = index++;
+	while(index < triangle_size) {
+		switch(dir) {
+			case 'ne': {
+				while(x + 1 < triangle_width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
+					++x;
+					--y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x+1,y]] !== undefined) break;
+				}
+
+				dir = 'se';
+				if(triangle_width % 2 === 0) --y;
+			} break;
+
+			case 'se': {
+				while(x + 1 < triangle_width && y + 1 < triangle_height && keyed[[x+1,y+1]] === undefined) {
+					++x;
+					++y;
+					keyed[[x,y]] = index++;
+					if(keyed[[x,y+1]] !== undefined) break;
+				}
+
+				dir = 'ne';
+				x = base_x++;
+				y = triangle_height;
+			} break;
+		}
+	}
+
+	// trim the edges
+	let indices = [];
+	for(let y = spike_height; y < height+spike_height; ++y) {
+		for(let x = spike_width; x < width+spike_width; ++x) {
+			indices.push(parseInt(keyed[[x,y]]));
+		}
+	}
+
+	indices.sort((a,b) => a-b);
+
+	let reduced = [], points = Array(width * height);
+	for(let y = spike_height; y < height+spike_height; ++y) {
+		for(let x = spike_width; x < width+spike_width; ++x) {
+			let index = indices.indexOf(keyed[[x,y]]);
+			reduced.push(index);
+			points[index] = [x - spike_width, y - spike_height];
+		}
+	}
+
+	return { points, keyed, indices, reduced, keyed, triangle_height, triangle_width, triangle_size, spike_height, spike_width };
+};
+
 export const applyOnOff = (input, fn) => {
 	const [ height, width ] = input;
 	const flat = flatten(input);
@@ -542,6 +625,7 @@ export const applyOnOff = (input, fn) => {
 
 export const applyOnOffDiamond = input => applyOnOff(input, onOffDiamond);
 export const applyOnOffSnake = input => applyOnOff(input, onOffSnake);
+export const applyOnOffTriangle = input => applyOnOff(input, onOffTriangle);
 
 export const applyOffOn = (input, fn) => {
 	const [ height, width ] = input, values = spread(input), details = fn(height, width);
@@ -563,6 +647,7 @@ export const applyOffOn = (input, fn) => {
 
 export const offOnDiamond = input => applyOffOn(input, onOffDiamond);
 export const offOnSnake = input => applyOffOn(input, onOffSnake);
+export const offOnTriangle = input => applyOffOn(input, onOffTriangle);
 
 export const mirror = (input, odd) => {
 	odd === undefined && (odd = false);
@@ -665,7 +750,8 @@ let prefix_by_key = {
 	spiral: '`',
 	diagonal: '>',
 	diamond: ']',
-	snake: '__'
+	snake: '__',
+	triangle: '--'
 };
 
 export const bestMethod = (shape, mirrored) => {
@@ -678,7 +764,8 @@ export const bestMethod = (shape, mirrored) => {
 	let diagonal = repositionBase49Limit(onOffDiagonal(shape));
 	let diamond = repositionBase49Limit(applyOnOffDiamond(shape));
 	let snake = repositionBase49Limit(applyOnOffSnake(shape));
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake };
+	let triangle = repositionBase49Limit(applyOnOffTriangle(shape));
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -686,10 +773,11 @@ export const bestMethod = (shape, mirrored) => {
 		[spiral.length]: 'spiral',
 		[diagonal.length]: 'diagonal',
 		[diamond.length]: 'diamond',
-		[snake.length]: 'snake'
+		[snake.length]: 'snake',
+		[triangle.length]: 'triangle'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length);
+	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
 	let ratio = Math.round(length / shape.join(',').length * 10000) / 100;

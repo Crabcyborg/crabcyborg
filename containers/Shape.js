@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnSnake, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnSnake, offOnTriangle, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -41,23 +41,18 @@ export var Shape = {
 		const alternative = shape[0] === '}';
 		const alternative_base49 = shape[0] === '^';
 		const alternative_base82 = shape[0] === '*';
-		const reposition_base49 = shape[0] === '-';
-		let vertical_base49 = shape[0] === '_';
+		const reposition_base49 = shape[0] === '-' && shape[1] !== '-';
+		const vertical_base49 = shape[0] === '_' && shape[1] !== '_';
 		const limited_base49 = shape[0] === '~';
 		const spiral = shape[0] === '`';
 		const diagonal = shape[0] === '>';
 		const diamond = shape[0] === ']';
-		const test = shape[0] === '_' && shape[1] === '_';
+		const snake = shape[0] === '_' && shape[1] === '_';
+		const triangle = shape[0] === '-' && shape[1] === '-';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		(on_off || vertical_base49 || limited_base49 || spiral || diagonal || diamond || test) && (shape = shape.substr(1));
-
-		test && (shape = shape.substr(1));
-
-		if(test) {
-			vertical_base49 = false;
-			console.log('here', shape);
-		}
-
+		(on_off || vertical_base49 || limited_base49 || spiral || diagonal || diamond || snake || triangle) && (shape = shape.substr(1));
+		(snake || triangle) && (shape = shape.substr(1));
+		
 		let configuration;
 		if(alternative) {
 			configuration = alternativeDecompress(shape);
@@ -77,8 +72,10 @@ export var Shape = {
 			configuration = offOnDiagonal(repositionDecompressBase49Limit(shape));
 		} else if(diamond) {
 			configuration = offOnDiamond(repositionDecompressBase49Limit(shape));
-		} else if(test) {
+		} else if(snake) {
 			configuration = offOnSnake(repositionDecompressBase49Limit(shape));
+		} else if(triangle) {
+			configuration = offOnTriangle(repositionDecompressBase49Limit(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}
