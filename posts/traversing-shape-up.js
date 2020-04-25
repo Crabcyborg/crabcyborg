@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit } from '$app/shapeup/optimization-helper';
+import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit, flipOnOff, flippedOffOnTriangle, offOn } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const size = 5;
@@ -14,10 +14,25 @@ let examples = {
     vertical: 'HEEL',
     horizontal: 'DINO',
     diagonal: 'KNIFE',
-    snake: 'PINK'
+    snake: 'PINK',
+    triangle: 'ROYAL'
 };
 let bests = {};
 let horizontal, vertical, diagonal, spiral, diamond, snake, triangle;
+
+const visualize = (height, width, keyed) => {
+    let output = [];
+    for(let y = 0; y < height; ++y) {
+        let row = [];
+        for(let x = 0; x < width; ++x) {
+            let index = keyed[[x,y]];
+            row.push(`${index}`.padStart(2, '0'));
+        }
+        output.push(row.join(' '));
+    }
+
+    return output.join('\n');
+};
 
 export const oninit = () => {
     let keys = Object.values(examples);
@@ -74,17 +89,7 @@ export const oninit = () => {
             }
         }
 
-        let output = [];
-        for(let y = 0; y < height; ++y) {
-            let row = [];
-            for(let x = 0; x < width; ++x) {
-                let index = keyed[[x,y]];
-                row.push(`${index}`.padStart(2, '0'));
-            }
-            output.push(row.join(' '));
-        }
-
-        return output.join('\n');
+        return visualize(height, width, keyed);
     })(7,7);
 
     spiral = {};
@@ -129,17 +134,7 @@ export const oninit = () => {
             }
         }
 
-        let output = [];
-        for(let y = 0; y < height; ++y) {
-            let row = [];
-            for(let x = 0; x < width; ++x) {
-                let index = keyed[[x,y]];
-                row.push(`${index}`.padStart(2, '0'));
-            }
-            output.push(row.join(' '));
-        }
-
-        return output.join('\n');
+        return visualize(height, width, keyed);
     })(7,7);
 
     const diamond_size = 7;
@@ -266,9 +261,12 @@ export const oninit = () => {
     triangle.actual_on_off_triangle = applyOnOffTriangle(triangle.actual_triangle_configuration);
     triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
-
-    console.log(bestMethod(triangle.actual_triangle_configuration));
-
+    triangle.flipped = flipOnOff(onOffTriangle(triangle_size, triangle_size));
+    triangle.flipped_visualization = visualize(triangle.height, triangle.width, triangle.flipped.keyed);
+    triangle.flipped_configuration = flippedOffOnTriangle([9,17,72,81]);
+    triangle.flipped_compressed = repositionBase49Limit([9,17,72,81]);
+    triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
+    
     /*
     keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
@@ -342,5 +340,11 @@ export const content = () => [
     'It works better than anything else if your shape is this exact type of triangle',
     m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 10 }),
     m('p', 'The entire url for this triangle is ', m('a.break', { href: triangle.actual_triangle_url, target: '_blank' }, triangle.actual_triangle_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', triangle.actual_on_off_triangle.join(','), '.'),
-    'However none of the shapes in my library are smallest using this method.'
+    'However none of the shapes in my library are smallest using this exact triangle. It\'s a good thing we can flip the pattern and try the same thing upside down.',
+    m('pre.mono', triangle.flipped_visualization),
+    m(ShapeUp, { configuration: triangle.flipped_configuration, size: 10 }),
+    m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
+    'The upside down triangle pattern is the best method for traversing my crown shape.',
+    m(ShapeUp, { configuration: shapes[examples.triangle], size }),
+    m(Best, { best: bests[examples.triangle] })
 ];
