@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit, flipOnOff, flippedOffOnTriangle, offOnDiamond, offOnTriangle } from '$app/shapeup/optimization-helper';
+import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit, flipOnOff, flippedOffOnTriangle, rotatedOffOnTriangle, offOnDiamond, offOnTriangle, rotatedOnOffTriangle } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const size = 5;
@@ -15,7 +15,8 @@ let examples = {
     horizontal: 'DINO',
     diagonal: 'KNIFE',
     snake: 'PINK',
-    triangle: 'CHECK'
+    triangle: 'CHECK',
+    triangle_rotated: 'EGG'
 };
 let bests = {};
 let horizontal, vertical, diagonal, spiral, diamond, snake, triangle;
@@ -266,15 +267,22 @@ export const oninit = () => {
     triangle.flipped_configuration = flippedOffOnTriangle([9,17,72,81]);
     triangle.flipped_compressed = repositionBase49Limit([9,17,72,81]);
     triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
-    
+    triangle.rotated = rotatedOnOffTriangle(triangle_size, triangle_size);
+    triangle.rotated_visualization = visualize(triangle.height, triangle.width, triangle.rotated.keyed);
+
+    triangle.rotated_configuration = rotatedOffOnTriangle([17,9,72,81]);
+
+    triangle.rotated_compressed = repositionBase49Limit([17,9,72,81]);
+    triangle.rotated_url = `/shapeup/\`\`${triangle.rotated_compressed}`;
+
     /*
     keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
 		let shape = shapes[key];
         console.log({key, ...bestMethod(shape)});
-    }
-    */
+    }   
+    */ 
 };
 
 const Best = {
@@ -338,13 +346,20 @@ export const content = () => [
     'And reduced:',
     m('pre.mono', triangle.reduced),
     'It works better than anything else if your shape is this exact type of triangle',
-    m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 10 }),
+    m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 6 }),
     m('p', 'The entire url for this triangle is ', m('a.break', { href: triangle.actual_triangle_url, target: '_blank' }, triangle.actual_triangle_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', triangle.actual_on_off_triangle.join(','), '.'),
     'However none of the shapes in my library are smallest using this exact triangle. It\'s a good thing we can flip the pattern and try the same thing upside down.',
     m('pre.mono', triangle.flipped_visualization),
-    m(ShapeUp, { configuration: triangle.flipped_configuration, size: 10 }),
+    m(ShapeUp, { configuration: triangle.flipped_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
     'The upside down triangle pattern is the best method for traversing our checkmark.',
     m(ShapeUp, { configuration: shapes[examples.triangle], size }),
-    m(Best, { best: bests[examples.triangle] })
+    m(Best, { best: bests[examples.triangle] }),
+    'Why stop at just flipping it when the triangle method can be rotated as well?',
+    m('pre.mono', triangle.rotated_visualization),
+    m(ShapeUp, { configuration: triangle.rotated_configuration, size: 6 }),
+    m('div', m('a.break', { href: triangle.rotated_url, target: '_blank' }, triangle.flipped_url)),
+    "It's the best method for our egg!",
+    m(ShapeUp, { configuration: shapes[examples.triangle_rotated], size }),
+    m(Best, { best: bests[examples.triangle_rotated] })
 ];

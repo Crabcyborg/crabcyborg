@@ -636,24 +636,48 @@ export const flipOnOff = details => {
 		for(let x = 0; x < details.width; ++x) {
 			let index = keyed[[x,y]];
 			reduced.push(index);
-			points[index] = [x, y];
+			points[index] = [x,y];
 		}
 	}
 
-	return { points, keyed, reduced };
+	return { points, keyed, reduced, width: details.width, height: details.height };
+};
+
+export const rotateOnOff = details => {
+	let point_index = 0, keyed = {};
+	for(let index of details.reduced) {
+		let point = details.points[index];
+		let [x,y] = point;
+		keyed[[y,x]] = index;
+	}
+
+	let height = details.width;
+	let width = details.height;
+	let reduced = [], points = Array(details.width * details.height);
+	for(let y = 0; y < height; ++y) {
+		for(let x = 0; x < width; ++x) {
+			let index = keyed[[x,y]];
+			reduced.push(index);
+			points[index] = [x,y];
+		}
+	}
+
+	return { points, keyed, reduced, width, height };
 };
 
 export const flippedOnOffTriangle = (height, width) => flipOnOff(onOffTriangle(height, width));
+export const rotatedOnOffTriangle = (height, width) => rotateOnOff(onOffTriangle(width, height));
 
 export const applyOnOffDiamond = input => applyOnOff(input, onOffDiamond);
 export const applyOnOffSnake = input => applyOnOff(input, onOffSnake);
-export const applyOnOffTriangle = (input, flip) => applyOnOff(input, flip ? flippedOnOffTriangle : onOffTriangle);
+export const applyOnOffTriangle = (input, flip, rotate) => applyOnOff(input, flip ? flippedOnOffTriangle : (rotate ? rotatedOnOffTriangle : onOffTriangle));
 
-export const applyOffOn = (input, fn, flip) => {
+export const applyOffOn = (input, fn, flip, rotate) => {
 	const [ height, width ] = input, values = spread(input);
-	let details = fn(height, width);
+	let details = rotate ? fn(width, height) : fn(height, width);
 
 	if(flip) details = flipOnOff(details);
+	if(rotate) details = rotateOnOff(details);
 
 	let target_index = 0, current = 0, output = [ height, width ];
 	for(let index of details.reduced) {
@@ -675,6 +699,7 @@ export const offOnSnake = input => applyOffOn(input, onOffSnake);
 export const offOnTriangle = input => applyOffOn(input, onOffTriangle);
 
 export const flippedOffOnTriangle = input => applyOffOn(input, onOffTriangle, true);
+export const rotatedOffOnTriangle = input => applyOffOn(input, onOffTriangle, false, true);
 
 export const mirror = (input, odd) => {
 	odd === undefined && (odd = false);
@@ -779,7 +804,8 @@ let prefix_by_key = {
 	diamond: ']',
 	snake: '__',
 	triangle: '--',
-	triangle_flipped: '~~'
+	triangle_flipped: '~~',
+	triangle_rotated: '``'
 };
 
 export const bestMethod = (shape, mirrored) => {
@@ -794,7 +820,8 @@ export const bestMethod = (shape, mirrored) => {
 	let snake = repositionBase49Limit(applyOnOffSnake(shape));
 	let triangle = repositionBase49Limit(applyOnOffTriangle(shape));
 	let triangle_flipped = repositionBase49Limit(applyOnOffTriangle(shape, true));
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped };
+	let triangle_rotated = repositionBase49Limit(applyOnOffTriangle(shape, false, true));
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, triangle_rotated };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -804,10 +831,11 @@ export const bestMethod = (shape, mirrored) => {
 		[diamond.length]: 'diamond',
 		[snake.length]: 'snake',
 		[triangle.length]: 'triangle',
-		[triangle_flipped.length]: 'triangle_flipped'
+		[triangle_flipped.length]: 'triangle_flipped',
+		[triangle_rotated.length]: 'triangle_rotated'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length);
+	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, triangle_rotated.length);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
 	let ratio = Math.round(length / shape.join(',').length * 10000) / 100;

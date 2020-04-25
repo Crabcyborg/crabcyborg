@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
-import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnSnake, offOnTriangle, flippedOffOnTriangle, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
+import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnSnake, offOnTriangle, flippedOffOnTriangle, rotatedOffOnTriangle, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const unsubPatterns = (input, symbols) => {
@@ -44,15 +44,16 @@ export var Shape = {
 		const reposition_base49 = shape[0] === '-' && shape[1] !== '-';
 		const vertical_base49 = shape[0] === '_' && shape[1] !== '_';
 		const limited_base49 = shape[0] === '~' && shape[1] !== '~';
-		const spiral = shape[0] === '`';
+		const spiral = shape[0] === '`' && shape[1] !== '`';
 		const diagonal = shape[0] === '>';
 		const diamond = shape[0] === ']';
 		const snake = shape[0] === '_' && shape[1] === '_';
 		const triangle = shape[0] === '-' && shape[1] === '-';
 		const triangle_flipped = shape[0] === '~' && shape[1] === '~';
+		const triangle_rotated = shape[0] === '`' && shape[1] === '`';
 		const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || reposition_base49;
-		(on_off || vertical_base49 || limited_base49 || spiral || diagonal || diamond || snake || triangle || triangle_flipped) && (shape = shape.substr(1));
-		(snake || triangle || triangle_flipped) && (shape = shape.substr(1));
+		(on_off || vertical_base49 || limited_base49 || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated) && (shape = shape.substr(1));
+		(snake || triangle || triangle_flipped || triangle_rotated) && (shape = shape.substr(1));
 		
 		let configuration;
 		if(alternative) {
@@ -79,6 +80,8 @@ export var Shape = {
 			configuration = offOnTriangle(repositionDecompressBase49Limit(shape));
 		} else if(triangle_flipped) {
 			configuration = flippedOffOnTriangle(repositionDecompressBase49Limit(shape));
+		} else if(triangle_rotated) {
+			configuration = rotatedOffOnTriangle(repositionDecompressBase49Limit(shape));
 		} else {
 			configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 		}
