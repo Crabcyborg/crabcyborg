@@ -10,13 +10,13 @@ export const title = 'Traversing Shape Up Components';
 
 let examples = {
     diamond: 'LUNAR',
-    spiral: 'SPADE',
+    spiral: 'CLUB',
     vertical: 'HEEL',
     horizontal: 'DINO',
     diagonal: 'KNIFE',
     snake: 'PINK',
     triangle: 'CHECK',
-    triangle_rotated: 'EGG'
+    triangle_rotated: 'SPADE'
 };
 let bests = {};
 let horizontal, vertical, diagonal, spiral, diamond, snake, triangle;
@@ -269,9 +269,7 @@ export const oninit = () => {
     triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
     triangle.rotated = rotatedOnOffTriangle(triangle_size, triangle_size);
     triangle.rotated_visualization = visualize(triangle.height, triangle.width, triangle.rotated.keyed);
-
     triangle.rotated_configuration = rotatedOffOnTriangle([17,9,72,81]);
-
     triangle.rotated_compressed = repositionBase49Limit([17,9,72,81]);
     triangle.rotated_url = `/shapeup/\`\`${triangle.rotated_compressed}`;
 
@@ -282,7 +280,7 @@ export const oninit = () => {
 		let shape = shapes[key];
         console.log({key, ...bestMethod(shape)});
     }   
-    */ 
+    //*/ 
 };
 
 const Best = {
@@ -317,7 +315,7 @@ export const content = () => [
     m('h3', 'Spiral'),
     'The spiral method is fairly effective as most data is off around the border and on in the center.',
     m('pre.mono', spiral.visualization),
-    'It is the best method for traversing our spade:',
+    'It is the best method for traversing our club:',
     m(ShapeUp, { configuration: shapes[examples.spiral], size }),
     m(Best, { best: bests[examples.spiral] }),
     m('h3', 'Diamond'),
@@ -359,7 +357,7 @@ export const content = () => [
     m('pre.mono', triangle.rotated_visualization),
     m(ShapeUp, { configuration: triangle.rotated_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.rotated_url, target: '_blank' }, triangle.flipped_url)),
-    "It's the best method for our egg!",
+    "It's the best method for our spade!",
     m(ShapeUp, { configuration: shapes[examples.triangle_rotated], size }),
     m(Best, { best: bests[examples.triangle_rotated] })
 ];
