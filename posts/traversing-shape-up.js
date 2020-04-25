@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit, flipOnOff, flippedOffOnTriangle, offOn } from '$app/shapeup/optimization-helper';
+import { bestMethod, onOffDiamond, onOffSnake, onOffTriangle, applyOnOffDiamond, applyOnOffTriangle, applyOnOffSnake, repositionBase49Limit, flipOnOff, flippedOffOnTriangle, offOnDiamond, offOnTriangle } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 
 const size = 5;
@@ -15,7 +15,7 @@ let examples = {
     horizontal: 'DINO',
     diagonal: 'KNIFE',
     snake: 'PINK',
-    triangle: 'ROYAL'
+    triangle: 'CHECK'
 };
 let bests = {};
 let horizontal, vertical, diagonal, spiral, diamond, snake, triangle;
@@ -185,7 +185,7 @@ export const oninit = () => {
         return trimmed.join('\n');
     })();
 
-    diamond.actual_diamond_configuration = [9,9,8,14,15,143,239,251,248,248,56,8];
+    diamond.actual_diamond_configuration = offOnDiamond([9,9,40,41]);
     diamond.actual_on_off_diamond = applyOnOffDiamond(diamond.actual_diamond_configuration);
     diamond.actual_diamond_compressed = repositionBase49Limit(diamond.actual_on_off_diamond);
     diamond.actual_diamond_url = `/shapeup/]${diamond.actual_diamond_compressed}`;
@@ -257,7 +257,7 @@ export const oninit = () => {
         return trimmed.join('\n');
     })();
 
-    triangle.actual_triangle_configuration = [9,17,0,128,0,224,0,248,0,254,0,255,128,255,224,255,248,255,254,255,255,128];
+    triangle.actual_triangle_configuration = offOnTriangle([9,17,72,81]);
     triangle.actual_on_off_triangle = applyOnOffTriangle(triangle.actual_triangle_configuration);
     triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
@@ -344,7 +344,7 @@ export const content = () => [
     m('pre.mono', triangle.flipped_visualization),
     m(ShapeUp, { configuration: triangle.flipped_configuration, size: 10 }),
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
-    'The upside down triangle pattern is the best method for traversing my crown shape.',
+    'The upside down triangle pattern is the best method for traversing our checkmark.',
     m(ShapeUp, { configuration: shapes[examples.triangle], size }),
     m(Best, { best: bests[examples.triangle] })
 ];
