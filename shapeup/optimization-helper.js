@@ -1,4 +1,6 @@
 import { min } from 'min-string';
+import { traverse} from '$app/traverse-grid';
+const t = traverse;
 
 const targets = [128,64,32,16,8,4,2,1];
 
@@ -376,311 +378,38 @@ export const offOnDiagonal = input => {
 	return output;
 };
 
-export const onOffDiamond = (height, width) => {
-	let spike_height = Math.ceil((width-2)/2);
-	let spike_width = Math.ceil((height-2)/2);
-	let diamond_height = height + spike_height*2;
-	let diamond_width = width + spike_width*2;
-	let base_x = 0, x = base_x, base_y = Math.floor((diamond_height-1)/2), y = base_y;
-	let index = 0;
-	let keyed = {};
-	let dir = 'ne';
-	let miny = 0;
-
-	const triangleSize = length => {
-		let size = 0;
-		while(length > 0) {
-			size += length;
-			length -= 2;
-		}
-		return size;
-	};
-	const diamond_size = height * width + triangleSize(height-2) * 2 + triangleSize(width-2) * 2;
-
-	keyed[[x,y]] = index++;
-	while(index < diamond_size) {
-		switch(dir) {
-			case 'ne': {
-				while(x + 1 < diamond_width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
-					++x;
-					--y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x+1,y]] !== undefined) break;
-				}
-
-				dir = 'se';
-				if(diamond_width % 2 === 0) --y;
-			} break;
-
-			case 'se': {
-				while(x + 1 < diamond_width && y + 1 < diamond_height && keyed[[x+1,y+1]] === undefined) {
-					++x;
-					++y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x,y+1]] !== undefined) break;
-				}
-
-				dir = 'sw';
-				if(diamond_height % 2 === 0) ++x;
-			} break;
-
-			case 'sw': {
-				while(x - 1 >= 0 && y + 1 < diamond_height && keyed[[x-1,y+1]] === undefined) {
-					--x;
-					++y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x-1,y]] !== undefined) break;
-				}
-
-				dir = 'nw';
-				if(diamond_width % 2 === 0) ++y;
-			} break;
-
-			case 'nw': {
-				while(x - 1 >= 0 && y - 1 >= 0 && keyed[[x-1,y-1]] === undefined) {
-					--x;
-					--y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x,y-1]] !== undefined) break;
-				}
-
-				dir = 'ne';
-				x = base_x++;
-				y = base_y+1;
-			} break;
-		}
-	}
-
-	// trim the edges
-	let indices = [];
-	for(let y = spike_height; y < height+spike_height; ++y) {
-		for(let x = spike_width; x < width+spike_width; ++x) {
-			indices.push(parseInt(keyed[[x,y]]));
-		}
-	}
-
-	indices.sort((a,b) => a-b);
-
-	let reduced = [], points = Array(width * height);
-	for(let y = spike_height; y < height+spike_height; ++y) {
-		for(let x = spike_width; x < width+spike_width; ++x) {
-			let index = indices.indexOf(keyed[[x,y]]);
-			reduced.push(index);
-			points[index] = [x - spike_width, y - spike_height];
-		}
-	}
-
-	return { points, keyed, indices, reduced, keyed, diamond_height, diamond_width, diamond_size, spike_height, spike_width, height, width };
-};
-
-export const onOffSnake = (height, width) => {
-	let dir = 's';
-	let remaining = height * width;
-	let x = 0, y = 0, keyed = {}, points = Array(width * height), index = 0, reduced = [];
-	while(remaining) {
-		if(x >= 0 && x < width && y >= 0 && y < height) {
-			--remaining;
-			reduced.push(index);
-			keyed[[x,y]] = index;
-			points[y * width + x] = [x,y];
-			++index;
-		}
-
-		switch(dir) {
-			case 's':
-				++y;
-				dir = 'e1';
-			break;
-
-			case 'e1':
-				++x;
-				dir = 'n';
-			break;
-
-			case 'n':
-				--y;
-				dir = 'e2';
-			break;
-
-			case 'e2':
-				++x;
-				dir = 's';
-
-				if(x >= width) {
-					x = 0;
-					y += 2;
-				}
-			break;
-		}
-	}
-
-	return { points, keyed, reduced, height, width };
-};
-
-export const onOffTriangle = (height, width) => {
-	let spike_height = Math.ceil((width-2)/2);
-	let spike_width = height-1;
-	let triangle_height = height + spike_height;
-	let triangle_width = width + spike_width*2;
-	let base_x = 0, x = base_x, base_y = triangle_height-1, y = base_y;
-	let index = 0;
-	let keyed = {};
-	let dir = 'ne';
-	let miny = 0;
-
-	// for this style of triangle only:
-	//   X
-	// X X X
-	const triangleSize = length => {
-		let size = 0;
-		while(length > 0) size += length, length -= 2;
-		return size;
-	};
-
-	// for thie style of triangle only:
-	// X
-	// X X
-	// X X X
-	const rightAngleTriangleSize = length => {
-		let size = 0;
-		while(length > 0) size += length--;
-		return size;
-	};
-
-	const triangle_size = height * width + rightAngleTriangleSize(height-1) * 2 + triangleSize(width-2);
-
-	keyed[[x,y]] = index++;
-	while(index < triangle_size) {
-		switch(dir) {
-			case 'ne': {
-				while(x + 1 < triangle_width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
-					++x;
-					--y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x+1,y]] !== undefined) break;
-				}
-
-				dir = 'se';
-				if(triangle_width % 2 === 0) --y;
-			} break;
-
-			case 'se': {
-				while(x + 1 < triangle_width && y + 1 < triangle_height && keyed[[x+1,y+1]] === undefined) {
-					++x;
-					++y;
-					keyed[[x,y]] = index++;
-					if(keyed[[x,y+1]] !== undefined) break;
-				}
-
-				dir = 'ne';
-				x = base_x++;
-				y = triangle_height;
-			} break;
-		}
-	}
-
-	// trim the edges
-	let indices = [];
-	for(let y = spike_height; y < height+spike_height; ++y) {
-		for(let x = spike_width; x < width+spike_width; ++x) {
-			indices.push(parseInt(keyed[[x,y]]));
-		}
-	}
-
-	indices.sort((a,b) => a-b);
-
-	let reduced = [], points = Array(width * height);
-	for(let y = spike_height; y < height+spike_height; ++y) {
-		for(let x = spike_width; x < width+spike_width; ++x) {
-			let index = indices.indexOf(keyed[[x,y]]);
-			reduced.push(index);
-			points[index] = [x - spike_width, y - spike_height];
-		}
-	}
-
-	return { points, keyed, indices, reduced, triangle_height, triangle_width, triangle_size, spike_height, spike_width, height, width };
-};
-
-export const applyOnOff = (input, fn) => {
-	const [ height, width ] = input;
-	const flat = flatten(input);
-	const details = fn(height, width);
-
+// convert raw to on/off
+export const applyOnOff = (input, method) => {
+	const [ height, width ] = input, flat = flatten(input);
 	let output = [ height, width ], previous = 0, count = 0;
-	for(let point of details.points) {
-		let [x,y] = point, index = y * width + x, current = flat[index];
-
-		if(current == previous) {
+	t.forEach(method(height, width), ({ point }) => {
+		let index = point[1] * width + point[0];
+		if(flat[index] == previous) {
 			++count;
 		} else {
 			output.push(count);
 			count = 1;
-			previous = current;
+			previous = flat[index];
 		}
-	}
-
+	});
 	output.push(count);
 	return output;
 };
 
-export const flipOnOff = details => {
-	let point_index = 0, keyed = {};
-	for(let index of details.reduced) {
-		let point = details.points[index];
-		let [x,y] = point;
-		keyed[[x, details.height-y-1]] = index;
-	}
+export const applyOnOffDiamond = input => applyOnOff(input, t.diamond);
+export const applyOnOffSnake = input => applyOnOff(input, t.snake);
+export const applyOnOffTriangle = (input, flip, rotate) => applyOnOff(input, flip ? t.pipe(t.triangle, t.flipy) : (rotate ? t.pipe(t.triangle, t.rotate) : t.triangle));
 
-	let reduced = [], points = Array(details.width * details.height);
-	for(let y = 0; y < details.height; ++y) {
-		for(let x = 0; x < details.width; ++x) {
-			let index = keyed[[x,y]];
-			reduced.push(index);
-			points[index] = [x,y];
-		}
-	}
-
-	return { points, keyed, reduced, width: details.width, height: details.height };
-};
-
-export const rotateOnOff = details => {
-	let point_index = 0, keyed = {};
-	for(let index of details.reduced) {
-		let point = details.points[index];
-		let [x,y] = point;
-		keyed[[y,x]] = index;
-	}
-
-	let height = details.width;
-	let width = details.height;
-	let reduced = [], points = Array(details.width * details.height);
-	for(let y = 0; y < height; ++y) {
-		for(let x = 0; x < width; ++x) {
-			let index = keyed[[x,y]];
-			reduced.push(index);
-			points[index] = [x,y];
-		}
-	}
-
-	return { points, keyed, reduced, width, height };
-};
-
-export const flippedOnOffTriangle = (height, width) => flipOnOff(onOffTriangle(height, width));
-export const rotatedOnOffTriangle = (height, width) => rotateOnOff(onOffTriangle(width, height));
-
-export const applyOnOffDiamond = input => applyOnOff(input, onOffDiamond);
-export const applyOnOffSnake = input => applyOnOff(input, onOffSnake);
-export const applyOnOffTriangle = (input, flip, rotate) => applyOnOff(input, flip ? flippedOnOffTriangle : (rotate ? rotatedOnOffTriangle : onOffTriangle));
-
-export const applyOffOn = (input, fn, flip, rotate) => {
+// convert on/off type data to raw
+export const applyOffOn = (input, method, flip, rotate) => {
 	const [ height, width ] = input, values = spread(input);
-	let details = rotate ? fn(width, height) : fn(height, width);
+	let details = rotate ? method(width, height) : method(height, width);
 
-	if(flip) details = flipOnOff(details);
-	if(rotate) details = rotateOnOff(details);
+	if(flip) details = t.flip(details, 'y');
+	if(rotate) details = t.rotate(details);
 
 	let target_index = 0, current = 0, output = [ height, width ];
-	for(let index of details.reduced) {
+	for(let index of details.indices) {
 		if(values[index]) current += targets[target_index];
 
 		if(++target_index == 8) {
@@ -691,15 +420,13 @@ export const applyOffOn = (input, fn, flip, rotate) => {
 
 	output.push(current);
 	return output;
-
 };
 
-export const offOnDiamond = input => applyOffOn(input, onOffDiamond);
-export const offOnSnake = input => applyOffOn(input, onOffSnake);
-export const offOnTriangle = input => applyOffOn(input, onOffTriangle);
-
-export const flippedOffOnTriangle = input => applyOffOn(input, onOffTriangle, true);
-export const rotatedOffOnTriangle = input => applyOffOn(input, onOffTriangle, false, true);
+export const offOnDiamond = input => applyOffOn(input, t.diamond);
+export const offOnSnake = input => applyOffOn(input, t.snake);
+export const offOnTriangle = input => applyOffOn(input, t.triangle);
+export const flippedOffOnTriangle = input => applyOffOn(input, t.pipe(t.triangle), true);
+export const rotatedOffOnTriangle = input => applyOffOn(input, t.pipe(t.triangle), false, true);
 
 export const mirror = (input, odd) => {
 	odd === undefined && (odd = false);

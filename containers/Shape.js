@@ -2,6 +2,8 @@ import m from 'mithril';
 import { ShapeUp } from '$app/components';
 import { offOn, offOnVertical, offOnSpiral, offOnDiagonal, offOnDiamond, offOnSnake, offOnTriangle, flippedOffOnTriangle, rotatedOffOnTriangle, offOnLimit, repositionOnOff, repositionOffOn, mirror } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
+import { traverse} from '$app/traverse-grid';
+const t = traverse;
 
 const unsubPatterns = (input, symbols) => {
 	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
