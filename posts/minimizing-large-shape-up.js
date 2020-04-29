@@ -2,14 +2,15 @@ import m from 'mithril';
 import { Gist, ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { onOff, onOffVertical, onOffDiagonal, repositionOnOff, onOffLimit, onOffSpiral, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
+import { bestMethod, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
+import { traverse} from '$app/traverse-grid';
+const t = traverse;
 
 export const title = 'Minimizing a Large Shape Up Component';
 
 let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
-
 const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 
@@ -20,7 +21,7 @@ const meta = key => {
 	const raw_length = raw.length;
 	const raw_csv = raw.join(',');
 	const raw_csv_length = raw_csv.length;
-	const on_off = onOff(raw);
+	const on_off = applyOnOff(raw, t.horizontal);
 	const on_off_length = on_off.length;
 	const on_off_csv = on_off.join(',');
 	const on_off_csv_length = on_off_csv.length;	
@@ -41,13 +42,13 @@ export const oninit = () => {
 	first.alternative = alternative(first.on_off);
 	third.alternative = alternative(third.on_off);
 	third.on_off_base49 = alternativeBase49(third.on_off);
-	first.on_off_vertical = onOffVertical(first.raw);
+	first.on_off_vertical = applyOnOff(first.raw, t.vertical);
 	first.limited = onOffLimit(first.on_off_vertical, 63);
 	first.vertical = repositionBase49Limit(first.on_off_vertical);
 	first.vertical_url = `/shapeup/~${first.vertical}`;
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
-	second.vertical = repositionBase49(onOffVertical(second.raw));
+	second.vertical = repositionBase49(applyOnOff(second.raw, t.vertical));
 	second.vertical_url = `/shapeup/_${second.vertical}`;
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
@@ -57,11 +58,10 @@ export const oninit = () => {
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 	base82 = toBase82(first.on_off);
 	alternative_base82_url = `/shapeup/*${base82}`;
-	second.on_off_spiral = onOffSpiral(second.raw);
-	second.spiral_minimized = repositionBase49Limit(onOffSpiral(second.raw));
-	second.spiral_url = `/shapeup/\`${second.spiral_minimized}`;
-	second.half = repositionBase49Limit(onOffSpiral(half(second.raw)));
-	second.half_url = `/shapeup/[\`${second.half}`;
+	second.on_off_spiral = applyOnOff(second.raw, t.spiral);
+	second.spiral_minimized = repositionBase49Limit(second.on_off_spiral);
+	second.half = bestMethod(second.raw).string;
+	second.half_url = `/shapeup/[]}}${second.half}`;
 };
 
 export const content = () => [
@@ -123,8 +123,7 @@ export const content = () => [
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
 	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
 	m('p', 'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I have also implemented methods that traverse in a spiral, diagonally, and in a diamond. It turns out that the eiffel tower works best with the spiral method at ', second.spiral_minimized.length, ' characters.'),
-	m('div.mt2', m('a.break', { href: second.spiral_url, target: '_blank' }, second.spiral_url)),
-	m('p.f7', 'Oh by the way, the eiffel tower is symmetrical so I can drop half of the data and take our payload down to ', second.half.length, ' characters ', m('a.break.f7', { href: second.half_url, target: '_blank' }, second.half_url)),
+	m('p.f7', 'Oh by the way, the eiffel tower is symmetrical and I found a better method so I can drop half of the data and take our payload down to ', second.half.length, ' characters ', m('a.break.f7', { href: second.half_url, target: '_blank' }, second.half_url)),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p.break', first.on_off_csv),
 	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),

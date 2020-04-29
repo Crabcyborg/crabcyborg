@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { bestMethod, applyOnOff, applyOffOn, applyOnOffDiamond, applyOnOffTriangle, repositionBase49Limit, flippedOffOnTriangle, rotatedOffOnTriangle, offOnTriangle } from '$app/shapeup/optimization-helper';
+import { Gradient, bestMethod, applyOnOff, applyOffOn, repositionBase49Limit, bounce } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse} from '$app/traverse-grid';
 const t = traverse;
@@ -13,13 +13,15 @@ const size = 5;
 const visualize = method => t.pipe(method, t.visualize)(example_size, example_size);
 const examples = {
     diamond: 'LUNAR',
-    spiral: 'CLUB',
-    vertical: 'HEEL',
-    horizontal: 'DINO',
+    spiral: 'YIN',
+    vertical: 'CHAIR',
+    skip: 'EGGO',
     diagonal: 'KNIFE',
-    snake: 'PINK',
+    snake: 'FLIP',
     triangle: 'CHECK',
-    triangle_rotated: 'SPADE'
+    triangle_rotated: 'LIP',
+    turn: 'PAC',
+    bounce: 'CASH'
 };
 
 let diamond, triangle;
@@ -99,22 +101,24 @@ export const oninit = () => {
         return trimmed.join('\n');
     })();
     triangle.actual_on_off_triangle = [9,17,72,81];
+    triangle.actual_on_off_triangle_swapped_dimensions = [17,9,72,81];
+
     triangle.actual_triangle_configuration = applyOffOn(triangle.actual_on_off_triangle, t.triangle);
     triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
     triangle.flipped = t.pipe(t.triangle, t.flipy)(example_size, example_size);
     triangle.flipped_visualization = t.visualize(triangle.flipped);
-    triangle.flipped_configuration = flippedOffOnTriangle([9,17,72,81]);
-    triangle.flipped_compressed = repositionBase49Limit([9,17,72,81]);
+    triangle.flipped_configuration = applyOffOn(triangle.actual_on_off_triangle, t.pipe(t.triangle, t.flipy));
+    triangle.flipped_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
-    triangle.rotated = t.pipe(t.triangle, t.rotate)(example_size, example_size);
+    triangle.rotated = t.pipe(t.triangle, t.swap)(example_size, example_size);
     triangle.rotated_visualization = t.visualize(triangle.rotated);
-    triangle.rotated_configuration = rotatedOffOnTriangle([17,9,72,81]);
-    triangle.rotated_compressed = repositionBase49Limit([17,9,72,81]);
+    triangle.rotated_configuration = applyOffOn(triangle.actual_on_off_triangle_swapped_dimensions, t.triangle, true);
+    triangle.rotated_compressed = repositionBase49Limit(triangle.actual_on_off_triangle_swapped_dimensions);
     triangle.rotated_url = `/shapeup/\`\`${triangle.rotated_compressed}`;
 
     /*
-    keys = Object.keys(shapes);
+    let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
 		let shape = shapes[key];
@@ -123,7 +127,7 @@ export const oninit = () => {
     //*/ 
 };
 
-const Visualization = { view: v => m('pre.mono', visualize(v.attrs.method)) };
+const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: example_size, width: example_size }) };
 
 const Example = {
     oninit: v => {
@@ -136,6 +140,7 @@ const Example = {
         m(
             '.mono',
             {},
+            v.state.best.method, ' ',
             v.state.best.ratio, '% ',
             v.state.best.length, ' characters ',
             m('a.break', { href: `/shapeup/${v.state.best.string}`, target: '_blank' }, `/shapeup/${v.state.best.string}`) 
@@ -148,24 +153,37 @@ export const content = () => [
     m('h3', 'Horizontal'),
     "The most common way to traverse an array.",
     m(Visualization, { method: t.horizontal }),
-    "It is the best way to traverse our triceratops:",
-    m(Example, { method: 'horizontal' }),
+    "None of the shapes in my library are their smallest using this method.",
     m('h3', 'Vertical'),
     m(Visualization, { method: t.vertical }),
-    'It is the best way to traverse our high heel shoe:',
+    'Vertical is really nothing special. In fact, it is just a rotated horizontal method. It is the best way to traverse our chair:',
     m(Example, { method: 'vertical' }),
+    m('h3', 'Turn'),
+    'Turn is an alternated horizontal method. Similar to rotate, alternate is a mutate method that horizontally flips every other row.',
+    m(Visualization, { method: t.turn }),
+    'It is the best method for traversing our pacman:',
+    m(Example, { method: 'turn' }),
+    m('h3', 'Skip'),
+    'The skip method is a repositioned horizontal pattern where I iterate every even index, and then every odd index.',
+    m(Visualization, { method: t.skip }),
+    'It works really well if your data looks like our waffle:',
+    m(Example, { method: 'skip' }),
+    m('h3', 'Bounce'),
+    'The bounce method bounces back and forth between two indices, both from the beginning incrementing forward and from the end decrementing backward, meeting in the center. It works well on data that has some symmetry. It is the best method for traversing our dollar sign:',
+    m(Visualization, { method: traverse.pipe(traverse.horizontal, traverse.bounce) }),
+    m(Example, { method: 'bounce' }),
     m('h3', 'Diagonal'),
-    "The diagonal pattern does not win out very often, but when it does it can be very effective.",
+    "The diagonal method does not win out very often, but when it does it can be very effective.",
     m(Visualization, { method: t.diagonal }),
     "It works very well when traversing our knife:",
     m(Example, { method: 'diagonal' }),
     m('h3', 'Spiral'),
     'The spiral method is fairly effective as most data is off around the border and on in the center.',
     m(Visualization, { method: t.spiral }),
-    'It is the best method for traversing our club:',
+    'It is the best method for traversing our yin yang:',
     m(Example, { method: 'spiral' }),
     m('h3', 'Diamond'),
-    m('p', "The diamond pattern is harder to implement than the others. It helps to visualize the entire diamond first:"),
+    m('p', "The diamond method is harder to implement than the others. It helps to visualize the entire diamond first:"),
     m('pre.mono', diamond.visualization),
     "In actuality, we trim off the triangles and we get this:",
     m('pre.mono', diamond.trimmed),
@@ -177,7 +195,7 @@ export const content = () => [
     "It is also the best way to traverse our moon:",
     m(Example, { method: 'diamond' }),
     m('h3', 'Snake'),
-    'The snake method works like the horizontal pattern but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. This works well with large empty areas and large filled areas. As our flamingo has a lot of white space the snake method works best.',
+    'The snake method works like the horizontal method but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. It is the best method for traversing our dolphin.',
     m(Visualization, { method: t.snake }),
     m(Example, { method: 'snake' }),
     m('h3', 'Triangle'),
@@ -194,12 +212,12 @@ export const content = () => [
     m('pre.mono', triangle.flipped_visualization),
     m(ShapeUp, { configuration: triangle.flipped_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
-    'The upside down triangle pattern is the best method for traversing our checkmark.',
+    'The upside down triangle method is the best method for traversing our checkmark.',
     m(Example, { method: 'triangle' }),
     'Why stop at just flipping it when the triangle method can be rotated as well?',
     m('pre.mono', triangle.rotated_visualization),
     m(ShapeUp, { configuration: triangle.rotated_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.rotated_url, target: '_blank' }, triangle.flipped_url)),
-    "It's the best method for our spade!",
-    m(Example, { method: 'triangle_rotated' }),
+    "It's the best method for our lips.",
+    m(Example, { method: 'triangle_rotated' })
 ];
