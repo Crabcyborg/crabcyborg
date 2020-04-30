@@ -173,12 +173,10 @@ export const content = () => [
     m('p', 'The entire url for this diamond is ', m('a.break', { href: diamond.actual_diamond_url, target: '_blank' }, diamond.actual_diamond_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', diamond.actual_on_off_diamond.join(','), '.'),
     "It is also the best way to traverse our moon:",
     m(Example, { method: 'diamond' }),
-    /*
     m('h3', 'Snake'),
     'The snake method works like the horizontal method but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. It is the best method for traversing our dolphin.',
     m(Visualization, { method: t.snake }),
     m(Example, { method: 'snake' }),
-    */
     m('h3', 'Triangle'),
     'The triangle method is pretty similar to the diamond method:',
     m('pre.mono', triangle.visualization),

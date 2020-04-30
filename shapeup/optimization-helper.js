@@ -366,7 +366,7 @@ export const handleString = shape => {
 	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
 	(snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
 	
-	const offOnDecompress = method => applyOffOn(repositionDecompressBase49(shape), method);
+	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method);
 
 	let configuration;
 	if(alternative) {
@@ -398,7 +398,7 @@ export const handleString = shape => {
 	} else if(turn) {
 		configuration = offOnDecompress(t.turn);
 	} else if(skip) {
-		configuration = offOnDecompress(methods.skip);
+		configuration = offOnDecompress(t.skip);
 	} else if(bounce) {
 		configuration = offOnDecompress(methods.bounce);
 	} else if(leap) {
