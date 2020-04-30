@@ -472,7 +472,7 @@ const examples = {
     bounce: 'CASH',
 	leap: 'PLANE',
 	split: 'PLUS',
-	reflect: 'RAIN',
+	reflect: 'GIN',
 	shift: 'PINK',
 	waterfall: 'TRUNK'
 };
