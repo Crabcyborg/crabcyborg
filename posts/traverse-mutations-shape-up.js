@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { Gradient, bestMethod, applyOnOff, applyOffOn, repositionBase49Limit, bounce } from '$app/shapeup/optimization-helper';
+import { Gradient, Example, bestMethod, applyOnOff, applyOffOn, repositionBase49Limit, methods } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse as t } from '$app/traverse-grid';
 
@@ -10,12 +10,8 @@ export const title = 'Traverse Grid Mutations with Shape Up Components';
 const example_size = 7;
 const size = 5;
 const visualize = method => t.pipe(method, t.visualize)(example_size, example_size);
-const examples = {
-
-};
 
 export const oninit = () => {
-
     /*
     let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
@@ -26,33 +22,34 @@ export const oninit = () => {
     //*/ 
 };
 
-const Visualization = { view: v => m('pre.mono', visualize(v.attrs.method)) };
+const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: example_size, width: example_size }) };
 
-const Example = {
-    oninit: v => {
-        const { method } = v.attrs, shape = shapes[examples[method]], best = bestMethod(shape);
-        v.state = { shape, best };
-    },
-    view: v => m(
-        'div',
-        m(ShapeUp, { configuration: v.state.shape, size }),
-        m(
-            '.mono',
-            {},
-            v.state.best.method, ' ',
-            v.state.best.ratio, '% ',
-            v.state.best.length, ' characters ',
-            m('a.break', { href: `/shapeup/${v.state.best.string}`, target: '_blank' }, `/shapeup/${v.state.best.string}`) 
-        )
-    )
-};
+const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
-    "With traverse-grid it is really easy to apply mutations to methods. Let's see what we can come up with.",
+    "With traverse-grid it is really easy to apply mutations to methods.",
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, bounce and rotate. It is also possible to apply any of the methods as a mutation as well using the mutate function.'),
-
-    m(Gradient, { method: t.pipe(t.skip, t.reposition), width: example_size, height: example_size }),
-    m(Gradient, { method: t.pipe(t.skip, t.reposition, t.reposition), width: example_size, height: example_size }),
-    m(Gradient, { method: t.pipe(t.diagonal, t.reposition), width: example_size, height: example_size }),
-
+    "These are some that I came up with. I gave a few of them names:",
+    m('h3', 'Stripe'),
+    m(Visualization, { method: t.pipe(t.horizontal, t.stripe) } ),
+    m('h3', m(Descriptor, 'diagonal + alternate')),
+    m(Visualization, { method: t.pipe(t.diagonal, t.alternate) }),
+    m('h3', 'Swirl', m(Descriptor, 'spiral + bounce + reposition + bounce')),
+    m(Visualization, { method: methods.swirl }),
+    m('h3', 'Donut', m(Descriptor, 'diamond + bounce')),
+    m(Visualization, { method: methods.donut }),
+    m('h3', 'Leap', m(Descriptor, 'turn + diagonal + bounce')),
+    m(Visualization, { method: methods.leap }),
+    "The leap method is the best way to traverse my airplane.",
+    m(Example, { method: 'leap' }),
+    m('h3', 'Clover', m(Descriptor, 'skip + spiral')),
+    m(Visualization, { method: methods.clover }),
+    m('h3', 'Bacon', m(Descriptor, 'diagonal + reposition')),
+    m(Visualization, { method: methods.bacon }),
+    m('h3', 'Bow', m(Descriptor, 'diamond + reflect')),
+    m(Visualization, { method: t.pipe(t.diamond, t.reflect) }),
+    m('h3', m(Descriptor, 'bounce + reflect + reposition')),
+    m(Visualization, { method: t.pipe(methods.bounce, t.reflect, t.reposition) }),
+    m('h3', m(Descriptor, 'split + swap + reflect + swap + reflect')),
+    m(Visualization, { method: t.pipe(methods.split, t.swap, t.reflect, t.swap, t.reflect) }),
 ];

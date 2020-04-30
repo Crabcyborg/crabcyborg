@@ -61,7 +61,7 @@ export const oninit = () => {
 	second.on_off_spiral = applyOnOff(second.raw, t.spiral);
 	second.spiral_minimized = repositionBase49Limit(second.on_off_spiral);
 	second.half = bestMethod(second.raw).string;
-	second.half_url = `/shapeup/[]}}${second.half}`;
+	second.half_url = `/shapeup/${second.half}`;
 };
 
 export const content = () => [

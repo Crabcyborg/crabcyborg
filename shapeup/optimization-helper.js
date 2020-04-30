@@ -1,8 +1,9 @@
 import m from 'mithril';
+import { ShapeUp } from '$app/components';
 import { min } from 'min-string';
-import { traverse} from '$app/traverse-grid';
+import { traverse as t } from '$app/traverse-grid';
+import { shapes } from '$app/shapeup/shapes';
 import { colors } from '$app/shapeup/colors';
-const t = traverse;
 
 const targets = [128,64,32,16,8,4,2,1];
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
@@ -18,10 +19,20 @@ const prefix_by_key = {
 	triangle_flipped: '~~',
 	triangle_rotated: '``',
 	turn: '>>',
-	turn_rotated: ']]',
-	snake_rotated: '}}',
-	skip: '...',
-	bounce: '...'
+//	turn_rotated: '...',
+//	snake_rotated: '...',
+	skip: ']]A',
+	bounce: ']]B',
+//	swirl: '...',
+//	donut: '...',
+	leap: ']]C',
+//	clover: '...',
+//	bacon: '...',
+	split: ']]D',
+	reflect: ']]E',
+	shift: ']]F',
+	stripe: ']]G',
+	waterfall: ']]H'
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
@@ -222,24 +233,37 @@ export const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutat
 export const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
 export const bestMethod = (shape, mirrored) => {
+	const repositionCompress = method => repositionBase49Limit(applyOnOff(shape, method));
+
 	mirrored === undefined && (mirrored = false);
 
 	let compressed = min.compress(shape);
-	let horizontal = repositionBase49Limit(applyOnOff(shape, t.horizontal));
-	let vertical = repositionBase49Limit(applyOnOff(shape, t.vertical));
-	let spiral = repositionBase49Limit(applyOnOff(shape, t.spiral));
-	let diagonal = repositionBase49Limit(applyOnOff(shape, t.diagonal));
-	let diamond = repositionBase49Limit(applyOnOff(shape, t.diamond));
-	let snake = repositionBase49Limit(applyOnOff(shape, t.snake));
-	let triangle = repositionBase49Limit(applyOnOff(shape, t.triangle));
-	let triangle_flipped = repositionBase49Limit(applyOnOff(shape, t.pipe(t.triangle, t.flipy)));
-	let triangle_rotated = repositionBase49Limit(applyOnOff(shape, t.pipe(t.triangle, t.swap)));
-	let turn = repositionBase49Limit(applyOnOff(shape, t.turn));
-	let turn_rotated = repositionBase49Limit(applyOnOff(shape, traverse.rotate(traverse.turn)));
-	let snake_rotated = repositionBase49Limit(applyOnOff(shape, traverse.rotate(traverse.snake)));
-	let skip = repositionBase49Limit(applyOnOff(shape, t.skip));
-	let bounce = repositionBase49Limit(applyOnOff(shape, traverse.pipe(traverse.horizontal, traverse.bounce)));
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, triangle_rotated, turn, turn_rotated, snake_rotated, skip, bounce };
+	let horizontal = repositionCompress(t.horizontal);
+	let vertical = repositionCompress(t.vertical);
+	let spiral = repositionCompress(t.spiral);
+	let diagonal = repositionCompress(t.diagonal);
+	let diamond = repositionCompress(t.diamond);
+	let snake = repositionCompress(t.snake);
+	let triangle = repositionCompress(t.triangle);
+	let triangle_flipped = repositionCompress(t.pipe(t.triangle, t.flipy));
+//	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
+	let turn = repositionCompress(t.turn);
+//	let turn_rotated = repositionCompress(t.rotate(t.turn));
+//	let snake_rotated = repositionCompress(t.rotate(t.snake));
+	let skip = repositionCompress(t.skip);
+	let bounce = repositionCompress(methods.bounce);
+//	let swirl = repositionCompress(methods.swirl);
+//	let donut = repositionCompress(methods.donut);
+	let leap = repositionCompress(methods.leap);
+//	let clover = repositionCompress(methods.clover);
+//	let bacon = repositionCompress(methods.bacon);
+	let split = repositionCompress(methods.split);
+	let reflect = repositionCompress(methods.reflect);
+	let shift = repositionCompress(methods.shift);
+	let stripe = repositionCompress(methods.stripe);
+	let waterfall = repositionCompress(t.pipe(t.horizontal, t.waterfall));
+
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ turn, /*turn_rotated, snake_rotated,*/ skip, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -250,15 +274,28 @@ export const bestMethod = (shape, mirrored) => {
 		[snake.length]: 'snake',
 		[triangle.length]: 'triangle',
 		[triangle_flipped.length]: 'triangle_flipped',
-		[triangle_rotated.length]: 'triangle_rotated',
+//		[triangle_rotated.length]: 'triangle_rotated',
 		[turn.length]: 'turn',
-		[turn_rotated.length]: 'turn_rotated',
-		[snake_rotated.length]: 'snake_rotated',
+//		[turn_rotated.length]: 'turn_rotated',
+//		[snake_rotated.length]: 'snake_rotated',
 		[skip.length]: 'skip',
-		[bounce.length]: 'bounce'
+		[bounce.length]: 'bounce',
+//		[swirl.length]: 'swirl',
+//		[donut.length]: 'donut',
+		[leap.length]: 'leap',
+//		[clover.length]: 'clover',
+//		[bacon.length]: 'bacon',
+		[split.length]: 'split',
+		[reflect.length]: 'reflect',
+		[shift.length]: 'shift',
+		[stripe.length]: 'stripe',
+		[waterfall.length]: 'waterfall'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, triangle_rotated.length, turn.length, turn_rotated.length, snake_rotated.length, skip.length, bounce.length);
+	let smallest = Math.min(
+		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ turn.length, /*turn_rotated.length, snake_rotated.length,*/ skip.length, bounce.length, 
+		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length
+	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
 	let raw_length = shape.join(',').length;
@@ -290,7 +327,7 @@ export const matchMethod = shape => {
 
 export const handleString = shape => {
 	const match = matchMethod(shape);
-	console.log('match', match);
+//	console.log('match', match);
 
 	let mirror_even = shape[0] === ')';
 	let mirror_odd = shape[0] === '[';
@@ -311,13 +348,26 @@ export const handleString = shape => {
 	const triangle_flipped = shape[0] === '~' && shape[1] === '~';
 	const triangle_rotated = shape[0] === '`' && shape[1] === '`';
 	const turn = shape[0] === '>' && shape[1] === '>';
-	const turn_rotated = shape[0] === ']' && shape[1] === ']'
-	const snake_rotated = shape[0] === '}' && shape[1] === '}';
+
+	let skip = false, bounce = false, leap = false, split = false, reflect = false, shift = false, stripe = false, waterfall = false;
+	if(shape[0] === ']' && shape[1] === ']' && ['A','B','C','D','E','F','G','H'].indexOf(shape[2]) >= 0) {
+		skip = shape[2] === 'A';
+		bounce = shape[2] === 'B';
+		leap = shape[2] === 'C';
+		split = shape[2] === 'D';
+		reflect = shape[2] === 'E';
+		shift = shape[2] === 'F';
+		stripe = shape[2] === 'G';
+		waterfall = shape[2] === 'H';
+		shape = shape.substr(3);
+	}
 
 	const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || horizontal;
-	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || turn || turn_rotated || snake_rotated) && (shape = shape.substr(1));
-	(snake || triangle || triangle_flipped || triangle_rotated || turn || turn_rotated || snake_rotated) && (shape = shape.substr(1));
+	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
+	(snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
 	
+	const offOnDecompress = method => applyOffOn(repositionDecompressBase49(shape), method);
+
 	let configuration;
 	if(alternative) {
 		configuration = alternativeDecompress(shape);
@@ -328,29 +378,41 @@ export const handleString = shape => {
 	} else if(horizontal) {
 		configuration = repositionDecompressBase49(shape);
 	} else if(vertical_unlimited) {
-		configuration = applyOffOn(repositionDecompressBase49(shape), t.vertical);
+		configuration = offOnDecompress(t.vertical);
 	} else if(vertical) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.vertical);
+		configuration = offOnDecompress(t.vertical);
 	} else if(spiral) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.spiral);
+		configuration = offOnDecompress(t.spiral);
 	} else if(diagonal) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.diagonal);
+		configuration = offOnDecompress(t.diagonal);
 	} else if(diamond) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.diamond);
+		configuration = offOnDecompress(t.diamond);
 	} else if(snake) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.snake);
+		configuration = offOnDecompress(t.snake);
 	} else if(triangle) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.triangle);
+		configuration = offOnDecompress(t.triangle);
 	} else if(triangle_flipped) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.pipe(t.triangle, t.flipy))
+		configuration = offOnDecompress(t.pipe(t.triangle, t.flipy))
 	} else if(triangle_rotated) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.triangle, true);
+		configuration = offOnDecompress(t.triangle, true);
 	} else if(turn) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.turn);
-	} else if(turn_rotated) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.turn, true);
-	} else if(snake_rotated) {
-		configuration = applyOffOn(repositionDecompressBase49Limit(shape), t.snake, true);
+		configuration = offOnDecompress(t.turn);
+	} else if(skip) {
+		configuration = offOnDecompress(methods.skip);
+	} else if(bounce) {
+		configuration = offOnDecompress(methods.bounce);
+	} else if(leap) {
+		configuration = offOnDecompress(methods.leap);
+	} else if(split) {
+		configuration = offOnDecompress(methods.split);
+	} else if(reflect) {
+		configuration = offOnDecompress(methods.reflect);
+	} else if(shift) {
+		configuration = offOnDecompress(methods.shift);
+	} else if(stripe) {
+		configuration = offOnDecompress(methods.stripe);
+	} else if(waterfall) {
+		configuration = offOnDecompress(t.pipe(t.horizontal, t.waterfall));
 	} else {
 		configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 	}
@@ -395,4 +457,54 @@ export const Gradient = {
 		}
         return m('pre.mono', output);
     }
+};
+
+const examples = {
+	diamond: 'LUNAR',
+    spiral: 'YIN',
+    vertical: 'NOTE',
+    skip: 'EGGO',
+    diagonal: 'KNIFE',
+    snake: 'FLIP',
+    triangle: 'CHECK',
+    triangle_rotated: 'LIP',
+    turn: 'PAC',
+    bounce: 'CASH',
+	leap: 'PLANE',
+	split: 'PLUS',
+	reflect: 'RAIN',
+	shift: 'PINK',
+	waterfall: 'TRUNK'
+};
+
+export const Example = {
+    oninit: v => {
+        const { method } = v.attrs, shape = shapes[examples[method]], best = bestMethod(shape);
+        v.state = { shape, best };
+    },
+    view: v => m(
+        'div',
+        m(ShapeUp, { configuration: v.state.shape, size: 5 }),
+        m(
+            '.mono',
+            {},
+            v.state.best.method, ' ',
+            v.state.best.ratio, '% ',
+            v.state.best.length, ' characters ',
+            m('a.break', { href: `/shapeup/${v.state.best.string}`, target: '_blank' }, `/shapeup/${v.state.best.string}`) 
+        )
+    )
+};
+
+export const methods = {
+	split: t.pipe(t.horizontal, t.split),	
+	bounce: t.pipe(t.horizontal, t.bounce),
+	swirl: t.pipe(t.spiral, t.bounce, t.reposition, t.bounce),
+	donut: t.pipe(t.diamond, t.bounce),
+	leap: t.pipe(t.turn, t.mutate(t.diagonal), t.bounce),
+	clover: t.pipe(t.skip, t.mutate(t.spiral)),
+	bacon: t.pipe(t.diagonal, t.reposition),
+	reflect: t.pipe(t.horizontal, t.reflect),
+	shift: t.pipe(t.horizontal, t.shift(Math.round(7*7/2))),
+	stripe: t.pipe(t.horizontal, t.stripe)
 };
