@@ -18,7 +18,7 @@ const prefix_by_key = {
 	triangle: '--',
 	triangle_flipped: '~~',
 	triangle_rotated: '``',
-	turn: '>>',
+	alternate: '>>',
 //	turn_rotated: '...',
 //	snake_rotated: '...',
 	skip: ']]A',
@@ -32,7 +32,8 @@ const prefix_by_key = {
 	reflect: ']]E',
 	shift: ']]F',
 	stripe: ']]G',
-	waterfall: ']]H'
+	waterfall: ']]H',
+	stitch: ']]I'
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
@@ -245,12 +246,12 @@ export const bestMethod = (shape, mirrored) => {
 	let diamond = repositionCompress(t.diamond);
 	let snake = repositionCompress(t.snake);
 	let triangle = repositionCompress(t.triangle);
-	let triangle_flipped = repositionCompress(t.pipe(t.triangle, t.flipy));
+	let triangle_flipped = repositionCompress(t.pipe(t.triangle, t.flip('y')));
 //	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
-	let turn = repositionCompress(t.turn);
-//	let turn_rotated = repositionCompress(t.rotate(t.turn));
+	let alternate = repositionCompress(methods.alternate);
+//	let turn_rotated = repositionCompress(t.rotate(methods.alternate));
 //	let snake_rotated = repositionCompress(t.rotate(t.snake));
-	let skip = repositionCompress(t.skip);
+	let skip = repositionCompress(methods.skip);
 	let bounce = repositionCompress(methods.bounce);
 //	let swirl = repositionCompress(methods.swirl);
 //	let donut = repositionCompress(methods.donut);
@@ -262,8 +263,9 @@ export const bestMethod = (shape, mirrored) => {
 	let shift = repositionCompress(methods.shift);
 	let stripe = repositionCompress(methods.stripe);
 	let waterfall = repositionCompress(t.pipe(t.horizontal, t.waterfall));
+	let stitch = repositionCompress(t.pipe(t.stitch));
 
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ turn, /*turn_rotated, snake_rotated,*/ skip, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall };
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, /*turn_rotated, snake_rotated,*/ skip, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -275,7 +277,7 @@ export const bestMethod = (shape, mirrored) => {
 		[triangle.length]: 'triangle',
 		[triangle_flipped.length]: 'triangle_flipped',
 //		[triangle_rotated.length]: 'triangle_rotated',
-		[turn.length]: 'turn',
+		[alternate.length]: 'alternate',
 //		[turn_rotated.length]: 'turn_rotated',
 //		[snake_rotated.length]: 'snake_rotated',
 		[skip.length]: 'skip',
@@ -289,12 +291,13 @@ export const bestMethod = (shape, mirrored) => {
 		[reflect.length]: 'reflect',
 		[shift.length]: 'shift',
 		[stripe.length]: 'stripe',
-		[waterfall.length]: 'waterfall'
+		[waterfall.length]: 'waterfall',
+		[stitch.length]: 'stitch'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
 	let smallest = Math.min(
-		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ turn.length, /*turn_rotated.length, snake_rotated.length,*/ skip.length, bounce.length, 
-		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length
+		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, /*turn_rotated.length, snake_rotated.length,*/ skip.length, bounce.length, 
+		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length, stitch.length
 	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
@@ -347,10 +350,10 @@ export const handleString = shape => {
 	const triangle = shape[0] === '-' && shape[1] === '-';
 	const triangle_flipped = shape[0] === '~' && shape[1] === '~';
 	const triangle_rotated = shape[0] === '`' && shape[1] === '`';
-	const turn = shape[0] === '>' && shape[1] === '>';
+	const alternate = shape[0] === '>' && shape[1] === '>';
 
-	let skip = false, bounce = false, leap = false, split = false, reflect = false, shift = false, stripe = false, waterfall = false;
-	if(shape[0] === ']' && shape[1] === ']' && ['A','B','C','D','E','F','G','H'].indexOf(shape[2]) >= 0) {
+	let skip = false, bounce = false, leap = false, split = false, reflect = false, shift = false, stripe = false, waterfall = false, stitch = false;
+	if(shape[0] === ']' && shape[1] === ']' && ['A','B','C','D','E','F','G','H','I'].indexOf(shape[2]) >= 0) {
 		skip = shape[2] === 'A';
 		bounce = shape[2] === 'B';
 		leap = shape[2] === 'C';
@@ -359,12 +362,13 @@ export const handleString = shape => {
 		shift = shape[2] === 'F';
 		stripe = shape[2] === 'G';
 		waterfall = shape[2] === 'H';
+		stitch = shape[2] === 'I';
 		shape = shape.substr(3);
 	}
 
 	const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || horizontal;
-	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
-	(snake || triangle || triangle_flipped || triangle_rotated || turn) && (shape = shape.substr(1));
+	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || alternate) && (shape = shape.substr(1));
+	(snake || triangle || triangle_flipped || triangle_rotated || alternate) && (shape = shape.substr(1));
 	
 	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method);
 
@@ -392,13 +396,13 @@ export const handleString = shape => {
 	} else if(triangle) {
 		configuration = offOnDecompress(t.triangle);
 	} else if(triangle_flipped) {
-		configuration = offOnDecompress(t.pipe(t.triangle, t.flipy))
+		configuration = offOnDecompress(t.pipe(t.triangle, t.flip('y')))
 	} else if(triangle_rotated) {
 		configuration = offOnDecompress(t.triangle, true);
-	} else if(turn) {
-		configuration = offOnDecompress(t.turn);
+	} else if(alternate) {
+		configuration = offOnDecompress(methods.alternate);
 	} else if(skip) {
-		configuration = offOnDecompress(t.skip);
+		configuration = offOnDecompress(methods.skip);
 	} else if(bounce) {
 		configuration = offOnDecompress(methods.bounce);
 	} else if(leap) {
@@ -413,6 +417,8 @@ export const handleString = shape => {
 		configuration = offOnDecompress(methods.stripe);
 	} else if(waterfall) {
 		configuration = offOnDecompress(t.pipe(t.horizontal, t.waterfall));
+	} else if(stitch) {
+		configuration = offOnDecompress(t.pipe(t.stitch));
 	} else {
 		configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
 	}
@@ -462,19 +468,20 @@ export const Gradient = {
 const examples = {
 	diamond: 'LUNAR',
     spiral: 'YIN',
-    vertical: 'NOTE',
+    vertical: 'PRIZE',
     skip: 'EGGO',
     diagonal: 'KNIFE',
     snake: 'FLIP',
     triangle: 'CHECK',
     triangle_rotated: 'LIP',
-    turn: 'PAC',
+    alternate: 'PAC',
     bounce: 'CASH',
 	leap: 'PLANE',
 	split: 'PLUS',
 	reflect: 'GIN',
 	shift: 'PINK',
-	waterfall: 'TRUNK'
+	waterfall: 'TRUNK',
+	stitch: 'NOTE'
 };
 
 export const Example = {
@@ -501,10 +508,12 @@ export const methods = {
 	bounce: t.pipe(t.horizontal, t.bounce),
 	swirl: t.pipe(t.spiral, t.bounce, t.reposition, t.bounce),
 	donut: t.pipe(t.diamond, t.bounce),
-	leap: t.pipe(t.turn, t.mutate(t.diagonal), t.bounce),
-	clover: t.pipe(t.skip, t.mutate(t.spiral)),
+	leap: t.pipe(t.horizontal, t.alternate, t.mutate(t.diagonal), t.bounce),
+	clover: t.pipe(t.horizontal, t.reposition, t.mutate(t.spiral)),
 	bacon: t.pipe(t.diagonal, t.reposition),
 	reflect: t.pipe(t.horizontal, t.reflect),
 	shift: t.pipe(t.horizontal, t.shift(Math.round(7*7/2))),
-	stripe: t.pipe(t.horizontal, t.stripe)
+	stripe: t.pipe(t.horizontal, t.stripe),
+	alternate: t.pipe(t.horizontal, t.alternate),
+	skip: t.pipe(t.horizontal, t.reposition)
 };

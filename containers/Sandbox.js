@@ -15,7 +15,7 @@ export var Sandbox = {
 	view: v => [
 		[
 			m('p', 'Hello World'),
-			'turn',
+			'alternate',
 			m('pre.mono', t.pipe(t.vertical, t.visualize)(5,5)),
 			'horizontal',
 			m('pre.mono', t.pipe(t.horizontal, t.visualize)(5,5)),

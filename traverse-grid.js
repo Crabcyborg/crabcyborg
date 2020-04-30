@@ -60,7 +60,7 @@ let traverse = {
 		to < size/2 && (points.push(details.points[to]));
 		return d({ ...details, keyed: t.key(points) });
 	},
-	flip: (details, type) => {
+	flip: type => details => {
 		let keyed = {};
 		for(let index in details.points) {
 			const [x,y] = details.points[index];
@@ -258,6 +258,30 @@ let traverse = {
 		}
 		return d({ keyed, height, width });
 	},
+	stitch: (height, width) => {
+		let dir = 'se', iteration = 0, x = 0, y = 0, keyed = {}, remaining = width * height, index = 0, base_x = 0;
+		while(remaining) {
+			if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
+	
+			switch(dir) {
+				case 'se': ++x; ++y, dir = 'sw'; break;
+				case 'sw': --x, ++y, dir = 'se'; break;
+			}
+
+			if(y == height) {
+				if(++iteration % 2 == 0) {
+					y = 0;
+					x = base_x += 2;
+					dir = 'se';
+				} else {
+					y = 0;
+					x = base_x + 1;
+					dir = 'sw';
+				}
+			}
+		}
+		return d({ keyed, height, width });
+	},
 	triangle: (height, width) => {
 		const spike = {
 			height: Math.ceil((width-2)/2),
@@ -310,12 +334,7 @@ let traverse = {
 }, t = traverse, d = t.details;
 
 // accessibility
-t.flipx = details => t.flip(details, 'x');
-t.flipy = details => t.flip(details, 'y');
-t.flipxy = details => t.flip(details, 'xy');
 t.vertical = t.rotate(t.horizontal);
-t.skip = t.pipe(t.horizontal, t.reposition);
-t.turn = t.pipe(t.horizontal, t.alternate);
 
 if(typeof module !== 'undefined') module['exports'] = { traverse };
 else window.traverse = traverse;

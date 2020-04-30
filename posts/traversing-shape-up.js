@@ -93,8 +93,8 @@ export const oninit = () => {
     triangle.actual_triangle_configuration = applyOffOn(triangle.actual_on_off_triangle, t.triangle);
     triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
-    triangle.flipped = t.pipe(t.triangle, t.flipy)(example_size, example_size);
-    triangle.flipped_configuration = applyOffOn(triangle.actual_on_off_triangle, t.pipe(t.triangle, t.flipy));
+    triangle.flipped = t.pipe(t.triangle, t.flip('y'))(example_size, example_size);
+    triangle.flipped_configuration = applyOffOn(triangle.actual_on_off_triangle, t.pipe(t.triangle, t.flip('y')));
     triangle.flipped_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
     triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
     triangle.rotated = t.pipe(t.triangle, t.swap)(example_size, example_size);
@@ -113,22 +113,22 @@ export const content = () => [
     "None of the shapes in my library are their smallest using this method.",
     m('h3', 'Vertical'),
     m(Visualization, { method: t.vertical }),
-    'Vertical is really nothing special. In fact, it is just a rotated horizontal method. It is the best way to traverse our note:',
+    'Vertical is really nothing special. In fact, it is just a rotated horizontal method. It is the best way to traverse our trophy:',
     m(Example, { method: 'vertical' }),
     m('h3', 'Shift'),
-    'The shift pattern might be the simplest mutation of all. It just starts from somewhere else than the beginning. In this case, I start from half way',
+    'Shift might be the simplest mutation of all. It just starts from somewhere else than the beginning. In this case, I start from half way',
     m(Visualization, { method: methods.shift }),
-    'I did not expect it to win out but it is actually the best way to traverse my flamingo:',
+    'I did not expect it to win out but it is actually the best way to traverse our flamingo:',
     m(Example, { method: 'shift' }),
-    m('h3', 'Turn'),
-    'Turn is an alternated horizontal method. Similar to rotate, alternate is a mutate method that horizontally flips every other row.',
-    m(Visualization, { method: t.turn }),
+    m('h3', 'Alternate'),
+    'Alternate is a simple mutation that horizontally flips every other row. Applied to a horizontal pattern, it creates a pattern that moves back and forth.',
+    m(Visualization, { method: methods.alternate }),
     'It is the best method for traversing our pacman:',
-    m(Example, { method: 'turn' }),
+    m(Example, { method: 'alternate' }),
     /*
     m('h3', 'Skip'),
     'The skip method is a repositioned horizontal pattern where I iterate every even index, and then every odd index.',
-    m(Visualization, { method: t.skip }),
+    m(Visualization, { method: methods.skip }),
     'It works really well if your data looks like our waffle:',
     m(Example, { method: 'skip' }),
     */
@@ -139,16 +139,20 @@ export const content = () => [
     m('h3', 'Split'),
     'Another simple mutation is the split method, that separates our grid into two chunks before iterating each.',
     m(Visualization, { method: methods.split }),
-    'It is the best method for traversing my plus sign:',
+    'It is the best method for traversing our plus sign:',
     m(Example, { method: 'split' }),
     m('h3', 'Waterfall'),
     m(Visualization, { method: t.pipe(t.horizontal, t.waterfall) } ),
     'The waterfall is the best method for traversing our elephant:',
     m(Example, { method: 'waterfall' }),
+    m('h3', 'Stitch'),
+    m(Visualization, { method: t.pipe(t.stitch) } ),
+    'The stitch pattern is the best method for traversing our note:',
+    m(Example, { method: 'stitch' }),
     /*
     m('h3', 'Reflect'),
     m(Visualization, { method: methods.reflect }),
-    'The reflect method is a pretty simple mutation. It is the best method for traversing my umbrella:',
+    'The reflect method is a pretty simple mutation. It is the best method for traversing our umbrella:',
     m(Example, { method: 'reflect' }),
     */
     m('h3', 'Diagonal'),
@@ -188,7 +192,7 @@ export const content = () => [
     m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 6 }),
     m('p', 'The entire url for this triangle is ', m('a.break', { href: triangle.actual_triangle_url, target: '_blank' }, triangle.actual_triangle_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', triangle.actual_on_off_triangle.join(','), '.'),
     'However none of the shapes in my library are smallest using this exact triangle. It\'s a good thing we can flip the pattern and try the same thing upside down.',
-    m(Visualization, { method: t.pipe(t.triangle, t.flipy) }),    
+    m(Visualization, { method: t.pipe(t.triangle, t.flip('y')) }),    
     m(ShapeUp, { configuration: triangle.flipped_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
     'The upside down triangle method is the best method for traversing our checkmark.',
