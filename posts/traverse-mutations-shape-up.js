@@ -28,10 +28,13 @@ const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
     "With traverse-grid it is really easy to apply mutations to methods.",
-    m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, bounce and rotate. It is also possible to apply any of the methods as a mutation as well using the mutate function.'),
-    "These are some that I came up with. I gave a few of them names:",
+    m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, shift, waterfall, reflect, bounce and rotate.'),
+    "Some other supported mutations applied to the horizontal pattern that do not outperform some of my preferred methods for my library:",
     m('h3', 'Stripe'),
     m(Visualization, { method: t.pipe(t.horizontal, t.stripe) } ),
+    m('h3', 'Split'),
+    m(Visualization, { method: methods.split }),
+    "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate) }),
     m('h3', 'Swirl', m(Descriptor, 'spiral + bounce + reposition + bounce')),

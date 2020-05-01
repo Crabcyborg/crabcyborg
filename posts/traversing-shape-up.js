@@ -125,36 +125,27 @@ export const content = () => [
     m(Visualization, { method: methods.alternate }),
     'It is the best method for traversing our pacman:',
     m(Example, { method: 'alternate' }),
-    /*
     m('h3', 'Reposition'),
     'The reposition method only iterates even indices in the first iteration, and then odd indices in the second.',
     m(Visualization, { method: methods.reposition }),
     'It works really well if your data looks like our waffle:',
     m(Example, { method: 'reposition' }),
-    */
     m('h3', 'Bounce'),
     'The bounce method bounces back and forth between two indices, both from the beginning incrementing forward and from the end decrementing backward, meeting in the center. It works well on data that has some symmetry. It is the best method for traversing our dollar sign:',
     m(Visualization, { method: methods.bounce }),
     m(Example, { method: 'bounce' }),
-    m('h3', 'Split'),
-    'Another simple mutation is the split method, that separates our grid into two chunks before iterating each.',
-    m(Visualization, { method: methods.split }),
-    'It is the best method for traversing our plus sign:',
-    m(Example, { method: 'split' }),
     m('h3', 'Waterfall'),
     m(Visualization, { method: t.pipe(t.horizontal, t.waterfall) } ),
     'The waterfall is the best method for traversing our elephant:',
     m(Example, { method: 'waterfall' }),
+    m('h3', 'Reflect'),
+    m(Visualization, { method: methods.reflect }),
+    'The reflect method is a pretty simple mutation. It is the best method for traversing our martini glass:',
+    m(Example, { method: 'reflect' }),
     m('h3', 'Stitch'),
     m(Visualization, { method: t.pipe(t.stitch) } ),
     'Stitch zig zags in pairs along two cell columns until it fills a space. It is the best method for traversing our note:',
     m(Example, { method: 'stitch' }),
-    /*
-    m('h3', 'Reflect'),
-    m(Visualization, { method: methods.reflect }),
-    'The reflect method is a pretty simple mutation. It is the best method for traversing our umbrella:',
-    m(Example, { method: 'reflect' }),
-    */
     m('h3', 'Diagonal'),
     "The diagonal method does not win out very often, but when it does it can be very effective.",
     m(Visualization, { method: t.diagonal }),
@@ -197,12 +188,10 @@ export const content = () => [
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
     'The upside down triangle method is the best method for traversing our checkmark.',
     m(Example, { method: 'triangle' }),
-    /*
     'Why stop at just flipping it when the triangle method can be rotated as well?',
     m(Visualization, { method: t.pipe(t.triangle, t.swap) }),  
     m(ShapeUp, { configuration: triangle.rotated_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.rotated_url, target: '_blank' }, triangle.flipped_url)),
     "It's the best method for our lips.",
     m(Example, { method: 'triangle_rotated' })
-    */
 ];

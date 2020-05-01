@@ -122,14 +122,13 @@ export const applyOffOn = (input, method, rotate, on_by_default) => {
 
 	if(rotate) details = t.swap(details);
 
-	let def = on_by_default ? 1 : 0, target_index = 0, current = on_by_default ? 1 : 0, output = [ height, width ];
+	let def = on_by_default ? 1 : 0, target_index = 0, current = 0/*1 - def*/, output = [ height, width ];
 	for(let index of details.indices) {
 		if(values[index] != def) current += targets[target_index];
 
 		if(++target_index == 8) {
 			output.push(current);
-			target_index = 0;
-			current = 0;
+			target_index = current = 0;
 		}
 	}
 
@@ -137,7 +136,7 @@ export const applyOffOn = (input, method, rotate, on_by_default) => {
 	return output;
 };
 
-export const mirror = (input, odd) => {
+export const mirror = (input, odd, on_by_default) => {
 	odd === undefined && (odd = false);
 
 	const flat = flatten(input);
@@ -150,9 +149,9 @@ export const mirror = (input, odd) => {
 		for(let x = original_width - (odd ? 2 : 1); x >= 0; --x) mirrored.push(flat[y * original_width + x]);
 	}
 
-	let target_index = 0, current = 0, output = [ height, width ];
+	let target_index = 0, def = 0/*on_by_default ? 1 : 0*/, current = 0/*1 - def*/, output = [ height, width ];
 	for(let value of mirrored) {
-		if(value) current += targets[target_index];
+		if(value != def) current += targets[target_index];
 
 		if(++target_index == 8) {
 			output.push(current);
@@ -230,7 +229,19 @@ export const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutat
 export const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
 export const bestMethod = (shape, mirrored) => {
-	const repositionCompress = method => repositionBase49Limit(applyOnOff(shape, method));
+	let on_by_default_by_result = {};
+	const repositionCompress = method => {
+		let on_by_default = false;
+		const applied = applyOnOff(shape, method);
+		if(applied[2] == 0) {
+			on_by_default = true;
+			applied.splice(2,1);
+		}
+
+		let result = repositionBase49Limit(applied);
+		on_by_default_by_result[result] = on_by_default;
+		return result;
+	};
 
 	mirrored === undefined && (mirrored = false);
 
@@ -243,7 +254,7 @@ export const bestMethod = (shape, mirrored) => {
 	let snake = repositionCompress(t.snake);
 	let triangle = repositionCompress(t.triangle);
 	let triangle_flipped = repositionCompress(t.pipe(t.triangle, t.flip('y')));
-//	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
+	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
 	let alternate = repositionCompress(methods.alternate);
 //	let turn_rotated = repositionCompress(t.rotate(methods.alternate));
 //	let snake_rotated = repositionCompress(t.rotate(t.snake));
@@ -261,7 +272,7 @@ export const bestMethod = (shape, mirrored) => {
 	let waterfall = repositionCompress(t.pipe(t.horizontal, t.waterfall));
 	let stitch = repositionCompress(t.pipe(t.stitch));
 
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, /*turn_rotated, snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch };
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, triangle_rotated, alternate, /*turn_rotated, snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -272,7 +283,7 @@ export const bestMethod = (shape, mirrored) => {
 		[snake.length]: 'snake',
 		[triangle.length]: 'triangle',
 		[triangle_flipped.length]: 'triangle_flipped',
-//		[triangle_rotated.length]: 'triangle_rotated',
+		[triangle_rotated.length]: 'triangle_rotated',
 		[alternate.length]: 'alternate',
 //		[turn_rotated.length]: 'turn_rotated',
 //		[snake_rotated.length]: 'snake_rotated',
@@ -292,7 +303,7 @@ export const bestMethod = (shape, mirrored) => {
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
 	let smallest = Math.min(
-		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, /*turn_rotated.length, snake_rotated.length,*/ reposition.length, bounce.length, 
+		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, triangle_rotated.length, alternate.length, /*turn_rotated.length, snake_rotated.length,*/ reposition.length, bounce.length, 
 		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length, stitch.length
 	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
@@ -309,7 +320,7 @@ export const bestMethod = (shape, mirrored) => {
 		}
 	}
 
-	const string = prefix_by_key[method] + string_by_key[method];
+	const string = (on_by_default_by_result[string_by_key[method]] ? '_' : '') + prefix_by_key[method] + string_by_key[method];
 	return { method, length, string, mirrored, swapped, ratio };
 };
 
@@ -337,7 +348,7 @@ export const handleString = shape => {
 	console.log('match', match);
 
 	shape = match.string;
-	const postProcess = shape => match.mirrored ? mirror(shape, match.mirror_odd) : shape;
+	const postProcess = shape => match.mirrored ? mirror(shape, match.mirror_odd, match.on_by_default) : shape;
 	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method, false, match.on_by_default);
 	const offOn = shape => applyOffOn(shape, t.horizontal);
 	const handleKey = key => {
@@ -398,7 +409,6 @@ const examples = {
     alternate: 'PAC',
     bounce: 'CASH',
 	leap: 'PLANE',
-	split: 'PLUS',
 	reflect: 'GIN',
 	shift: 'PINK',
 	waterfall: 'TRUNK',
@@ -438,5 +448,6 @@ export const methods = {
 	alternate: t.pipe(t.horizontal, t.alternate),
 	reposition: t.pipe(t.horizontal, t.reposition),
 	waterfall: t.pipe(t.horizontal, t.waterfall),
-	triangle_flipped: t.pipe(t.triangle, t.flip('y'))
+	triangle_flipped: t.pipe(t.triangle, t.flip('y')),
+	triangle_rotated: t.rotate(t.triangle)
 };
