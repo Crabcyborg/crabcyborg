@@ -32,6 +32,8 @@ export const content = () => [
     m('h3', 'Vertical'),
     m(Visualization, { method: t.vertical }),
     'Vertical is really nothing special. In fact, it is just a rotated horizontal method.',
+    m('h3', 'Alternate (diagonal)'),
+    m(Visualization, { method: methods.alternate_diagonal }),
     m('h3', 'Skew'),
     m(Visualization, { method: methods.skew } ),
     m('h3', 'Stripe'),

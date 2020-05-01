@@ -47,11 +47,26 @@ let traverse = {
 	forEach: (details, callback) => details.points.forEach((point, index) => callback({index: details.indices[index], point})),
 	reduce: (details, callback, initial_value) => details.points.reduce((accumulator, point, index) => callback(accumulator, {index: details.indices[index], point}, initial_value)),
 	// mutations
-	alternate: details => {
+	alternate: type => details => {
 		let keyed = { ...details.keyed };
-		for(let y = 1; y < details.height; y += 2)
-			for(let x = 0; x < details.width; ++x)
-				keyed[[x,y]] = details.keyed[[details.width - x - 1, y]];
+		switch(type) {
+			case 'diagonal':
+				const to = details.height + details.width - 1;
+				for(let base_y = 1; base_y < to; base_y += 2) {
+					for(let x = 0; x < details.width; ++x) {
+						let y = base_y - x;
+						if(x >= 0 && x < details.width && y >= 0 && y < details.height && y < details.width && x < details.height) keyed[[x,y]] = details.keyed[[y,x]];
+					}
+				}
+			break;
+
+			case 'horizontal': default:
+				for(let y = 1; y < details.height; y += 2)
+					for(let x = 0; x < details.width; ++x)
+						keyed[[x,y]] = details.keyed[[details.width - x - 1, y]];
+			break;
+		}
+		
 		return d({ ...details, keyed });
 	},
 	bounce: details => {

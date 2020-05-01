@@ -104,7 +104,7 @@ export const oninit = () => {
 
 const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: example_size, width: example_size }) };
 
-export const content = () => [    
+export const content = () => [
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'minimizing-large-shape-up'}), ', I mention that I can get a shape smaller by traversing the array from different directions.'),
     m('h3', 'Horizontal'),
     "The most common way to traverse an array.",
