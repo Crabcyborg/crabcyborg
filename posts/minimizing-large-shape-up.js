@@ -49,7 +49,7 @@ export const oninit = () => {
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 	second.vertical = repositionBase49(applyOnOff(second.raw, t.vertical));
-	second.vertical_url = `/shapeup/_${second.vertical}`;
+	second.vertical_url = `/shapeup/~${second.vertical}`;
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;

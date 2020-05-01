@@ -11,16 +11,24 @@ let butterfly;
 
 export const title = 'Mirroring Shape Up Components';
 
-export const oninit = () => {
-	butterfly = {
-		full: repositionBase49Limit(applyOnOff(shapes.FLY, t.vertical)),
-		half: half(shapes.FLY)
-	};
+const verticalCompress = shape => {
+	const applied = applyOnOff(shape, t.vertical);
 
-	butterfly.half_optimized = repositionBase49Limit(applyOnOff(butterfly.half, t.vertical));
-	butterfly.half_url = `/shapeup/_${butterfly.half_optimized}`;
-	butterfly.mirror_url = `/shapeup/)_${butterfly.half_optimized}`;
-	butterfly.odd_mirror_url = `/shapeup/[_${butterfly.half_optimized}`;
+	let prefix = '';
+	if(applied[2] == 0) {
+		applied.splice(2,1);
+		prefix = '_';
+	}
+	
+	return prefix + '~' + repositionBase49Limit(applied);
+}
+
+export const oninit = () => {
+	butterfly = { full: verticalCompress(shapes.FLY), half: half(shapes.FLY) };
+	butterfly.half_optimized = verticalCompress(butterfly.half);
+	butterfly.half_url = `/shapeup/${butterfly.half_optimized}`;
+	butterfly.mirror_url = `/shapeup/)${butterfly.half_optimized}`;
+	butterfly.odd_mirror_url = `/shapeup/[${butterfly.half_optimized}`;
 };
 
 export const content = () => [

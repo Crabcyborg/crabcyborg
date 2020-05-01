@@ -7,18 +7,17 @@ import { colors } from '$app/shapeup/colors';
 
 const targets = [128,64,32,16,8,4,2,1];
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
+
 const prefix_by_key = {
 	on_off: '|',
 	alternative: '}',
 	alternative_base49: '^',
 	alternative_base82: '*',
 	horizontal: '-',
-	vertical_unlimited: '_',
 	vertical: '~',
 	spiral: '`',
 	diagonal: '>',
 	diamond: ']',
-	snake: '__',
 	triangle: '--',
 	triangle_flipped: '~~',
 	triangle_rotated: '``',
@@ -31,11 +30,11 @@ const prefix_by_key = {
 	shift: ']]F',
 	stripe: ']]G',
 	waterfall: ']]H',
-	stitch: ']]I'
+	stitch: ']]I',
+	snake: ']]J'
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
-key_by_prefix['}'] = 'alternative';
 
 export const flatten = input => {
 	let flat = [];
@@ -117,19 +116,20 @@ export const applyOnOff = (input, method) => {
 };
 
 // convert on/off type data to raw
-export const applyOffOn = (input, method, rotate) => {
+export const applyOffOn = (input, method, rotate, on_by_default) => {
 	const [ height, width ] = input, values = spread(input);
 	let details = rotate ? method(width, height) : method(height, width);
 
 	if(rotate) details = t.swap(details);
 
-	let target_index = 0, current = 0, output = [ height, width ];
+	let def = on_by_default ? 1 : 0, target_index = 0, current = on_by_default ? 1 : 0, output = [ height, width ];
 	for(let index of details.indices) {
-		if(values[index]) current += targets[target_index];
+		if(values[index] != def) current += targets[target_index];
 
 		if(++target_index == 8) {
 			output.push(current);
-			target_index = current = 0;
+			target_index = 0;
+			current = 0;
 		}
 	}
 
@@ -167,11 +167,9 @@ export const mirror = (input, odd) => {
 export const half = input => {
 	const [ height, width ] = input, flat = flatten(input), to = Math.ceil(width / 2);
 	let halved = [];
-	for(let y = 0; y < height; ++y) {
-		for(let x = 0; x < to; ++x) {
+	for(let y = 0; y < height; ++y)
+		for(let x = 0; x < to; ++x)
 			halved.push(flat[y * width + x]);
-		}
-	}
 
 	let target_index = 0, current = 0, output = [ height, to ];
 	for(let value of halved) {
@@ -183,7 +181,7 @@ export const half = input => {
 		}
 	}
 
-	output.push(current);
+//	current && output.push(current);
 	return output;
 };
 
@@ -319,16 +317,19 @@ export const matchMethod = shape => {
 	const mirror_even = shape[0] === ')', mirror_odd = shape[0] === '[', mirrored = mirror_even || mirror_odd;
 	mirrored && (shape = shape.substr(1));
 
+	const on_by_default = shape[0] === '_';
+	on_by_default && (shape = shape.substr(1));
+
 	let prefixes = Object.keys(key_by_prefix);
 	prefixes.reverse();
 
 	for(let prefix of prefixes) {
 		if(shape[0] === prefix[0] && (prefix.length < 2 || shape[1] === prefix[1]) && (prefix.length < 3 || shape[2] === prefix[2])) {
-			return { prefix, key: key_by_prefix[prefix], string: shape.substr(prefix.length), mirrored, mirror_even, mirror_odd };
+			return { prefix, key: key_by_prefix[prefix], string: shape.substr(prefix.length), mirrored, mirror_even, mirror_odd, on_by_default };
 		}
 	}
 
-	return { prefix: '', key: shape.indexOf(',') > 0 ? 'raw' : 'compressed', string: shape };
+	return { prefix: '', key: shape.indexOf(',') > 0 ? 'raw' : 'compressed', string: shape, mirrored, mirror_even, mirror_odd, on_by_default };
 };
 
 export const handleString = shape => {
@@ -337,14 +338,13 @@ export const handleString = shape => {
 
 	shape = match.string;
 	const postProcess = shape => match.mirrored ? mirror(shape, match.mirror_odd) : shape;
-	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method);
+	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method, false, match.on_by_default);
 	const offOn = shape => applyOffOn(shape, t.horizontal);
 	const handleKey = key => {
 		switch(key) {
 			case 'raw': return shape.split(',');
 			case 'compressed': return min.decompress(shape);
 			case 'on_off': return offOn(min.decompress(shape));
-			case 'vertical_unlimited': return offOnDecompress(t.vertical);
 			case 'alternative': return offOn(alternativeDecompress(shape));
 			case 'alternative_base49': return offOn(alternativeDecompressBase49(shape));
 			case 'alternative_base82': return offOn(base82ToDecimal(shape));
@@ -353,7 +353,9 @@ export const handleString = shape => {
 		if(t[key] !== undefined) return offOnDecompress(t[key]);
 	};
 
-	return postProcess(handleKey(match.key));
+	const result = postProcess(handleKey(match.key));
+	console.log('result', result);
+	return result;
 };
 
 export const Gradient = {
@@ -362,26 +364,18 @@ export const Gradient = {
     },
     view: v => {
         const { details } = v.state;
-
 		const color = colors[Math.floor(Math.random() * colors.length)];
-
         let output = [];
 		for(let y = 0, row = []; y < details.height; ++y, row = []) {
 			for(let x = 0; x < details.width; ++x) {
 				let index = details.keyed[[x,y]];
-				
-				let gray = Math.round(255 - (index*2.5));
-				
 				let [ r,g,b ] = color;
 				let pad = 150;
 				let adjustment = index * 4;
-
+				let a = (index+10) / 75;
 				r += pad - adjustment
 				g += pad - adjustment;
 				b += pad - adjustment;
-
-				let a = (index+10) / 75;
-
                 row.push(
                     m('.dib', { style: { padding: '4px', backgroundColor: `rgb(${r}, ${g}, ${b}, ${a})` } }, `${index}`.padStart(2, '0'))
                 );
@@ -444,6 +438,5 @@ export const methods = {
 	alternate: t.pipe(t.horizontal, t.alternate),
 	reposition: t.pipe(t.horizontal, t.reposition),
 	waterfall: t.pipe(t.horizontal, t.waterfall),
-	triangle_flipped: t.pipe(t.triangle, t.flip('y')),
-
+	triangle_flipped: t.pipe(t.triangle, t.flip('y'))
 };
