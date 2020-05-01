@@ -42,7 +42,7 @@ export const content = () => [
     m(Visualization, { method: methods.leap }),
     "The leap method is the best way to traverse our airplane.",
     m(Example, { method: 'leap' }),
-    m('h3', 'Clover', m(Descriptor, 'skip + spiral')),
+    m('h3', 'Clover', m(Descriptor, 'reposition + spiral')),
     m(Visualization, { method: methods.clover }),
     m('h3', 'Bacon', m(Descriptor, 'diagonal + reposition')),
     m(Visualization, { method: methods.bacon }),

@@ -126,11 +126,11 @@ export const content = () => [
     'It is the best method for traversing our pacman:',
     m(Example, { method: 'alternate' }),
     /*
-    m('h3', 'Skip'),
-    'The skip method is a repositioned horizontal pattern where I iterate every even index, and then every odd index.',
-    m(Visualization, { method: methods.skip }),
+    m('h3', 'Reposition'),
+    'The reposition method only iterates even indices in the first iteration, and then odd indices in the second.',
+    m(Visualization, { method: methods.reposition }),
     'It works really well if your data looks like our waffle:',
-    m(Example, { method: 'skip' }),
+    m(Example, { method: 'reposition' }),
     */
     m('h3', 'Bounce'),
     'The bounce method bounces back and forth between two indices, both from the beginning incrementing forward and from the end decrementing backward, meeting in the center. It works well on data that has some symmetry. It is the best method for traversing our dollar sign:',
@@ -147,7 +147,7 @@ export const content = () => [
     m(Example, { method: 'waterfall' }),
     m('h3', 'Stitch'),
     m(Visualization, { method: t.pipe(t.stitch) } ),
-    'The stitch pattern is the best method for traversing our note:',
+    'Stitch zig zags in pairs along two cell columns until it fills a space. It is the best method for traversing our note:',
     m(Example, { method: 'stitch' }),
     /*
     m('h3', 'Reflect'),

@@ -8,8 +8,12 @@ import { colors } from '$app/shapeup/colors';
 const targets = [128,64,32,16,8,4,2,1];
 const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
 const prefix_by_key = {
-	compressed: '',
+	on_off: '|',
+	alternative: '}',
+	alternative_base49: '^',
+	alternative_base82: '*',
 	horizontal: '-',
+	vertical_unlimited: '_',
 	vertical: '~',
 	spiral: '`',
 	diagonal: '>',
@@ -19,15 +23,9 @@ const prefix_by_key = {
 	triangle_flipped: '~~',
 	triangle_rotated: '``',
 	alternate: '>>',
-//	turn_rotated: '...',
-//	snake_rotated: '...',
-	skip: ']]A',
+	reposition: ']]A',
 	bounce: ']]B',
-//	swirl: '...',
-//	donut: '...',
 	leap: ']]C',
-//	clover: '...',
-//	bacon: '...',
 	split: ']]D',
 	reflect: ']]E',
 	shift: ']]F',
@@ -251,7 +249,7 @@ export const bestMethod = (shape, mirrored) => {
 	let alternate = repositionCompress(methods.alternate);
 //	let turn_rotated = repositionCompress(t.rotate(methods.alternate));
 //	let snake_rotated = repositionCompress(t.rotate(t.snake));
-	let skip = repositionCompress(methods.skip);
+	let reposition = repositionCompress(methods.reposition);
 	let bounce = repositionCompress(methods.bounce);
 //	let swirl = repositionCompress(methods.swirl);
 //	let donut = repositionCompress(methods.donut);
@@ -265,7 +263,7 @@ export const bestMethod = (shape, mirrored) => {
 	let waterfall = repositionCompress(t.pipe(t.horizontal, t.waterfall));
 	let stitch = repositionCompress(t.pipe(t.stitch));
 
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, /*turn_rotated, snake_rotated,*/ skip, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch };
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, /*turn_rotated, snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -280,7 +278,7 @@ export const bestMethod = (shape, mirrored) => {
 		[alternate.length]: 'alternate',
 //		[turn_rotated.length]: 'turn_rotated',
 //		[snake_rotated.length]: 'snake_rotated',
-		[skip.length]: 'skip',
+		[reposition.length]: 'reposition',
 		[bounce.length]: 'bounce',
 //		[swirl.length]: 'swirl',
 //		[donut.length]: 'donut',
@@ -296,7 +294,7 @@ export const bestMethod = (shape, mirrored) => {
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
 	let smallest = Math.min(
-		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, /*turn_rotated.length, snake_rotated.length,*/ skip.length, bounce.length, 
+		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, /*turn_rotated.length, snake_rotated.length,*/ reposition.length, bounce.length, 
 		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length, stitch.length
 	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
@@ -318,115 +316,44 @@ export const bestMethod = (shape, mirrored) => {
 };
 
 export const matchMethod = shape => {
+	const mirror_even = shape[0] === ')', mirror_odd = shape[0] === '[', mirrored = mirror_even || mirror_odd;
+	mirrored && (shape = shape.substr(1));
+
 	let prefixes = Object.keys(key_by_prefix);
+	prefixes.reverse();
+
 	for(let prefix of prefixes) {
-		if(shape[0] === prefix[0] && (prefix.length === 1 || shape[1] === prefix[1])) return {
-			prefix,
-			key: key_by_prefix[prefix]
-		};
+		if(shape[0] === prefix[0] && (prefix.length < 2 || shape[1] === prefix[1]) && (prefix.length < 3 || shape[2] === prefix[2])) {
+			return { prefix, key: key_by_prefix[prefix], string: shape.substr(prefix.length), mirrored, mirror_even, mirror_odd };
+		}
 	}
-	return false;
+
+	return { prefix: '', key: shape.indexOf(',') > 0 ? 'raw' : 'compressed', string: shape };
 };
 
 export const handleString = shape => {
 	const match = matchMethod(shape);
-//	console.log('match', match);
+	console.log('match', match);
 
-	let mirror_even = shape[0] === ')';
-	let mirror_odd = shape[0] === '[';
-	let mirrored = mirror_even || mirror_odd;
-	mirrored && (shape = shape.substr(1));
-	
-	const alternative = shape[0] === '}' && shape[0] !== '}';
-	const alternative_base49 = shape[0] === '^';
-	const alternative_base82 = shape[0] === '*';
-	const horizontal = shape[0] === '-' && shape[1] !== '-';
-	const vertical_unlimited = shape[0] === '_' && shape[1] !== '_';
-	const vertical = shape[0] === '~' && shape[1] !== '~';
-	const spiral = shape[0] === '`' && shape[1] !== '`';
-	const diagonal = shape[0] === '>' && shape[1] !== '>';
-	const diamond = shape[0] === ']' && shape[1] !== ']';
-	const snake = shape[0] === '_' && shape[1] === '_';
-	const triangle = shape[0] === '-' && shape[1] === '-';
-	const triangle_flipped = shape[0] === '~' && shape[1] === '~';
-	const triangle_rotated = shape[0] === '`' && shape[1] === '`';
-	const alternate = shape[0] === '>' && shape[1] === '>';
-
-	let skip = false, bounce = false, leap = false, split = false, reflect = false, shift = false, stripe = false, waterfall = false, stitch = false;
-	if(shape[0] === ']' && shape[1] === ']' && ['A','B','C','D','E','F','G','H','I'].indexOf(shape[2]) >= 0) {
-		skip = shape[2] === 'A';
-		bounce = shape[2] === 'B';
-		leap = shape[2] === 'C';
-		split = shape[2] === 'D';
-		reflect = shape[2] === 'E';
-		shift = shape[2] === 'F';
-		stripe = shape[2] === 'G';
-		waterfall = shape[2] === 'H';
-		stitch = shape[2] === 'I';
-		shape = shape.substr(3);
-	}
-
-	const on_off = shape[0] === '|' || alternative || alternative_base49 || alternative_base82 || horizontal;
-	(on_off || vertical_unlimited || vertical || spiral || diagonal || diamond || snake || triangle || triangle_flipped || triangle_rotated || alternate) && (shape = shape.substr(1));
-	(snake || triangle || triangle_flipped || triangle_rotated || alternate) && (shape = shape.substr(1));
-	
+	shape = match.string;
+	const postProcess = shape => match.mirrored ? mirror(shape, match.mirror_odd) : shape;
 	const offOnDecompress = method => applyOffOn(repositionDecompressBase49Limit(shape), method);
+	const offOn = shape => applyOffOn(shape, t.horizontal);
+	const handleKey = key => {
+		switch(key) {
+			case 'raw': return shape.split(',');
+			case 'compressed': return min.decompress(shape);
+			case 'on_off': return offOn(min.decompress(shape));
+			case 'vertical_unlimited': return offOnDecompress(t.vertical);
+			case 'alternative': return offOn(alternativeDecompress(shape));
+			case 'alternative_base49': return offOn(alternativeDecompressBase49(shape));
+			case 'alternative_base82': return offOn(base82ToDecimal(shape));
+		}
+		if(methods[key] !== undefined) return offOnDecompress(methods[key]);
+		if(t[key] !== undefined) return offOnDecompress(t[key]);
+	};
 
-	let configuration;
-	if(alternative) {
-		configuration = alternativeDecompress(shape);
-	} else if(alternative_base49) {
-		configuration = alternativeDecompressBase49(shape);
-	} else if(alternative_base82) {
-		configuration = base82ToDecimal(shape);
-	} else if(horizontal) {
-		configuration = repositionDecompressBase49(shape);
-	} else if(vertical_unlimited) {
-		configuration = offOnDecompress(t.vertical);
-	} else if(vertical) {
-		configuration = offOnDecompress(t.vertical);
-	} else if(spiral) {
-		configuration = offOnDecompress(t.spiral);
-	} else if(diagonal) {
-		configuration = offOnDecompress(t.diagonal);
-	} else if(diamond) {
-		configuration = offOnDecompress(t.diamond);
-	} else if(snake) {
-		configuration = offOnDecompress(t.snake);
-	} else if(triangle) {
-		configuration = offOnDecompress(t.triangle);
-	} else if(triangle_flipped) {
-		configuration = offOnDecompress(t.pipe(t.triangle, t.flip('y')))
-	} else if(triangle_rotated) {
-		configuration = offOnDecompress(t.triangle, true);
-	} else if(alternate) {
-		configuration = offOnDecompress(methods.alternate);
-	} else if(skip) {
-		configuration = offOnDecompress(methods.skip);
-	} else if(bounce) {
-		configuration = offOnDecompress(methods.bounce);
-	} else if(leap) {
-		configuration = offOnDecompress(methods.leap);
-	} else if(split) {
-		configuration = offOnDecompress(methods.split);
-	} else if(reflect) {
-		configuration = offOnDecompress(methods.reflect);
-	} else if(shift) {
-		configuration = offOnDecompress(methods.shift);
-	} else if(stripe) {
-		configuration = offOnDecompress(methods.stripe);
-	} else if(waterfall) {
-		configuration = offOnDecompress(t.pipe(t.horizontal, t.waterfall));
-	} else if(stitch) {
-		configuration = offOnDecompress(t.pipe(t.stitch));
-	} else {
-		configuration = shape.indexOf(',') > 0 ? shape.split(',') : min.decompress(shape);
-	}
-	
-	if(on_off) configuration = applyOffOn(configuration, t.horizontal);
-	if(mirrored) configuration = mirror(configuration, mirror_odd);
-	
-	return configuration;
+	return postProcess(handleKey(match.key));
 };
 
 export const Gradient = {
@@ -469,7 +396,7 @@ const examples = {
 	diamond: 'LUNAR',
     spiral: 'YIN',
     vertical: 'PRIZE',
-    skip: 'EGGO',
+    reposition: 'EGGO',
     diagonal: 'KNIFE',
     snake: 'FLIP',
     triangle: 'CHECK',
@@ -515,5 +442,8 @@ export const methods = {
 	shift: t.pipe(t.horizontal, t.shift(Math.round(7*7/2))),
 	stripe: t.pipe(t.horizontal, t.stripe),
 	alternate: t.pipe(t.horizontal, t.alternate),
-	skip: t.pipe(t.horizontal, t.reposition)
+	reposition: t.pipe(t.horizontal, t.reposition),
+	waterfall: t.pipe(t.horizontal, t.waterfall),
+	triangle_flipped: t.pipe(t.triangle, t.flip('y')),
+
 };

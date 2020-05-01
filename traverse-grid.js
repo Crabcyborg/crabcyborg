@@ -144,31 +144,12 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	// methods
-	horizontal: (height, width) => {
-		let keyed = {}, index = 0;
-		for(let y = 0; y < height; ++y)
-			for(let x = 0; x < width; ++x, ++index)
-				keyed[[x,y]] = index;
-		return d({ keyed, height, width });
-	},
 	diagonal: (height, width) => {
 		let keyed = {}, x = 0, y = height-1, remaining = width * height, index = 0;
 		while(remaining--) {
-			keyed[[x,y]] = index++;
-			++x, ++y;
+			keyed[[x,y]] = index++, ++x, ++y;
 			if(x == width || y == height) y -= x + 1, x = 0;
 			while(y < 0) ++y, ++x;
-		}
-		return d({ keyed, height, width });
-	},
-	spiral: (height, width) => {
-		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
-		while(remaining--) {
-			keyed[[x,y]] = index++, x += dx, y += dy;
-			if(x == minx) x += 1, y -= 1, dx = 0, dy = -1, maxy--;
-			else if(x == maxx) x -= 1, y += 1, dx = 0, dy = 1, miny++;
-			else if(y == miny) x += 1, y += 1, dx = 1, dy = 0, minx++;
-			else if(y == maxy) x -= 1, y -= 1, dx = -1, dy = 0, maxx--;
 		}
 		return d({ keyed, height, width });
 	},
@@ -241,6 +222,13 @@ let traverse = {
 	
 		return d({ keyed: t.key(points), height, width, diamond: { ...diamond, keyed }, spike });
 	},
+	horizontal: (height, width) => {
+		let keyed = {}, index = 0;
+		for(let y = 0; y < height; ++y)
+			for(let x = 0; x < width; ++x, ++index)
+				keyed[[x,y]] = index;
+		return d({ keyed, height, width });
+	},
 	snake: (height, width) => {
 		let dir = 's', x = 0, y = 0, keyed = {}, remaining = width * height, index = 0;
 		while(remaining) {
@@ -258,6 +246,17 @@ let traverse = {
 		}
 		return d({ keyed, height, width });
 	},
+	spiral: (height, width) => {
+		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
+		while(remaining--) {
+			keyed[[x,y]] = index++, x += dx, y += dy;
+			if(x == minx) x += 1, y -= 1, dx = 0, dy = -1, maxy--;
+			else if(x == maxx) x -= 1, y += 1, dx = 0, dy = 1, miny++;
+			else if(y == miny) x += 1, y += 1, dx = 1, dy = 0, minx++;
+			else if(y == maxy) x -= 1, y -= 1, dx = -1, dy = 0, maxx--;
+		}
+		return d({ keyed, height, width });
+	},
 	stitch: (height, width) => {
 		let dir = 'se', iteration = 0, x = 0, y = 0, keyed = {}, remaining = width * height, index = 0, base_x = 0;
 		while(remaining) {
@@ -269,15 +268,8 @@ let traverse = {
 			}
 
 			if(y == height) {
-				if(++iteration % 2 == 0) {
-					y = 0;
-					x = base_x += 2;
-					dir = 'se';
-				} else {
-					y = 0;
-					x = base_x + 1;
-					dir = 'sw';
-				}
+				if(++iteration % 2 == 0) y = 0, x = base_x += 2, dir = 'se';
+				else y = 0, x = base_x + 1, dir = 'sw';
 			}
 		}
 		return d({ keyed, height, width });
