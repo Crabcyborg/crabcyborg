@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { Gradient, Example, bestMethod, applyOnOff, applyOffOn, repositionBase49Limit, methods } from '$app/shapeup/optimization-helper';
+import { Gradient, Example, bestMethod, methods } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse as t } from '$app/traverse-grid';
 
@@ -9,7 +9,6 @@ export const title = 'Traverse Grid Mutations with Shape Up Components';
 
 const example_size = 7;
 const size = 5;
-const visualize = method => t.pipe(method, t.visualize)(example_size, example_size);
 
 export const oninit = () => {
     /*

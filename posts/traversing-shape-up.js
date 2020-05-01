@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { Gradient, Example, methods, bestMethod, applyOnOff, applyOffOn, repositionBase49Limit } from '$app/shapeup/optimization-helper';
+import { Gradient, Example, methods, applyOffOn, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse as t } from '$app/traverse-grid';
 
@@ -9,7 +9,6 @@ export const title = 'Traversing Shape Up Components';
 
 const example_size = 7;
 const size = 5;
-const visualize = method => t.pipe(method, t.visualize)(example_size, example_size);
 
 let diamond, triangle;
 
@@ -188,10 +187,12 @@ export const content = () => [
     m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
     'The upside down triangle method is the best method for traversing our checkmark.',
     m(Example, { method: 'triangle' }),
+ /*
     'Why stop at just flipping it when the triangle method can be rotated as well?',
     m(Visualization, { method: t.pipe(t.triangle, t.swap) }),  
     m(ShapeUp, { configuration: triangle.rotated_configuration, size: 6 }),
     m('div', m('a.break', { href: triangle.rotated_url, target: '_blank' }, triangle.flipped_url)),
     "It's the best method for our lips.",
     m(Example, { method: 'triangle_rotated' })
+*/
 ];
