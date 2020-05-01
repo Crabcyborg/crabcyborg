@@ -118,6 +118,15 @@ let traverse = {
 		for(let point of details.points) keyed[point] = (details.keyed[point] + amount) % length;
 		return d({ ...details, keyed });
 	},
+	skew: details => {
+		let keyed = {}, index = 0;
+		for(let y = 0; y < details.height; ++y) {
+			let base_x = y % details.width;
+			for(let x = base_x; x < details.width; ++x) keyed[[x,y]] = details.indices[index++];
+			for(let x = 0; x < base_x; ++x) keyed[[x,y]] = details.indices[index++];
+		}
+		return d({ ...details, keyed });
+	},
 	smooth: type => details => {
 		let keyed = {}, index = 0, checks = type === 'straight' ? [[0,-1], [1,0], [0,1], [-1,0]] : [[-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0]], smallest_gap;
 		for(let point of details.points) {

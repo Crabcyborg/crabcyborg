@@ -118,7 +118,7 @@ export const content = () => [
 	m('p.break', third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a.break', { href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
-	m('p.f7', 'Using the ', third.best.method, ' method described in ', m(GoToPost, {key: 'traversing-shape-up'}), ' I can get our bee down to ', third.best.string.length, ' characters! ', m('a.break', { href: third.best_url, target: '_blank' }, third.best_url)),
+	m('p.f7', 'Using the ', third.best.method, ' method described in ', m(GoToPost, {key: 'traversing-shape-up'}), ' I can get our bee down to ', third.best.string.length, ' characters! ', m('a.f7.break', { href: third.best_url, target: '_blank' }, third.best_url)),
 	m('p', "Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
 	m('div.mt2', m('a.break', { href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
