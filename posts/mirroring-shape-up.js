@@ -4,8 +4,7 @@ import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { applyOnOff, repositionOnOff, onOffLimit, mirror, half, topPatterns, repositionTopPatterns, toBase49, repositionBase49, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
-import { traverse} from '$app/traverse-grid';
-const t = traverse;
+import { traverse as t } from '$app/traverse-grid';
 
 let butterfly;
 

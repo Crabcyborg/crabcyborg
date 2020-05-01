@@ -1,12 +1,11 @@
 import m from 'mithril';
-import { Gist, ShapeUp } from '$app/components';
+import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { bestMethod, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
-import { traverse} from '$app/traverse-grid';
-const t = traverse;
+import { traverse as t } from '$app/traverse-grid';
 
 export const title = 'Minimizing a Large Shape Up Component';
 
@@ -53,6 +52,8 @@ export const oninit = () => {
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
+	third.best = bestMethod(third.raw);
+	third.best_url = `/shapeup/${third.best.string}`;
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
@@ -103,12 +104,10 @@ export const content = () => [
 		m('p.mt0', 'Compressed On/Off Length: ', third.on_off_compressed_length)
 	),
 	'Our bumble bee might have a fighting chance. The On/Off Array is smaller before it is compressed and larger after. The compressions are better configured for the original set of data so maybe we can tweak our min-string configuration and get a smaller payload here as well.',
-	/*
 	m('p.mt0', 'Alternative Compressed On/Off Length: ', third.alternative.length),
 	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters and three character permutations to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
 	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before."),
-	m('div.mt2', m('a.break', { href: alternative_url, target: '_blank' }, alternative_url)),
-	*/
+	m('div.mt2', m('a.break', { href: alternative_url, target: '_blank' }, alternative_url)),	
 	m('p', "To find a pattern, it always helps to see the data you're working with:"),
 	m('p.break', third.on_off_csv),
 	m('p', 'No values ever exceed ', third.on_off_max, ', so I can get this a lot smaller if I drop support for values up to 255.'),
@@ -119,6 +118,7 @@ export const content = () => [
 	m('p.break', third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a.break', { href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
+	m('p.f7', 'Using the ', third.best.method, ' method described in ', m(GoToPost, {key: 'traversing-shape-up'}), ' I can get our bee down to ', third.best.string.length, ' characters! ', m('a.break', { href: third.best_url, target: '_blank' }, third.best_url)),
 	m('p', "Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
 	m('div.mt2', m('a.break', { href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),

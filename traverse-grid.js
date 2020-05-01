@@ -24,6 +24,7 @@ let traverse = {
 		return keyed;
 	},
 	pipe: (...ops) => ops.reduce((a, b) => (height, width) => b(a(height, width))),
+	repeat: (method, iterations) => t.pipe(...Array(iterations).fill(method)),
 	rotate: method => (height, width) => t.pipe(method, t.swap)(width, height),
 	triangleSize: (length, type) => {
 		let size = 0;
@@ -115,6 +116,25 @@ let traverse = {
 	shift: amount => details => {
 		let keyed = {}, length = details.points.length;
 		for(let point of details.points) keyed[point] = (details.keyed[point] + amount) % length;
+		return d({ ...details, keyed });
+	},
+	smooth: type => details => {
+		let keyed = {}, index = 0, checks = type === 'straight' ? [[0,-1], [1,0], [0,1], [-1,0]] : [[-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0]], smallest_gap;
+		for(let point of details.points) {
+			if(keyed[point] !== undefined) continue;
+			keyed[point] = index++, smallest_gap = false;
+			for(let check of checks) {
+				let check_point = [point[0] + check[0], point[1] + check[1]];
+				if(details.keyed[check_point] && !keyed[check_point]) {
+					let gap = details.keyed[point] - details.keyed[check_point];
+					if(gap === 1) {
+						smallest_gap = { gap, check_point };
+						break;
+					} else if(smallest_gap === false || gap < smallest_gap.gap) smallest_gap = { gap, check_point };
+				}
+			}
+			if(smallest_gap) keyed[smallest_gap.check_point] = index++;
+		}
 		return d({ ...details, keyed });
 	},
 	split: details => {
