@@ -183,9 +183,12 @@ let traverse = {
 		return k(details, points);
 	},
 	step: amount => details => {
-		let keyed = {}, size = details.height * details.width, remaining = size;
-		for(let index = 0, j = 0; remaining > 0; ++j, --remaining, index = (index + amount) % size)
+		let keyed = {}, size = details.height * details.width, remaining = size, used = {};
+		for(let index = 0, j = 0; remaining > 0; ++j, --remaining, index = (index + amount) % size) {
+			while(used[details.indices[index]]) ++index;
 			keyed[details.points[j]] = details.indices[index];
+			used[details.indices[index]] = true;
+		}
 		return d({ ...details, keyed });
 	},
 	swap: details => {

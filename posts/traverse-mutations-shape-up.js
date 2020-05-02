@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { Gradient, Example, bestMethod, methods } from '$app/shapeup/optimization-helper';
+import { Gradient, Example, bestMethod, bestSeed, methods } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse as t } from '$app/traverse-grid';
 
@@ -11,7 +11,15 @@ const example_size = 7;
 const size = 5;
 
 export const oninit = () => {
-    /*
+/*
+    const shape = shapes.RUBY;
+    console.log(bestMethod(shape));
+    let from = Math.floor(Math.random() * 1000000);
+    let count = 10000;
+    console.log(from, bestSeed(shape, from, from + count));
+    */
+
+/*    
     let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
@@ -63,6 +71,8 @@ export const content = () => [
     m(Visualization, { method: t.pipe(t.horizontal, t.step(4)) }),
     m('h3', 'Step (5)'),
     m(Visualization, { method: t.pipe(t.horizontal, t.step(5)) }),
+    m('h3', 'Step (7)'),
+    m(Visualization, { method: t.pipe(t.horizontal, t.step(7)) }),
     "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate()) }),
