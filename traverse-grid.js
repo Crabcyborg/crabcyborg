@@ -1,6 +1,10 @@
 ;(function() {
 "use strict"
 let traverse = {
+	// Better 32-bit integer hash function: https://burtleburtle.net/bob/hash/integer.html
+	hash: n=>(n=61^n^n>>>16,n+=n<<3,n=Math.imul(n,668265261),n^=n>>>15)>>>0,
+	// Mulberry32, a fast high quality PRNG: https://gist.github.com/tommyettinger/46a874533244883189143505d203312c
+	mb32: s=>t=>(s=s+1831565813|0,t=Math.imul(s^s>>>15,1|s),t=t+Math.imul(t^t>>>7,61|t)^t,(t^t>>>14)>>>0)/2**32,
 	// helpers
 	details: details => {
 		const { height, width, keyed } = details, size = width * height;
@@ -19,6 +23,13 @@ let traverse = {
 	pipe: (...ops) => ops.reduce((a, b) => (height, width) => b(a(height, width))),
 	repeat: (method, iterations) => t.pipe(...Array(iterations || 1).fill(method)),
 	rotate: method => (height, width) => t.pipe(method, t.swap)(width, height),
+	shuffle: (array, seed) => {
+		for(let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(t.mb32(t.hash(seed+i))() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	},
 	triangleSize: (length, type) => {
 		let size = 0;
 		switch(type) {
@@ -41,7 +52,7 @@ let traverse = {
 			for(let x = spike.width; x < width+spike.width; ++x)
 				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
 
-		return d({ ...details, keyed: t.key(points) });
+		return k(details, points);
 	},
 	visualize: (details, options) => {
 		let output = [];
@@ -83,7 +94,7 @@ let traverse = {
 		let points = [];
 		for(let index = 0; index < to; ++index) points.push(details.points[index], details.points[size - index - 1]);
 		to < size/2 && (points.push(details.points[to]));
-		return d({ ...details, keyed: t.key(points) });
+		return k(details, points);
 	},
 	flip: type => details => {
 		let { height, width } = details, keyed = {}, callback;
@@ -121,7 +132,7 @@ let traverse = {
 		let points = [];
 		for(let index = 0; index < length; index += 2) points.push(details.points[index]);
 		for(let index = 1; index < length; index += 2) points.push(details.points[index]);
-		return d({ ...details, keyed: t.key(points) });
+		return k(details, points);
 	},
 	shift: amount => details => d({ ...details,
 		keyed: details.reduce((keyed, { point }, index) => {
@@ -169,7 +180,13 @@ let traverse = {
 		for(let iteration of [{x: 0, to}, {x: to, to: details.width}])
 			for(let y = 0; y < details.height; ++y)
 				for(let x = iteration.x; x < iteration.to; ++x) points.push(details.points[details.keyed[[x,y]]]);
-		return d({ ...details, keyed: t.key(points) });
+		return k(details, points);
+	},
+	step: amount => details => {
+		let keyed = {}, size = details.height * details.width, remaining = size;
+		for(let index = 0, j = 0; remaining > 0; ++j, --remaining, index = (index + amount) % size)
+			keyed[details.points[j]] = details.indices[index];
+		return d({ ...details, keyed });
 	},
 	swap: details => {
 		let keyed = {};
@@ -180,7 +197,7 @@ let traverse = {
         let points = [], to = details.points.length-1;
         for(let index = 0; index < to; index += 2) points.push(details.points[index+1], details.points[index]);
         to < details.points.length && points.push(details.points[to]);
-        return t.details({ ...details, keyed: t.key(points)});
+        return k(details, points);
     },
 	waterfall: details => {
 		let keyed = {};
@@ -268,6 +285,7 @@ let traverse = {
 				keyed[[x,y]] = index;
 		return d({ keyed, height, width });
 	},
+	seed: seed => (height, width) => k({ height, width }, t.shuffle(t.horizontal(height, width).points, seed)),
 	spiral: (height, width) => {
 		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
 		while(remaining--) {
@@ -354,7 +372,7 @@ let traverse = {
 	
 		return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
 	}
-}, t = traverse, d = t.details;
+}, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) });
 
 // accessibility
 t.vertical = t.rotate(t.horizontal);
