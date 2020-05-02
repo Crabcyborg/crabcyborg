@@ -9,7 +9,7 @@ import * as minimizing_shape_up from './minimizing-shape-up';
 import * as minimizing_large_shape_up from './minimizing-large-shape-up';
 import * as mirroring_shape_up from './mirroring-shape-up';
 import * as traversing_shape_up from './traversing-shape-up';
-import * as traverse_mutations_shape_up from './traverse-mutations-shape-up';
+import * as traverse_mutations from './traverse-mutations';
 import * as tracing_shape_up from './tracing-shape-up';
 import * as shape_up_text from './shape-up-text';
 import * as tracing_shape_up_font from './tracing-shape-up-font';
@@ -26,7 +26,7 @@ const imports = {
 	minimizing_large_shape_up,
 	mirroring_shape_up,
 	traversing_shape_up,
-	traverse_mutations_shape_up,
+	traverse_mutations,
 	tracing_shape_up,
 	shape_up_text,
 	tracing_shape_up_font

@@ -5,7 +5,7 @@ import { Gradient, Example, bestMethod, bestSeed, methods } from '$app/shapeup/o
 import { min } from 'min-string';
 import { traverse as t } from '$app/traverse-grid';
 
-export const title = 'Traverse Grid Mutations with Shape Up Components';
+export const title = 'Traverse Grid Mutations';
 
 const example_size = 7;
 const size = 5;

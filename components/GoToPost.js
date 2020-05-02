@@ -6,7 +6,8 @@ export var GoToPost = {
 	view: v => m(
 		Trigger,
 		{
-			onclick: () => m.route.set('/post/:slug/', {slug: v.attrs.key, key: Date.now()})
+			onclick: () => m.route.set('/post/:slug/', {slug: v.attrs.key, key: Date.now()}),
+			style: v.attrs.style
 		},
 		v.attrs.prepend,
 		posts[v.attrs.key].title
