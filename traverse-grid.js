@@ -5,12 +5,9 @@ let traverse = {
 	details: details => {
 		const { height, width, keyed } = details, size = width * height;
 		let points = Array(size), indices = [];
-		for(let y = 0; y < height; ++y) {
-			for(let x = 0; x < width; ++x) {
-				points[keyed[[x,y]]] = [x,y];
-				indices.push(keyed[[x,y]]);
-			}
-		}
+		for(let y = 0; y < height; ++y)
+			for(let x = 0; x < width; ++x)
+				points[keyed[[x,y]]] = [x,y], indices.push(keyed[[x,y]]);
 
 		let response = { ...details, points, indices };
 		response.map = callback => t.map(response, callback);
@@ -18,13 +15,9 @@ let traverse = {
 		response.reduce = (callback, initial_value) => t.reduce(response, callback, initial_value);
 		return response;
 	},
-	key: points => {
-		let keyed = {}, index = 0;
-		for(let point of points) keyed[point] = index++;
-		return keyed;
-	},
+	key: points => points.reduce((keyed, point, index) => { keyed[point] = index; return keyed; }, points, {}),
 	pipe: (...ops) => ops.reduce((a, b) => (height, width) => b(a(height, width))),
-	repeat: (method, iterations) => t.pipe(...Array(iterations).fill(method)),
+	repeat: (method, iterations) => t.pipe(...Array(iterations || 1).fill(method)),
 	rotate: method => (height, width) => t.pipe(method, t.swap)(width, height),
 	triangleSize: (length, type) => {
 		let size = 0;
@@ -33,6 +26,22 @@ let traverse = {
 			case 'right': while(length > 0) size += length--; break;
 		}
 		return size;
+	},
+	trim: details => {
+		const { keyed, height, width, spike } = details;
+
+		let indices = [];
+		for(let y = spike.height; y < height+spike.height; ++y)
+			for(let x = spike.width; x < width+spike.width; ++x)
+				indices.push(parseInt(keyed[[x,y]]));
+		indices.sort((a,b) => a-b);
+	
+		let points = Array(width * height);
+		for(let y = spike.height; y < height+spike.height; ++y)
+			for(let x = spike.width; x < width+spike.width; ++x)
+				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
+
+		return d({ ...details, keyed: t.key(points) });
 	},
 	visualize: (details, options) => {
 		let output = [];
@@ -90,15 +99,9 @@ let traverse = {
 	},
 	stripe: details => {
 		let keyed = {}, offset = 0;
-		for(let y = 0; y < details.height; y += 2) {
-			for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.keyed[[x,y]] - offset;
-			offset += details.width;
-		}
-		offset -= details.height * details.width;
-		for(let y = 1; y < details.height; y += 2) {
-			for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.keyed[[x,y]] - offset;
-			offset += details.width;
-		}
+		for(let base_y = 0; base_y <= 1; ++base_y, offset -= details.height * details.width)
+			for(let y = base_y; y < details.height; y += 2, offset += details.width)
+				for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.keyed[[x,y]] - offset;
 		return d({ ...details, keyed });
 	},
 	mutate: method => details => {
@@ -142,7 +145,7 @@ let traverse = {
 		}
 		return d({ ...details, keyed });
 	},
-	smooth: type => details => {
+	smooth: (type, repeat) => t.repeat(details => {
 		let keyed = {}, index = 0, checks = type === 'straight' ? [[0,-1], [1,0], [0,1], [-1,0]] : [[-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0]], smallest_gap;
 		for(let point of details.points) {
 			if(keyed[point] !== undefined) continue;
@@ -159,8 +162,9 @@ let traverse = {
 			}
 			if(smallest_gap) keyed[smallest_gap.check_point] = index++;
 		}
+
 		return d({ ...details, keyed });
-	},
+	}, repeat),
 	split: details => {
 		let points = [], to = Math.ceil(details.width / 2);
 		for(let y = 0; y < details.height; ++y)
@@ -253,18 +257,7 @@ let traverse = {
 			}
 		}
 	
-		let indices = [];
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
-				indices.push(parseInt(keyed[[x,y]]));
-		indices.sort((a,b) => a-b);
-
-		let points = Array(width * height);
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
-				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
-	
-		return d({ keyed: t.key(points), height, width, diamond: { ...diamond, keyed }, spike });
+		return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
 	},
 	horizontal: (height, width) => {
 		let keyed = {}, index = 0;
@@ -354,18 +347,7 @@ let traverse = {
 			}
 		}
 	
-		let indices = [];
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
-				indices.push(parseInt(keyed[[x,y]]));
-		indices.sort((a,b) => a-b);
-	
-		let points = Array(width * height);
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
-				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
-	
-		return d({ keyed: t.key(points), height, width, triangle: { ...triangle, keyed }, spike });
+		return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
 	}
 }, t = traverse, d = t.details;
 
