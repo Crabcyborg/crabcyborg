@@ -297,8 +297,9 @@ export const bestMethod = (shape, mirrored) => {
 //	let step4 = repositionCompress(t.pipe(t.horizontal, t.step(4)));
 //	let corner_in = repositionCompress(methods.corner_in);
 //	let corner_out = repositionCompress(methods.corner_out);
+//	let corner_crawl = repositionCompress(methods.corner_crawl);
 
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, turn_rotated, /*snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch, smooth, straight_smooth, smooth_x2, straight_smooth_x2, skew, alternate_diagonal, straight_smooth_x5, double, step2/*, step3, step4, corner_in, corner_out*/ };
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, turn_rotated, /*snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch, smooth, straight_smooth, smooth_x2, straight_smooth_x2, skew, alternate_diagonal, straight_smooth_x5, double, step2/*, step3, step4, corner_in, corner_out*//*, corner_crawl*/ };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -338,13 +339,14 @@ export const bestMethod = (shape, mirrored) => {
 //		[step3.length]: 'step3',
 //		[step4.length]: 'step4',
 //		[corner_in.length]: 'corner_in',
-//		[corner_out.length]: 'corner_out'
+//		[corner_out.length]: 'corner_out',
+//		[corner_crawl.length]: 'corner_crawl'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
 	let smallest = Math.min(
 		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, turn_rotated.length, /*snake_rotated.length,*/ reposition.length, bounce.length, 
 		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length, stitch.length, smooth.length, straight_smooth.length, smooth_x2.length, straight_smooth_x2.length, skew.length, alternate_diagonal.length,
-		straight_smooth_x5.length, double.length, step2.length/*, step3.length, step4.length, corner_in.length, corner_out.length*/
+		straight_smooth_x5.length, double.length, step2.length/*, step3.length, step4.length, corner_in.length, corner_out.length*//*, corner_crawl.length*/
 	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
@@ -504,7 +506,8 @@ export const methods = {
 	step3: t.pipe(t.horizontal, t.step(3)),
 	step4: t.pipe(t.horizontal, t.step(4)),
 	corner_in: t.corner('in'),
-	corner_out: t.corner('out')
+	corner_out: t.corner('out'),
+	corner_crawl: t.corner('crawl')
 };
 
 export const bestSeed = (shape, from, to) => {

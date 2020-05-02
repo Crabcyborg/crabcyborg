@@ -24,10 +24,8 @@ let traverse = {
 	repeat: (method, iterations) => t.pipe(...Array(iterations || 1).fill(method)),
 	rotate: method => (height, width) => t.pipe(method, t.swap)(width, height),
 	shuffle: (array, seed) => {
-		for(let i = array.length - 1; i > 0; i--) {
-			const j = Math.floor(t.mb32(t.hash(seed+i))() * (i + 1));
-			[array[i], array[j]] = [array[j], array[i]];
-		}
+		const random = i => t.mb32(t.hash(seed+i))(), index = i => Math.floor(random(i) * (i + 1));
+		for(let i = array.length - 1, j = index(i); i > 0; i--, j = index(i)) [array[i], array[j]] = [array[j], array[i]];
 		return array;
 	},
 	triangleSize: (length, type) => {
@@ -245,6 +243,23 @@ let traverse = {
 
 						case 'e':
 							if(x == width || keyed[[x,y]]) y = base_y, x = base_x++, dir = 's';
+							else keyed[[x,y]] = index++, ++x, remaining--;
+						break;
+					}
+				}
+			} break;
+
+			case 'crawl': {
+				let x = 0, y = height-1, dir = 'n', index = 0, base_y = 0, base_x = 1;
+				while(remaining) {
+					switch(dir) {
+						case 'n':
+							if(y < 0 || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
+							else keyed[[x,y]] = index++, --y, remaining--;
+						break;
+
+						case 'e':
+							if(x == width || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
 							else keyed[[x,y]] = index++, ++x, remaining--;
 						break;
 					}

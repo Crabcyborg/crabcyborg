@@ -77,6 +77,8 @@ export const content = () => [
     m(Visualization, { method: t.corner('out') }),
     m('h3', 'Corner (in)'),
     m(Visualization, { method: t.corner('in') }),
+    m('h3', 'Corner (crawl)'),
+    m(Visualization, { method: t.corner('crawl') }),
     "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate()) }),
