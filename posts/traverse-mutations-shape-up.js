@@ -11,7 +11,7 @@ const example_size = 7;
 const size = 5;
 
 export const oninit = () => {
-/*
+    /*
     const shape = shapes.RUBY;
     console.log(bestMethod(shape));
     let from = Math.floor(Math.random() * 1000000);
@@ -19,7 +19,7 @@ export const oninit = () => {
     console.log(from, bestSeed(shape, from, from + count));
     */
 
-/*    
+    /*
     let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
@@ -73,6 +73,10 @@ export const content = () => [
     m(Visualization, { method: t.pipe(t.horizontal, t.step(5)) }),
     m('h3', 'Step (7)'),
     m(Visualization, { method: t.pipe(t.horizontal, t.step(7)) }),
+    m('h3', 'Corner (out)'),
+    m(Visualization, { method: t.corner('out') }),
+    m('h3', 'Corner (in)'),
+    m(Visualization, { method: t.corner('in') }),
     "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate()) }),
@@ -119,5 +123,7 @@ export const content = () => [
     m('h3', m(Descriptor, 'tile (spiral 3x3)')),
     m(Visualization, { method: t.tile(t.spiral(3,3)) }),
     m('h3', m(Descriptor, 'tile (diamond 3x3)')),
-    m(Visualization, { method: t.tile(t.diamond(3,3)) })
+    m(Visualization, { method: t.tile(t.diamond(3,3)) }),
+    m('h3', m(Descriptor, 'corner (out) + smooth')),
+    m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) }),
 ];

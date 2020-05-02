@@ -214,6 +214,45 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	// methods
+	corner: direction => (height, width) => {
+		let remaining = height * width, keyed = {};
+		switch(direction) {
+			case 'in': {
+				let x = 0, y = height-1, dir = 'n', index = 0, base_y = 0, base_x = 1;
+				while(remaining) {
+					switch(dir) {
+						case 'n':
+							if(y < 0 || keyed[[x,y]]) x = width-1, y = base_y++, dir = 'w';
+							else keyed[[x,y]] = index++, --y, remaining--;
+						break;
+
+						case 'w':
+							if(x < 0 || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
+							else keyed[[x,y]] = index++, --x, remaining--;
+						break;
+					}
+				}
+			} break;
+
+			case 'out': {
+				let x = 0, y = 0, dir = 's', index = 0, base_y = 0, base_x = 1;
+				while(remaining) {
+					switch(dir) {
+						case 's':
+							if(y == height || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
+							else keyed[[x,y]] = index++, ++y, remaining--;
+						break;
+
+						case 'e':
+							if(x == width || keyed[[x,y]]) y = base_y, x = base_x++, dir = 's';
+							else keyed[[x,y]] = index++, ++x, remaining--;
+						break;
+					}
+				}
+			} break;
+		}
+		return d({ keyed, height, width });
+	},
 	diagonal: (height, width) => {
 		let keyed = {}, x = 0, y = height-1, remaining = width * height, index = 0;
 		while(remaining--) {
