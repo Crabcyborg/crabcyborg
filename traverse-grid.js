@@ -52,8 +52,8 @@ let traverse = {
 		return output.join('\n');
 	},
 	// iterators
-	map: (details, callback) => details.points.map((point, index) => callback({index: details.indices[index], point, x: point[0], y: point[1]})),
-	forEach: (details, callback) => details.points.forEach((point, index) => callback({index: details.indices[index], point, x: point[0], y: point[1]})),
+	map: (details, callback) => details.points.map((point, index) => callback({index: details.indices[index], point, x: point[0], y: point[1]}, index)),
+	forEach: (details, callback) => details.points.forEach((point, index) => callback({index: details.indices[index], point, x: point[0], y: point[1]}, index)),
 	reduce: (details, callback, initial_value) => details.points.reduce((accumulator, point, index) => callback(accumulator, {index: details.indices[index], point, x: point[0], y: point[1]}, index), initial_value),
 	// mutations
 	alternate: type => details => {
@@ -88,9 +88,9 @@ let traverse = {
 	flip: type => details => {
 		let { height, width } = details, keyed = {}, callback;
 		switch(type) {
-			case 'x': callback = ({x, y, index}) => keyed[[width-x-1, y]] = index; break;
-			case 'y': callback = ({x, y, index}) => keyed[[x, height-y-1]] = index; break;
-			case 'xy': callback = ({x, y, index}) => keyed[[width-x-1, height-y-1]] = index; break;			
+			case 'x': callback = ({x, y}, index) => keyed[[width-x-1, y]] = index; break;
+			case 'y': callback = ({x, y}, index) => keyed[[x, height-y-1]] = index; break;
+			case 'xy': callback = ({x, y}, index) => keyed[[width-x-1, height-y-1]] = index; break;			
 		}
 		details.forEach(callback);
 		return d({ ...details, keyed });
@@ -175,7 +175,7 @@ let traverse = {
 		let keyed = {};
 		for(let [x,y] of details.points) keyed[[y,x]] = details.keyed[[x,y]];
 		return d({ ...details, keyed, width: details.height, height: details.width });
-	},
+	},	
 	trade: details => {
         let points = [], to = details.points.length-1;
         for(let index = 0; index < to; index += 2) points.push(details.points[index+1], details.points[index]);
@@ -268,23 +268,6 @@ let traverse = {
 				keyed[[x,y]] = index;
 		return d({ keyed, height, width });
 	},
-	snake: (height, width) => {
-		let dir = 's', x = 0, y = 0, keyed = {}, remaining = width * height, index = 0;
-		while(remaining) {
-			if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
-	
-			switch(dir) {
-				case 's': ++y, dir = 'e1'; break;
-				case 'e1': ++x, dir = 'n'; break;
-				case 'n': --y, dir = 'e2'; break;
-				case 'e2':
-					++x, dir = 's';
-					if(x >= width) x = 0, y += 2;
-				break;
-			}
-		}
-		return d({ keyed, height, width });
-	},
 	spiral: (height, width) => {
 		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
 		while(remaining--) {
@@ -375,6 +358,8 @@ let traverse = {
 
 // accessibility
 t.vertical = t.rotate(t.horizontal);
+t.double = t.tile(t.horizontal(2,2));
+t.snake = t.tile({ points: [[0,0], [0,1], [1,1], [1,0]], height: 2, width: 2 });
 
 if(typeof module !== 'undefined') module['exports'] = { traverse };
 else window.traverse = traverse;

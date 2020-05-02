@@ -39,7 +39,8 @@ const prefix_by_key = {
 	turn_rotated: ']]O',
 	skew: ']]P',
 	alternate_diagonal: ']]Q',
-	straight_smooth_x5: ']]R'
+	straight_smooth_x5: ']]R',
+	double: ']]S'
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
@@ -286,8 +287,9 @@ export const bestMethod = (shape, mirrored) => {
 	let skew = repositionCompress(methods.skew);
 	let alternate_diagonal = repositionCompress(methods.alternate_diagonal);
 	let straight_smooth_x5 = repositionCompress(methods.straight_smooth_x5);
+	let double = repositionCompress(t.double);
 
-	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, turn_rotated, /*snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch, smooth, straight_smooth, smooth_x2, straight_smooth_x2, skew, alternate_diagonal, straight_smooth_x5 };
+	let string_by_key = { compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle, triangle_flipped, /*triangle_rotated,*/ alternate, turn_rotated, /*snake_rotated,*/ reposition, bounce, /*swirl, donut,*/ leap, /*clover, bacon,*/ split, reflect, shift, stripe, waterfall, stitch, smooth, straight_smooth, smooth_x2, straight_smooth_x2, skew, alternate_diagonal, straight_smooth_x5, double };
 	let key_by_value = {
 		[compressed.length]: 'compressed',
 		[horizontal.length]: 'horizontal',
@@ -321,13 +323,14 @@ export const bestMethod = (shape, mirrored) => {
 		[straight_smooth_x2.length]: 'straight_smooth_x2',
 		[skew.length]: 'skew',
 		[alternate_diagonal.length]: 'alternate_diagonal',
-		[straight_smooth_x5.length]: 'straight_smooth_x5'
+		[straight_smooth_x5.length]: 'straight_smooth_x5',
+		[double.length]: 'double'
 	};
 	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
 	let smallest = Math.min(
 		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length, triangle.length, triangle_flipped.length, /*triangle_rotated.length,*/ alternate.length, turn_rotated.length, /*snake_rotated.length,*/ reposition.length, bounce.length, 
 		/*swirl.length, donut.length,*/ leap.length, /*clover.length, bacon.length,*/ split.length, reflect.length, shift.length, stripe.length, waterfall.length, stitch.length, smooth.length, straight_smooth.length, smooth_x2.length, straight_smooth_x2.length, skew.length, alternate_diagonal.length,
-		straight_smooth_x5.length
+		straight_smooth_x5.length, double.length
 	);
 	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
 	let length = parseInt(swapped[key_by_value[smallest]]);
@@ -436,7 +439,8 @@ const examples = {
 	waterfall: 'TRUNK',
 	stitch: 'NOTE',
 	straight_smooth_x2: 'SPACE',
-	straight_smooth: 'BUZZ'
+	straight_smooth: 'BUZZ',
+	double: 'HOUSE'
 };
 
 export const Example = {

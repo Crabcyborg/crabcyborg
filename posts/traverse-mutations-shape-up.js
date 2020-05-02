@@ -26,6 +26,7 @@ const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height:
 const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
+    m(Visualization, { method: t.double }),
     "With traverse-grid it is really easy to apply mutations to methods.",
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, shift, waterfall, reflect, bounce and rotate.'),
     "Some other supported mutations applied to the horizontal pattern that do not outperform some of my preferred methods for my library:",
@@ -46,6 +47,8 @@ export const content = () => [
     m(Visualization, { method: methods.stripe } ),
     m('h3', 'Split'),
     m(Visualization, { method: methods.split }),
+    m('h3', 'Trade'),
+    m(Visualization, { method: t.pipe(t.horizontal, t.trade) }),
     m('h3', 'Shift'),
     'Shift might be the simplest mutation of all. It just starts from somewhere else than the beginning. In this case, I start from half way',
     m(Visualization, { method: methods.shift }),
@@ -95,5 +98,5 @@ export const content = () => [
     m('h3', m(Descriptor, 'tile (spiral 3x3)')),
     m(Visualization, { method: t.tile(t.spiral(3,3)) }),
     m('h3', m(Descriptor, 'tile (diamond 3x3)')),
-    m(Visualization, { method: t.tile(t.diamond(3,3)) }),
+    m(Visualization, { method: t.tile(t.diamond(3,3)) })
 ];
