@@ -2,7 +2,7 @@ import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { bestMethod, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
+import { bestMethod, methods, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
 import { traverse as t } from '$app/traverse-grid';
@@ -45,6 +45,8 @@ export const oninit = () => {
 	first.limited = onOffLimit(first.on_off_vertical, 63);
 	first.vertical = repositionBase49Limit(first.on_off_vertical);
 	first.vertical_url = `/shapeup/~${first.vertical}`;
+	first.best = repositionBase49Limit(applyOnOff(first.raw, methods.turn_rotated));
+	first.best_url = `/shapeup/]]O${first.best}`;
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 	second.vertical = repositionBase49(applyOnOff(second.raw, t.vertical));
@@ -136,5 +138,6 @@ export const content = () => [
 	m('p', "This is quite a bit smaller, but the max goes all the way up to ", Math.max(...first.on_off_vertical), ". It's actually really easy to enforce a limit of 63 with the on/off strategy, converting 100 for example to ", onOffLimit([100], 63).join(','), '.'),
 	m('p', 'Our limited array now has ', first.limited.length, ' values, more than the previous ', first.on_off_vertical.length, ' but it is still lower than the horizontally scanned set of data at ', first.on_off.length, ', and the limit is now only 63 which means we have the additional characters available to identify patterns again.'),
 	m('p', 'Our new compressed string is down to ', first.vertical.length, ' characters, ', Math.round(first.raw_csv_length / first.vertical.length * 100)/100, 'x smaller than the original.'),
-	m('div.mt2', m('a.break', { href: first.vertical_url, target: '_blank' }, first.vertical_url))	
+	m('div.mt2', m('a.break', { href: first.vertical_url, target: '_blank' }, first.vertical_url)),
+	m('p.f7', 'Or with an alternated vertical method we can get her down to ', first.best.length, ' characters ', m('a.break.f7', { href: first.best_url, target: '_blank' }, first.best_url)),
 ];
