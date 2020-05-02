@@ -167,12 +167,9 @@ let traverse = {
 	}, repeat),
 	split: details => {
 		let points = [], to = Math.ceil(details.width / 2);
-		for(let y = 0; y < details.height; ++y)
-			for(let x = 0; x < to; ++x)
-				points.push(details.points[details.keyed[[x,y]]]);
-		for(let y = 0; y < details.height; ++y)
-			for(let x = to; x < details.width; ++x)
-				points.push(details.points[details.keyed[[x,y]]]);
+		for(let iteration of [{x: 0, to}, {x: to, to: details.width}])
+			for(let y = 0; y < details.height; ++y)
+				for(let x = iteration.x; x < iteration.to; ++x) points.push(details.points[details.keyed[[x,y]]]);
 		return d({ ...details, keyed: t.key(points) });
 	},
 	swap: details => {
@@ -181,8 +178,8 @@ let traverse = {
 		return d({ ...details, keyed, width: details.height, height: details.width });
 	},
 	waterfall: details => {
-		let keyed = {}, to = Math.ceil(details.width / 2), index = 0;
-		for(let x = 0; x <= to; ++x) {
+		let keyed = {};
+		for(let x = 0, to = Math.ceil(details.width / 2), index = 0; x <= to; ++x) {
 			let right = details.width - 1 - x;
 			if(right < x) break;
 			for(let y = 0; y < details.height; ++y) keyed[[x,y]] = details.indices[index++];
@@ -260,8 +257,8 @@ let traverse = {
 		return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
 	},
 	horizontal: (height, width) => {
-		let keyed = {}, index = 0;
-		for(let y = 0; y < height; ++y)
+		let keyed = {};
+		for(let y = 0, index = 0; y < height; ++y)
 			for(let x = 0; x < width; ++x, ++index)
 				keyed[[x,y]] = index;
 		return d({ keyed, height, width });
