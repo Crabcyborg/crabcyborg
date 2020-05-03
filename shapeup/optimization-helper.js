@@ -198,13 +198,24 @@ export const half = input => {
 	return output;
 };
 
-export const isSymmetrical = input => {
+export const isSymmetricalHorizontally = input => {
 	const [ height, width ] = input, flat = flatten(input), to = Math.floor(width / 2);
 	for(let y = 0; y < height; ++y) {
 		let row_index = y * width, right_index = row_index + width - 1;
-		for(let x = 0; x < to; ++x) {
-			if(flat[row_index + x] != flat[right_index - x]) return false;
-		}
+		for(let x = 0; x < to; ++x)
+			if(flat[row_index + x] != flat[right_index - x])
+				return false;
+	}
+	return true;
+};
+
+export const isSymmetricalVertically = input => {
+	const [ height, width ] = input, flat = flatten(input), to = Math.floor(height / 2);
+	for(let y = 0; y < to; ++y) {
+		let row_index = y * width, mirror_index = (height - y - 1) * width;
+		for(let x = 0; x < width; ++x)
+			if(flat[row_index + x] != flat[mirror_index + x])
+				return false;
 	}
 	return true;
 };
@@ -368,7 +379,7 @@ export const bestMethod = (shape, mirrored) => {
 	let raw_length = shape.join(',').length;
 	let ratio = Math.round(length / (mirrored || raw_length) * 10000) / 100;
 
-	if(!mirrored && isSymmetrical(shape)) {
+	if(!mirrored && isSymmetricalHorizontally(shape)) {
 		const best_half = bestMethod(half(shape), raw_length);
 
 		if(best_half.length < length) {
@@ -378,7 +389,7 @@ export const bestMethod = (shape, mirrored) => {
 	}
 
 	const string = (on_by_default_by_result[string_by_key[method]] ? '_' : '') + prefix_by_key[method] + string_by_key[method];
-	return { method, length, string, mirrored, swapped, ratio };
+	return { method, length, string, mirrored, swapped, ratio, vertical_symmetry: isSymmetricalVertically(shape) };
 };
 
 export const matchMethod = shape => {
@@ -525,7 +536,8 @@ export const methods = {
 	corner_out: t.corner('out'),
 	corner_crawl: t.corner('crawl'),
 	pulse: t.pulse(),
-	pulse_corner: t.pulse('corner')
+	pulse_corner: t.pulse('corner'),
+	fold: t.pipe(t.horizontal, t.fold)
 };
 
 export const bestSeed = (shape, from, to) => {

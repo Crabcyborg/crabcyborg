@@ -37,17 +37,16 @@ let traverse = {
 		return size;
 	},
 	trim: details => {
-		const { keyed, height, width, spike } = details;
+		const { keyed, height, width, spike } = details, max_x = width+spike.width, max_y = height+spike.height;
+		let indices = [], points = Array(width * height), x, y;
 
-		let indices = [];
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
+		for(y = spike.height; y < max_y; ++y)
+			for(x = spike.width; x < max_x; ++x)
 				indices.push(parseInt(keyed[[x,y]]));
 		indices.sort((a,b) => a-b);
 	
-		let points = Array(width * height);
-		for(let y = spike.height; y < height+spike.height; ++y)
-			for(let x = spike.width; x < width+spike.width; ++x)
+		for(y = spike.height; y < max_y; ++y)
+			for(x = spike.width; x < max_x; ++x)
 				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
 
 		return k(details, points);
@@ -71,13 +70,11 @@ let traverse = {
 			case 'diagonal':
 				const to = details.height + details.width - 1;
 				for(let base_y = 1; base_y < to; base_y += 2) {
-					for(let x = 0; x < details.width; ++x) {
-						let y = base_y - x;
-						if(x >= 0 && x < details.width && y >= 0 && y < details.height && y < details.width && x < details.height) keyed[[x,y]] = details.keyed[[y,x]];
-					}
+					for(let x = 0, y = base_y; x < details.width; ++x, y = base_y - x)
+						if(x >= 0 && x < details.width && y >= 0 && y < details.height && y < details.width && x < details.height)
+							keyed[[x,y]] = details.keyed[[y,x]];
 				}
 			break;
-
 			case 'horizontal': default:
 				for(let y = 1; y < details.height; y += 2)
 					for(let x = 0; x < details.width; ++x)
@@ -102,11 +99,20 @@ let traverse = {
 		details.forEach(callback);
 		return d({ ...details, keyed });
 	},
+	fold: details => {
+		let keyed = {}, index = 0;
+		for(let y = 0; y < details.height; y += 2) {
+			if(y < details.height-1)
+				for(let x = 0; x < details.width; ++x) keyed[[x,y+1]] = details.indices[index++];
+			for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.indices[index++];
+		}
+		return d({ ...details, keyed });
+	},
 	stripe: details => {
-		let keyed = {};
-		for(let base_y = 0, offset = 0; base_y <= 1; ++base_y, offset -= details.height * details.width)
-			for(let y = base_y; y < details.height; y += 2, offset += details.width)
-				for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.keyed[[x,y]] - offset;
+		let offsets = [0, Math.ceil(details.height/2) * details.width], keyed = {};
+		for(let y = 0; y < details.height; ++y)
+			for(let x = 0, offset = offsets[y % 2] + Math.floor(y/2) * details.width; x < details.width; ++x)
+				keyed[[x,y]] = details.indices[offset + x];
 		return d({ ...details, keyed });
 	},
 	mutate: method => details => {
@@ -218,7 +224,6 @@ let traverse = {
 							if(y < 0 || keyed[[x,y]]) x = width-1, y = base_y++, dir = 'w';
 							else keyed[[x,y]] = index++, --y, remaining--;
 						break;
-
 						case 'w':
 							if(x < 0 || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
 							else keyed[[x,y]] = index++, --x, remaining--;
@@ -235,7 +240,6 @@ let traverse = {
 							if(y == height || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
 							else keyed[[x,y]] = index++, ++y, remaining--;
 						break;
-
 						case 'e':
 							if(x == width || keyed[[x,y]]) y = base_y, x = base_x++, dir = 's';
 							else keyed[[x,y]] = index++, ++x, remaining--;
@@ -252,7 +256,6 @@ let traverse = {
 							if(y < 0 || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
 							else keyed[[x,y]] = index++, --y, remaining--;
 						break;
-
 						case 'e':
 							if(x == width || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
 							else keyed[[x,y]] = index++, ++x, remaining--;
@@ -295,8 +298,7 @@ let traverse = {
 	
 					dir = 'se';
 					if(diamond.width % 2 === 0) --y;
-				} break;
-	
+				} break;	
 				case 'se': {
 					while(x + 1 < diamond.width && y + 1 < diamond.height && keyed[[x+1,y+1]] === undefined) {
 						++x, ++y, keyed[[x,y]] = index++;
@@ -306,17 +308,14 @@ let traverse = {
 					dir = 'sw';
 					if(diamond.height % 2 === 0) ++x;
 				} break;
-	
 				case 'sw': {
 					while(x - 1 >= 0 && y + 1 < diamond.height && keyed[[x-1,y+1]] === undefined) {
 						--x, ++y, keyed[[x,y]] = index++;
 						if(keyed[[x-1,y]] !== undefined) break;
 					}
-	
 					dir = 'nw';
 					if(diamond.width % 2 === 0) ++y;
 				} break;
-	
 				case 'nw': {
 					while(x - 1 >= 0 && y - 1 >= 0 && keyed[[x-1,y-1]] === undefined) {
 						--x, --y, keyed[[x,y]] = index++;

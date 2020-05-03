@@ -23,8 +23,9 @@ export const oninit = () => {
     let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
-		let shape = shapes[key];
-        console.log({key, ...bestMethod(shape)});
+        let shape = shapes[key];
+        let best = bestMethod(shape);
+        console.log({key, ...best});
     }   
     //*/ 
 };
@@ -52,6 +53,9 @@ export const content = () => [
     m(Visualization, { method: t.pipe(t.vertical, t.flip('xy')) } ),
     m('h3', 'Stripe'),
     m(Visualization, { method: methods.stripe } ),
+    m('h3', 'Fold'),
+    m(Visualization, { method: methods.fold } ),
+    m(Visualization, { method: t.pipe(t.horizontal, t.swap, t.fold, t.swap) } ),
     m('h3', 'Split'),
     m(Visualization, { method: methods.split }),
     m('h3', 'Trade'),
@@ -130,4 +134,5 @@ export const content = () => [
     m(Visualization, { method: t.tile(t.diamond(3,3)) }),
     m('h3', m(Descriptor, 'corner (out) + smooth')),
     m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) }),
+    m('h3', m(Descriptor, 'pulse (corner) + smooth (x2)'))
 ];
