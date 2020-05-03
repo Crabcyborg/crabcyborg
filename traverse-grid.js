@@ -108,6 +108,11 @@ let traverse = {
 		}
 		return d({ ...details, keyed });
 	},
+	invert: details => {
+		let last = details.points.length-1, keyed = {};
+		details.forEach(({ point }, index) => keyed[point] = last - index);
+		return d({ ...details, keyed })
+	},
 	stripe: details => {
 		let offsets = [0, Math.ceil(details.height/2) * details.width], keyed = {};
 		for(let y = 0; y < details.height; ++y)
@@ -213,68 +218,6 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	// methods
-	corner: dir => (height, width) => {
-		let remaining = height * width, keyed = {};
-		switch(dir) {
-			case 'in': {
-				let x = 0, y = height-1, dir = 'n', index = 0, base_y = 0, base_x = 1;
-				while(remaining) {
-					switch(dir) {
-						case 'n':
-							if(y < 0 || keyed[[x,y]]) x = width-1, y = base_y++, dir = 'w';
-							else keyed[[x,y]] = index++, --y, remaining--;
-						break;
-						case 'w':
-							if(x < 0 || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
-							else keyed[[x,y]] = index++, --x, remaining--;
-						break;
-					}
-				}
-			} break;
-
-			case 'out': {
-				let x = 0, y = 0, dir = 's', index = 0, base_y = 0, base_x = 1;
-				while(remaining) {
-					switch(dir) {
-						case 's':
-							if(y == height || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
-							else keyed[[x,y]] = index++, ++y, remaining--;
-						break;
-						case 'e':
-							if(x == width || keyed[[x,y]]) y = base_y, x = base_x++, dir = 's';
-							else keyed[[x,y]] = index++, ++x, remaining--;
-						break;
-					}
-				}
-			} break;
-
-			case 'crawl': {
-				let x = 0, y = height-1, dir = 'n', index = 0, base_y = 0, base_x = 1;
-				while(remaining) {
-					switch(dir) {
-						case 'n':
-							if(y < 0 || keyed[[x,y]]) x = base_x, y = base_y++, dir = 'e';
-							else keyed[[x,y]] = index++, --y, remaining--;
-						break;
-						case 'e':
-							if(x == width || keyed[[x,y]]) y = height-1, x = base_x++, dir = 'n';
-							else keyed[[x,y]] = index++, ++x, remaining--;
-						break;
-					}
-				}
-			} break;
-		}
-		return d({ keyed, height, width });
-	},
-	diagonal: (height, width) => {
-		let keyed = {}, x = 0, y = height-1, remaining = width * height, index = 0;
-		while(remaining--) {
-			keyed[[x,y]] = index++, ++x, ++y;
-			if(x == width || y == height) y -= x + 1, x = 0;
-			while(y < 0) ++y, ++x;
-		}
-		return d({ keyed, height, width });
-	},
 	diamond: (height, width) => {
 		const spike = {
 			height: Math.ceil((width-2)/2),
@@ -329,90 +272,22 @@ let traverse = {
 	
 		return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
 	},
-	horizontal: (height, width) => {
-		let keyed = {};
-		for(let y = 0, index = 0; y < height; ++y)
-			for(let x = 0; x < width; ++x, ++index)
-				keyed[[x,y]] = index;
-		return d({ keyed, height, width });
-	},
-	pulse: type => (height, width) => {
-		let size = height * width, keyed = {}, index = 0, base_x, base_y, base_size, x, y;
-		switch(type) {
-			case 'corner': {
-				base_x = base_y = x = y = 0, base_size = 1, keyed[[x,y]] = index++, ++base_x, ++x, ++base_size;
-
-				let dir = 's', target = base_size, remaining = size - 1, iteration = 0;
-				while(remaining) {
-					if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
-		
-					if(++iteration === target) {
-						switch(dir) {
-							case 's': dir = 'w'; break;
-							case 'w': x = ++base_x, y = -1, dir = 's', target = ++base_size; break;
-						}
-						iteration = 0;
-					}
-		
-					switch(dir) {
-						case 's': ++y; break;
-						case 'w': --x; break;
-					}
-				}
-			} break;
-			case 'edge': default: {
-				base_x = 2, x = 0, base_y = Math.floor(height/2), y = base_y, base_size = 2 - height % 2, keyed[[x,y]] = index++;
-				if(base_size == 2) keyed[[x,y+1]] = index++;
-				
-				--base_y, --y, --base_size;
-				let dir = 'e', remaining = size - index, iteration = 0, target = base_x;
-				while(remaining) {
-					if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
-		
-					if(++iteration === target) {
-						switch(dir) {
-							case 'e': dir = 's', target = base_size += 2; break;
-							case 's': dir = 'w', target = base_x; break;
-							case 'w': x = -1, y = --base_y, dir = 'e', target = ++base_x; break;
-						}
-						iteration = 0;
-					}
-		
-					switch(dir) {
-						case 'e': ++x; break;
-						case 's': ++y; break;
-						case 'w': --x; break;
-					}
-				}
-			} break;
-		}
-		return d({ keyed, height, width });
-	},
 	seed: seed => (height, width) => k({ height, width }, t.shuffle(t.horizontal(height, width).points, seed)),
-	spiral: (height, width) => {
-		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
+	callback: (initialize, update) => (height, width) => {
+		let keyed = {}, remaining = width * height, index = 0, iteration = 0, [ direction, x, y, base_x, base_y, target ] = initialize({height, width});
 		while(remaining--) {
-			keyed[[x,y]] = index++, x += dx, y += dy;
-			if(x == minx) x += 1, y -= 1, dx = 0, dy = -1, maxy--;
-			else if(x == maxx) x -= 1, y += 1, dx = 0, dy = 1, miny++;
-			else if(y == miny) x += 1, y += 1, dx = 1, dy = 0, minx++;
-			else if(y == maxy) x -= 1, y -= 1, dx = -1, dy = 0, maxx--;
-		}
-		return d({ keyed, height, width });
-	},
-	stitch: (height, width) => {
-		let dir = 'se', iteration = 0, x = 0, y = 0, keyed = {}, remaining = width * height, index = 0, base_x = 0;
-		while(remaining) {
-			if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
-	
-			switch(dir) {
-				case 'se': ++x; ++y, dir = 'sw'; break;
-				case 'sw': --x, ++y, dir = 'se'; break;
+			let previous = keyed[[x,y]] = index++;
+			switch(direction) {
+				case 'n': --y; break;
+				case 's': ++y; break;
+				case 'w': --x; break;
+				case 'e': ++x; break;
+				case 'ne': --y, ++x; break;
+				case 'nw': --y, --x; break;
+				case 'se': ++y, ++x; break;
+				case 'sw': ++y, --x; break;
 			}
-
-			if(y == height)
-				if(++iteration % 2 == 0) y = 0, x = base_x += 2, dir = 'se';
-				else y = 0, x = base_x + 1, dir = 'sw';
+			if(++iteration === target) [ direction, x, y, base_x, base_y, target ] = update({ direction, x, y, height, width, base_x, base_y, index: previous }), iteration = 0;
 		}
 		return d({ keyed, height, width });
 	},
@@ -475,12 +350,78 @@ let traverse = {
 	
 		return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
 	}
-}, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) });
+}, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) }), c = t.callback;
 
 // accessibility
+t.horizontal = c(({width}) => ['e', 0, 0, 0, 0, width], ({ base_y, width }) => ['e', 0, ++base_y, 0, base_y, width]);
 t.vertical = t.rotate(t.horizontal);
 t.double = t.tile(t.horizontal(2,2));
 t.snake = t.tile({ points: [[0,0], [0,1], [1,1], [1,0]], height: 2, width: 2 });
+t.corner = type => {
+	switch(type) {
+		case 'crawl': return c(({height}) => ['n', 0, height-1, 0, 0, height], ({direction, height, width, base_x, base_y}) => {
+			switch(direction) {
+				case 'n': return ['e', ++base_x, base_y++, base_x, base_y, width-base_x];
+				case 'e': return ['n', base_x, height-1, base_x, base_y, height-base_y];
+			}
+		});
+		case 'in': return c(({height}) => ['n', 0, height-1, 0, 0, height], ({direction, height, width, base_x, base_y}) => {
+			switch(direction) {
+				case 'n': return ['w', width-1, base_y++, base_x, base_y, width-base_x-1];
+				case 'w': return ['n', ++base_x, height-1, base_x, base_y, height-base_y];
+			}
+		});
+		case 'out': return c(({height}) => ['s', 0, 0, 0, 0, height], ({direction, height, width, base_x, base_y}) => {
+			switch(direction) {
+				case 's': return ['e', ++base_x, base_y++, base_x, base_y, width-base_x];
+				case 'e': return ['s', base_x, base_y, base_x, base_y, height-base_y];
+			}
+		});
+	}
+};
+t.diagonal = c(({ height }) => ['se', 0, height-1, 0, height-1, 1], ({ height, width, base_x, base_y }) => [
+	'se', base_y > 0 ? base_x : ++base_x, base_y > 0 ? --base_y : 0, base_x, Math.max(base_y, 0), Math.min(height-base_y, width-base_x)
+]);
+t.pulse = type => {
+	let size = 1;
+	switch(type) {
+		case 'corner': return c(
+			() => ['w', 0, 0, 0, 0, 1],
+			({ direction, x, y, base_x, height, width }) => {
+				switch(direction) {
+					case 'w': return base_x >= width-1 ? ['w', width-1, ++base_x, base_x, 0, width] : ['s', ++base_x, 0, base_x, 0, size++];
+					case 's': return base_x >= height ? ['s', ++base_x, 0, base_x, 0, height] : ['w', x, y, base_x, 0, size];
+				}
+			}
+		);
+		case 'edge': default: return c(
+			({ height }) => ['s', 0, Math.floor(height/2), 2, Math.floor(height/2), size],
+			({ direction, height, x, y, base_x, base_y, index }) => {
+				if(!index && !--size) return ['e', 0, --base_y, base_x, base_y, 1];
+				switch(direction) {
+					case 's': return y === height ? ['s', base_x++, 0, base_x, 0, height] : ['w', x, y, base_x, base_y, base_x];
+					case 'e': return ['s', x, y, base_x, base_y, size += 2];
+					case 'w': return base_y <= 0 ? ['s', base_x, 0, ++base_x, 0, height] : ['e', 0, --base_y, ++base_x, base_y, base_x-1];
+				}
+			}
+		);
+	}
+};
+t.spiral = c(({width}) => ['e', 0, 0, 0, 0, width], ({ direction, height, width, base_x, base_y }) => {
+	switch(direction) {
+		case 'e': return ['s', width-base_x-1, base_y+1, base_x, base_y, height-base_y*2-1];
+		case 's': return ['w', width-base_x-2, height-base_y-1, base_x, base_y, width-base_x*2-1];
+		case 'w': return ['n', base_x, height-base_y-2, base_x, base_y, height-base_y*2-2];
+		case 'n': return ['e', base_x+1, base_y+1, ++base_x, ++base_y, width-base_x*2];
+	}
+});
+t.stitch = (() => {
+	let limit;
+	return c(({width}) => { limit = width + (1-width%2) - 2; return ['se', 0, 0, 0, 0, 1]; }, ({ direction, height, width, x, y, base_x }) => 
+		y === height ? (base_x === limit ? ['s', width-1, 0, base_x, 0, height] : [base_x % 2 === 0 ? 'sw' : 'se', ++base_x, 0, base_x, 0, 1])
+		: [direction === 'se' ? 'sw' : 'se', x, y, base_x, 0, 1]
+	);
+})();
 
 if(typeof module !== 'undefined') module['exports'] = { traverse };
 else window.traverse = traverse;

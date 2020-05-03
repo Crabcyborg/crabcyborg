@@ -30,11 +30,12 @@ export const oninit = () => {
     //*/ 
 };
 
-const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: example_size, width: example_size }) };
+const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: v.attrs.height || example_size, width: v.attrs.width || example_size }) };
 
 const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
+//  m(Visualization, { method: t.corner('crawl'), height: 10 }),
     "With traverse-grid it is really easy to apply mutations to methods.",
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, shift, waterfall, reflect, bounce and rotate.'),
     "Some other supported mutations applied to the horizontal pattern that do not outperform some of my preferred methods for my library:",
@@ -85,6 +86,8 @@ export const content = () => [
     m(Visualization, { method: t.corner('crawl') }),
     m('h3', 'Pulse (corner)'),
     m(Visualization, { method: t.pulse('corner') }),
+    'Which can also be recreated with corner (crawl) + invert + flip (xy) + swap, but that is hardly effective',
+    m(Visualization, { method: t.pipe(t.corner('crawl'), t.invert, t.flip('xy'), t.swap ) }),
     "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate()) }),
@@ -133,6 +136,5 @@ export const content = () => [
     m('h3', m(Descriptor, 'tile (diamond 3x3)')),
     m(Visualization, { method: t.tile(t.diamond(3,3)) }),
     m('h3', m(Descriptor, 'corner (out) + smooth')),
-    m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) }),
-    m('h3', m(Descriptor, 'pulse (corner) + smooth (x2)'))
+    m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) })
 ];
