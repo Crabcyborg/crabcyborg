@@ -83,13 +83,11 @@ let traverse = {
 					for(let x = 0; x < details.width; ++x)
 						keyed[[x,y]] = details.keyed[[details.width - x - 1, y]];
 			break;
-		}
-		
+		}		
 		return d({ ...details, keyed });
 	},
 	bounce: details => {
-		const size = details.height * details.width, to = Math.floor(size/2);
-		let points = [];
+		let size = details.height * details.width, to = Math.floor(size/2), points = [];
 		for(let index = 0; index < to; ++index) points.push(details.points[index], details.points[size - index - 1]);
 		to < size/2 && (points.push(details.points[to]));
 		return k(details, points);
@@ -105,29 +103,27 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	stripe: details => {
-		let keyed = {}, offset = 0;
-		for(let base_y = 0; base_y <= 1; ++base_y, offset -= details.height * details.width)
+		let keyed = {};
+		for(let base_y = 0, offset = 0; base_y <= 1; ++base_y, offset -= details.height * details.width)
 			for(let y = base_y; y < details.height; y += 2, offset += details.width)
 				for(let x = 0; x < details.width; ++x) keyed[[x,y]] = details.keyed[[x,y]] - offset;
 		return d({ ...details, keyed });
 	},
 	mutate: method => details => {
-		const pattern = method(details.height, details.width);
-		let keyed = [];
+		let pattern = method(details.height, details.width), keyed = [];
 		t.forEach(details, ({ index, point }) => keyed[ details.points[index] ] = pattern.keyed[point]);
 		return d({ ...details, keyed });
 	},
 	reflect: details => {
-		let keyed = {}, to = Math.ceil(details.width / 2), index = 0;
-		for(let y = 0; y < details.height; ++y) {
+		let keyed = {};
+		for(let y = 0, index = 0, to = Math.ceil(details.width / 2); y < details.height; ++y) {
 			for(let x = to-1; x >= 0; --x) keyed[[x,y]] = details.indices[index++];
 			for(let x = details.width - 1; x >= to; --x) keyed[[x,y]] = details.indices[index++];
 		}
 		return d({ ...details, keyed });
 	},
 	reposition: details => {
-		const length = details.points.length;
-		let points = [];
+		let length = details.points.length, points = [];
 		for(let index = 0; index < length; index += 2) points.push(details.points[index]);
 		for(let index = 1; index < length; index += 2) points.push(details.points[index]);
 		return k(details, points);
@@ -141,7 +137,7 @@ let traverse = {
 	skew: details => {
 		let keyed = {}, index = 0;
 		for(let y = 0; y < details.height; ++y) {
-			let base_x = y % details.width;
+			const base_x = y % details.width;
 			for(let x = base_x; x < details.width; ++x) keyed[[x,y]] = details.indices[index++];
 			for(let x = 0; x < base_x; ++x) keyed[[x,y]] = details.indices[index++];
 		}
@@ -159,7 +155,7 @@ let traverse = {
 			if(keyed[point] !== undefined) continue;
 			keyed[point] = index++, smallest_gap = false;
 			for(let check of checks) {
-				let check_point = [point[0] + check[0], point[1] + check[1]];
+				const check_point = [point[0] + check[0], point[1] + check[1]];
 				if(details.keyed[check_point] && !keyed[check_point]) {
 					let gap = details.keyed[point] - details.keyed[check_point];
 					if(gap === 1) {
@@ -170,7 +166,6 @@ let traverse = {
 			}
 			if(smallest_gap) keyed[smallest_gap.check_point] = index++;
 		}
-
 		return d({ ...details, keyed });
 	}, repeat),
 	split: details => {
@@ -203,7 +198,7 @@ let traverse = {
 	waterfall: details => {
 		let keyed = {};
 		for(let x = 0, to = Math.ceil(details.width / 2), index = 0; x <= to; ++x) {
-			let right = details.width - 1 - x;
+			let right = details.width - x - 1;
 			if(right < x) break;
 			for(let y = 0; y < details.height; ++y) keyed[[x,y]] = details.indices[index++];
 			if(right == x) break;
@@ -212,9 +207,9 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	// methods
-	corner: direction => (height, width) => {
+	corner: dir => (height, width) => {
 		let remaining = height * width, keyed = {};
-		switch(direction) {
+		switch(dir) {
 			case 'in': {
 				let x = 0, y = height-1, dir = 'n', index = 0, base_y = 0, base_x = 1;
 				while(remaining) {
@@ -342,6 +337,58 @@ let traverse = {
 				keyed[[x,y]] = index;
 		return d({ keyed, height, width });
 	},
+	pulse: type => (height, width) => {
+		let size = height * width, keyed = {}, index = 0, base_x, base_y, base_size, x, y;
+		switch(type) {
+			case 'corner': {
+				base_x = base_y = x = y = 0, base_size = 1, keyed[[x,y]] = index++, ++base_x, ++x, ++base_size;
+
+				let dir = 's', target = base_size, remaining = size - 1, iteration = 0;
+				while(remaining) {
+					if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
+		
+					if(++iteration === target) {
+						switch(dir) {
+							case 's': dir = 'w'; break;
+							case 'w': x = ++base_x, y = -1, dir = 's', target = ++base_size; break;
+						}
+						iteration = 0;
+					}
+		
+					switch(dir) {
+						case 's': ++y; break;
+						case 'w': --x; break;
+					}
+				}
+			} break;
+			case 'edge': default: {
+				base_x = 2, x = 0, base_y = Math.floor(height/2), y = base_y, base_size = 2 - height % 2, keyed[[x,y]] = index++;
+				if(base_size == 2) keyed[[x,y+1]] = index++;
+				
+				--base_y, --y, --base_size;
+				let dir = 'e', remaining = size - index, iteration = 0, target = base_x;
+				while(remaining) {
+					if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
+		
+					if(++iteration === target) {
+						switch(dir) {
+							case 'e': dir = 's', target = base_size += 2; break;
+							case 's': dir = 'w', target = base_x; break;
+							case 'w': x = -1, y = --base_y, dir = 'e', target = ++base_x; break;
+						}
+						iteration = 0;
+					}
+		
+					switch(dir) {
+						case 'e': ++x; break;
+						case 's': ++y; break;
+						case 'w': --x; break;
+					}
+				}
+			} break;
+		}
+		return d({ keyed, height, width });
+	},
 	seed: seed => (height, width) => k({ height, width }, t.shuffle(t.horizontal(height, width).points, seed)),
 	spiral: (height, width) => {
 		let keyed = {}, x = 0, y = 0, dx = 1, dy = 0, remaining = height * width, maxx = width, maxy = height, minx = -1, miny = -1, index = 0;
@@ -370,7 +417,7 @@ let traverse = {
 		}
 		return d({ keyed, height, width });
 	},
-	tile: (tile, direction) => (height, width) => {
+	tile: (tile, dir) => (height, width) => {
 		let keyed = {}, x, y, base_x = 0, base_y = 0, remaining = height * width, index = 0;
 		while(remaining) {
 			for(let point of tile.points) {
@@ -378,7 +425,7 @@ let traverse = {
 				if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
 			}
 
-			switch(direction) {
+			switch(dir) {
 				case 'vertical':
 					base_y += tile.height;
 					if(base_y >= height) base_y = 0, base_x += tile.width;
