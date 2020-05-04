@@ -218,63 +218,9 @@ let traverse = {
 		return d({ ...details, keyed });
 	},
 	// methods
-	diamond: (height, width) => {
-		const spike = {
-			height: Math.ceil((width-2)/2),
-			width: Math.ceil((height-2)/2)
-		};
-		const diamond = {
-			height: height + spike.height*2,
-			width: width + spike.width*2,
-			size: height * width + t.triangleSize(height-2, 'isosceles') * 2 + t.triangleSize(width-2, 'isosceles') * 2
-		};
-		let base_x = 0, x = base_x, base_y = Math.floor((diamond.height-1)/2), y = base_y, index = 0, keyed = {}, dir = 'ne', miny = 0;
-	
-		keyed[[x,y]] = index++;
-		while(index < diamond.size) {
-			switch(dir) {
-				case 'ne': {
-					while(x + 1 < diamond.width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
-						++x, --y, keyed[[x,y]] = index++;
-						if(keyed[[x+1,y]] !== undefined) break;
-					}
-	
-					dir = 'se';
-					if(diamond.width % 2 === 0) --y;
-				} break;	
-				case 'se': {
-					while(x + 1 < diamond.width && y + 1 < diamond.height && keyed[[x+1,y+1]] === undefined) {
-						++x, ++y, keyed[[x,y]] = index++;
-						if(keyed[[x,y+1]] !== undefined) break;
-					}
-	
-					dir = 'sw';
-					if(diamond.height % 2 === 0) ++x;
-				} break;
-				case 'sw': {
-					while(x - 1 >= 0 && y + 1 < diamond.height && keyed[[x-1,y+1]] === undefined) {
-						--x, ++y, keyed[[x,y]] = index++;
-						if(keyed[[x-1,y]] !== undefined) break;
-					}
-					dir = 'nw';
-					if(diamond.width % 2 === 0) ++y;
-				} break;
-				case 'nw': {
-					while(x - 1 >= 0 && y - 1 >= 0 && keyed[[x-1,y-1]] === undefined) {
-						--x, --y, keyed[[x,y]] = index++;
-						if(keyed[[x,y-1]] !== undefined) break;
-					}
-	
-					dir = 'ne', x = base_x++, y = base_y+1;
-				} break;
-			}
-		}
-	
-		return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
-	},
 	seed: seed => (height, width) => k({ height, width }, t.shuffle(t.horizontal(height, width).points, seed)),
-	callback: (initialize, update) => (height, width) => {
-		let keyed = {}, remaining = width * height, index = 0, iteration = 0, [ direction, x, y, base_x, base_y, target ] = initialize({height, width});
+	callback: (initialize, update, size) => (height, width) => {
+		let keyed = {}, remaining = size || (width * height), index = 0, iteration = 0, [ direction, x, y, base_x, base_y, target ] = initialize({height, width});
 		while(remaining--) {
 			let previous = keyed[[x,y]] = index++;
 			switch(direction) {
@@ -352,7 +298,7 @@ let traverse = {
 	}
 }, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) }), c = t.callback;
 
-// accessibility
+// methods
 t.horizontal = c(({width}) => ['e', 0, 0, 0, 0, width], ({ base_y, width }) => ['e', 0, ++base_y, 0, base_y, width]);
 t.vertical = t.rotate(t.horizontal);
 t.double = t.tile(t.horizontal(2,2));
@@ -382,6 +328,24 @@ t.corner = type => {
 t.diagonal = c(({ height }) => ['se', 0, height-1, 0, height-1, 1], ({ height, width, base_x, base_y }) => [
 	'se', base_y > 0 ? base_x : ++base_x, base_y > 0 ? --base_y : 0, base_x, Math.max(base_y, 0), Math.min(height-base_y, width-base_x)
 ]);
+t.diamond = (height, width) => {
+	const spike = { height: Math.ceil((width-2)/2), width: Math.ceil((height-2)/2) };
+	const diamond = {
+		height: height + spike.height*2, width: width + spike.width*2,
+		size: height * width + t.triangleSize(height-2, 'isosceles') * 2 + t.triangleSize(width-2, 'isosceles') * 2
+	};
+	let even_height = diamond.height % 2 === 0, even_width = diamond.width % 2 === 0, base_y = Math.floor((diamond.height-1)/2), size = base_y;
+	const result = c(() => ['ne', 0, base_y, 0, base_y, even_width ? size+1 : size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
+		switch(direction) {
+			case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_height ? size+1 : size];
+			case 'se': return ['sw', even_height ? x-1 : x, y, base_x, base_y, even_width ? size+1 : size];
+			case 'sw': return ['nw', x, even_width ? y-1 : y, base_x, base_y, even_height ? size+1 : size];
+			case 'nw': return !even_height || size > 1 ? ['ne', ++base_x, base_y, base_x, base_y, even_width ? size-- : --size] : ['s', ++base_x, base_y, 0, 0, height];
+		}
+	}, diamond.size)(diamond.height, diamond.width);
+	const keyed = result.keyed;
+	return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
+};
 t.pulse = type => {
 	let size = 1;
 	switch(type) {
