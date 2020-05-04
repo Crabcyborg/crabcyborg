@@ -295,6 +295,7 @@ export const bestMethod = (shape, mirrored) => {
 	let double = repositionCompress(t.double);
 	let step2 = repositionCompress(t.pipe(t.horizontal, t.step(2)));
 	let pulse = repositionCompress(t.pulse());
+//	let climb = repositionCompress(t.climb);
 //	let triangle = repositionCompress(t.triangle);
 //	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
 //	let snake_rotated = repositionCompress(t.rotate(t.snake));
@@ -318,7 +319,7 @@ export const bestMethod = (shape, mirrored) => {
 		reposition, bounce, leap, split, reflect, waterfall, stitch, straight_smooth, smooth_x2, straight_smooth_x2,
 		alternate_diagonal, straight_smooth_x5, double, step2, pulse
 		/*triangle,*/ /*triangle_rotated,*//*snake_rotated,*//*swirl, donut,*//*clover, bacon,*//*shift,*//* stripe,*//*smooth,*/
-		/*skew,*//*, step3, step4, corner_in, corner_out*//*, corner_crawl*//*, pulse_corner*/
+		/*skew,*//*, step3, step4, corner_in, corner_out*//*, corner_crawl*//*, pulse_corner*//*climb*/
 	};
 	let key_by_value = {
 		[compressed.length]: 'compressed',
@@ -345,6 +346,7 @@ export const bestMethod = (shape, mirrored) => {
 		[double.length]: 'double',
 		[step2.length]: 'step2',
 		[pulse.length]: 'pulse',
+//		[climb.length]: 'climb'
 //		[triangle.length]: 'triangle',
 //		[triangle_rotated.length]: 'triangle_rotated',
 //		[snake_rotated.length]: 'snake_rotated',

@@ -258,13 +258,17 @@ let traverse = {
 		}
 		return d({ keyed, height, width });
 	}
-}, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) }), c = t.callback;
+}, t = traverse, d = t.details, c = t.callback, k = (details, points) => d({ ...details, keyed: t.key(points) });
 
 // methods
 t.horizontal = c(({width}) => ['e', 0, 0, 0, 0, width], ({ base_y, width }) => ['e', 0, ++base_y, 0, base_y, width]);
 t.vertical = t.rotate(t.horizontal);
 t.double = t.tile(t.horizontal(2,2));
 t.snake = t.tile({ points: [[0,0], [0,1], [1,1], [1,0]], height: 2, width: 2 });
+t.climb = c(({height}) => ['s', 0, height-1, -2, height-1, 1], ({direction, height, width, x, y, base_x, base_y}) => 
+	y < height && x < width ? [direction === 's' ? 'e' : 's', x, y, base_x, base_y, 1]
+	: [(base_y -= 2) < 0 ? 'e' : 's', base_y <= 0 ? base_x + 2 : 0, base_y > 0 ? base_y : 0, base_y <= 0 ? (base_x += (!base_y && !(base_x+2) ? 1 : 2)) : base_x, base_y, 1]
+);
 t.corner = type => {
 	switch(type) {
 		case 'crawl': return c(({height}) => ['n', 0, height-1, 0, 0, height], ({direction, height, width, base_x, base_y}) => {
