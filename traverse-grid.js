@@ -257,44 +257,6 @@ let traverse = {
 			}
 		}
 		return d({ keyed, height, width });
-	},
-	triangle: (height, width) => {
-		const spike = {
-			height: Math.ceil((width-2)/2),
-			width: height-1
-		};
-		const triangle = {
-			height: height + spike.height,
-			width: width + spike.width*2,
-			size: height * width + t.triangleSize(height-1, 'right') * 2 + t.triangleSize(width-2, 'isosceles')
-		};
-		let base_x = 0, x = base_x, base_y = triangle.height-1, y = base_y, index = 0, keyed = {}, dir = 'ne', miny = 0;
-	
-		keyed[[x,y]] = index++;
-		while(index < triangle.size) {
-			switch(dir) {
-				case 'ne': {
-					while(x + 1 < triangle.width && y - 1 >= miny && keyed[[x+1,y-1]] === undefined) {
-						++x, --y, keyed[[x,y]] = index++;
-						if(keyed[[x+1,y]] !== undefined) break;
-					}
-	
-					dir = 'se';
-					if(triangle.width % 2 === 0) --y;
-				} break;
-	
-				case 'se': {
-					while(x + 1 < triangle.width && y + 1 < triangle.height && keyed[[x+1,y+1]] === undefined) {
-						++x, ++y, keyed[[x,y]] = index++;
-						if(keyed[[x,y+1]] !== undefined) break;
-					}
-	
-					dir = 'ne', x = base_x++, y = triangle.height;
-				} break;
-			}
-		}
-	
-		return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
 	}
 }, t = traverse, d = t.details, k = (details, points) => d({ ...details, keyed: t.key(points) }), c = t.callback;
 
@@ -386,6 +348,23 @@ t.stitch = (() => {
 		: [direction === 'se' ? 'sw' : 'se', x, y, base_x, 0, 1]
 	);
 })();
+t.triangle = (height, width) => {
+	const spike = { height: Math.ceil((width-2)/2), width: height-1 };
+	const triangle = {
+		height: height + spike.height,
+		width: width + spike.width*2,
+		size: height * width + t.triangleSize(height-1, 'right') * 2 + t.triangleSize(width-2, 'isosceles')
+	};
+	let even_width = triangle.width % 2 === 0, size = triangle.height;
+	const result = c(() => ['ne', 0, triangle.height-1, 0, 0, even_width ? size : --size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
+		switch(direction) {
+			case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_width ? size++ : ++size];
+			case 'se': return ['ne', ++base_x, triangle.height-1, base_x, base_y, size -= 2];
+		}
+	}, triangle.size)(triangle.height, triangle.width);
+	const keyed = result.keyed;
+	return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
+};
 
 if(typeof module !== 'undefined') module['exports'] = { traverse };
 else window.traverse = traverse;
