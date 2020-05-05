@@ -319,6 +319,28 @@ t.diamond = (height, width) => {
 	const keyed = result.keyed;
 	return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
 };
+t.fan = (height, width) => {
+    const half_width = width/2, half_height = height/2, hwf = Math.floor(half_width), hwc = Math.ceil(half_width), hhf = Math.floor(half_height), hhc = Math.ceil(half_height);
+	
+	let mod = -(width % 2);
+	if(width % 2 === 1 && height % 2) {
+		mod += 1;
+	}  else if(width % 2 === 0 && height % 2 === 0) {
+		mod -= 1;
+	}
+
+    return t.callback(
+        () => [ 'w', hwf - (width % 2 === 0 ? 1 : 0), hhf + mod, hwf - (1 - width % 2), hhf + mod, hwc],
+        ({ direction, x, y, base_x, base_y }) => {
+            switch(direction) {
+                case 'w': return y === 0 ? ['n', hwc, hhf + mod, hwc, hhf, hhc] : ['w', base_x, --base_y, base_x, base_y, hwc];
+                case 'n': return x === width-1 ? ['e', hwf , hhc, hwc, hhc, hwc] : ['n', ++base_x, hhf + mod, base_x, base_y, hhc];
+                case 'e': return y === height-1 ? ['s', hwf-1, hhc, hwf-1, hhc, hhf] : ['e', hwf, ++base_y, base_x, base_y, hwc];
+                case 's': return ['s', --base_x, hhc, base_x, base_y, hhf];
+            }
+        }
+    )(height, width);
+};
 t.pulse = type => {
 	let size = 1;
 	switch(type) {

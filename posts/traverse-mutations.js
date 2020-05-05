@@ -47,6 +47,8 @@ export const content = () => [
     m(Visualization, { method: t.cascade }),
     m('h3', 'Climb'),
     m(Visualization, { method: t.climb }),
+    m('h3', 'Fan'),
+    m(Visualization, { method: t.fan }),
     m('h3', 'Skew'),
     m(Visualization, { method: methods.skew } ),
     m('h3', 'Flip (x)'),
