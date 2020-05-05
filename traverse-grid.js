@@ -237,7 +237,7 @@ let traverse = {
 		}
 		return d({ keyed, height, width });
 	},
-	tile: (tile, dir) => (height, width) => {
+	tile: (tile, direction) => (height, width) => {
 		let keyed = {}, x, y, base_x = 0, base_y = 0, remaining = height * width, index = 0;
 		while(remaining) {
 			for(let point of tile.points) {
@@ -245,7 +245,7 @@ let traverse = {
 				if(x >= 0 && x < width && y >= 0 && y < height) keyed[[x,y]] = index++, --remaining;
 			}
 
-			switch(dir) {
+			switch(direction) {
 				case 'vertical':
 					base_y += tile.height;
 					if(base_y >= height) base_y = 0, base_x += tile.width;
@@ -265,6 +265,13 @@ t.horizontal = c(({width}) => ['e', 0, 0, 0, 0, width], ({ base_y, width }) => [
 t.vertical = t.rotate(t.horizontal);
 t.double = t.tile(t.horizontal(2,2));
 t.snake = t.tile({ points: [[0,0], [0,1], [1,1], [1,0]], height: 2, width: 2 });
+t.cascade = c(
+	({height}) => ['s', 0, height-2, 0, height-2, 2],
+	({direction, height, width, x, y, base_x, base_y}) => {
+		let even_height = height % 2 === 0, new_x = y >= height ? (base_y <= 0 ? ++base_x : base_x) : x+1;
+		return new_x === width ? ['s', ++base_x, 0, base_x, base_y, even_height ? 2 : 1] : ['s', new_x, y >= height ? Math.max(base_y -= 2, 0) : y, base_x, base_y, even_height ? 2 : (y >= height && base_y < 0 ? 1 : 2)];
+	}
+);
 t.climb = c(({height}) => ['s', 0, height-1, -2, height-1, 1], ({direction, height, width, x, y, base_x, base_y}) => 
 	y < height && x < width ? [direction === 's' ? 'e' : 's', x, y, base_x, base_y, 1]
 	: [(base_y -= 2) < 0 ? 'e' : 's', base_y <= 0 ? base_x + 2 : 0, base_y > 0 ? base_y : 0, base_y <= 0 ? (base_x += (!base_y && !(base_x+2) ? 1 : 2)) : base_x, base_y, 1]

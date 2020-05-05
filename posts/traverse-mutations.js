@@ -19,7 +19,7 @@ export const oninit = () => {
     console.log(from, bestSeed(shape, from, from + count));
     */
 
-    /*
+    /*   
     let keys = Object.keys(shapes);
 	for(let key_index = 0; key_index < keys.length; ++key_index) {
 		let key = keys[key_index];
@@ -36,13 +36,15 @@ const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
     "With traverse-grid it is really easy to apply mutations to methods.",
-    m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, shift, waterfall, reflect, bounce and rotate.'),
+    m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, waterfall, reflect, bounce and rotate.'),
     "Some other supported mutations applied to the horizontal pattern that do not outperform some of my preferred methods for my library:",
     m('h3', 'Vertical'),
     m(Visualization, { method: t.vertical }),
     'Vertical is really nothing special. In fact, it is just a rotated horizontal method.',
     m('h3', 'Alternate (diagonal)'),
     m(Visualization, { method: methods.alternate_diagonal }),
+    m('h3', 'Cascade'),
+    m(Visualization, { method: t.cascade }),
     m('h3', 'Climb'),
     m(Visualization, { method: t.climb }),
     m('h3', 'Skew'),
@@ -89,7 +91,7 @@ export const content = () => [
     m(Visualization, { method: t.pulse('corner') }),
     'Which can also be recreated with corner (crawl) + invert + flip (xy) + swap, but that is hardly effective',
     m(Visualization, { method: t.pipe(t.corner('crawl'), t.invert, t.flip('xy'), t.swap ) }),
-    "Mutations can be applied together as well, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
+    "Mutations can be applied together in many ways, and any method can be turned into a mutation. These are some that I came up with. I gave a few of them names:",
     m('h3', m(Descriptor, 'diagonal + alternate')),
     m(Visualization, { method: t.pipe(t.diagonal, t.alternate()) }),
     m('h3', 'Swirl', m(Descriptor, 'spiral + bounce + reposition + bounce')),
@@ -137,5 +139,7 @@ export const content = () => [
     m('h3', m(Descriptor, 'tile (diamond 3x3)')),
     m(Visualization, { method: t.tile(t.diamond(3,3)) }),
     m('h3', m(Descriptor, 'corner (out) + smooth')),
-    m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) })
+    m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) }),
+    m('h3', m(Descriptor, 'waterfall + reflect')),
+    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.reflect) })
 ];
