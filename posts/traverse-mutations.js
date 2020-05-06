@@ -143,5 +143,11 @@ export const content = () => [
     m('h3', m(Descriptor, 'corner (out) + smooth')),
     m(Visualization, { method: t.pipe(t.corner('out'), t.smooth()) }),
     m('h3', m(Descriptor, 'waterfall + reflect')),
-    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.reflect) })
+    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.reflect) }),
+    m('h3', m(Descriptor, 'concatenate (vertical, sliced spiral + waterfall)')),
+    m(Visualization, { method: (height, width) => t.pipe(t.spiral, t.slice({ top: 2 }))(height, width).concatenate(methods.waterfall(3,3), 'vertical')}),
+    m('h3', m(Descriptor, 'concatenate (vertical, sliced diamond + spiral)')),
+    m(Visualization, { method: (height, width) => t.pipe(t.diamond, t.slice({ top: 3 }))(example_size, example_size).concatenate(t.spiral(3, 3), 'vertical')}),
+    m('h3', m(Descriptor, 'concatenate (horizontal, sliced diamond + reposition)')),
+    m(Visualization, { method: () => t.pipe(t.diamond, t.slice({ top: 3 }))(example_size, example_size).concatenate(methods.reposition(8, 3), 'horizontal')}),
 ];

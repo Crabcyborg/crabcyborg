@@ -6,6 +6,34 @@ let traverse = {
 	// Mulberry32, a fast high quality PRNG: https://gist.github.com/tommyettinger/46a874533244883189143505d203312c
 	mb32: s=>t=>(s=s+1831565813|0,t=Math.imul(s^s>>>15,1|s),t=t+Math.imul(t^t>>>7,61|t)^t,(t^t>>>14)>>>0)/2**32,
 	// helpers
+	concatenate: (a,b,direction) => {
+		switch(direction) {
+			case 'vertical': {
+				if(a.width !== b.width) {
+					const width = Math.max(a.width, b.width);
+					if(a.width === width) b = t.tile(b, 'horizontal')(b.height, width);
+					else a = t.tile(a, 'horizontal')(a.height, width);
+				}
+				let keyed = { ...a.keyed };
+				for(let y = 0, offset = a.height*a.width; y < b.height; ++y)
+					for(let x = 0; x < b.width; ++x)
+						keyed[[x,y+a.height]] = b.keyed[[x,y]] + offset;
+				return d({ keyed, height: a.height + b.height, width: a.width });
+			}
+			case 'horizontal': {
+				if(a.height !== b.height) {
+					const height = Math.max(a.height, b.height);
+					if(a.height === height) b = t.tile(b, 'vertical')(height, b.width);
+					else a = t.tile(a, 'vertical')(height, a.width);
+				}
+				let keyed = { ...a.keyed };
+				for(let y = 0, offset = a.height*a.width; y < b.height; ++y)
+					for(let x = 0; x < b.width; ++x)
+						keyed[[x+a.width,y]] = b.keyed[[x,y]] + offset;
+				return d({ keyed, height: a.height, width: a.width + b.width });
+			}
+		}
+	},
 	details: details => {
 		const { height, width, keyed } = details, size = width * height;
 		let points = Array(size), indices = [];
@@ -14,6 +42,7 @@ let traverse = {
 				points[keyed[[x,y]]] = [x,y], indices.push(keyed[[x,y]]);
 
 		let response = { ...details, points, indices };
+		response.concatenate = (b,direction) => t.concatenate(response, b, direction);
 		response.map = callback => t.map(response, callback);
 		response.forEach = callback => t.forEach(response, callback);
 		response.reduce = (callback, initial_value) => t.reduce(response, callback, initial_value);
@@ -28,6 +57,18 @@ let traverse = {
 		for(let i = array.length - 1, j = index(i); i > 0; i--, j = index(i)) [array[i], array[j]] = [array[j], array[i]];
 		return array;
 	},
+	simplify: details => {
+		const { height, width } = details;
+		let indices = [], keyed = {};
+		for(let y = 0, index = 0; y < height; ++y)
+			for(let x = 0; x < width; ++x, ++index)
+				indices.push(parseInt(details.keyed[[x,y]]));
+		indices.sort((a,b) => a-b);
+		for(let y = 0, index = 0; y < details.height; ++y)
+			for(let x = 0; x < details.width; ++x, ++index)
+				keyed[[x,y]] = indices.indexOf(details.keyed[[x,y]]);
+		return d({ ...details, keyed });
+	},
 	triangleSize: (length, type) => {
 		let size = 0;
 		switch(type) {
@@ -35,21 +76,6 @@ let traverse = {
 			case 'right': while(length > 0) size += length--; break;
 		}
 		return size;
-	},
-	trim: details => {
-		const { keyed, height, width, spike } = details, max_x = width+spike.width, max_y = height+spike.height;
-		let indices = [], points = Array(width * height), x, y;
-
-		for(y = spike.height; y < max_y; ++y)
-			for(x = spike.width; x < max_x; ++x)
-				indices.push(parseInt(keyed[[x,y]]));
-		indices.sort((a,b) => a-b);
-	
-		for(y = spike.height; y < max_y; ++y)
-			for(x = spike.width; x < max_x; ++x)
-				points[indices.indexOf(keyed[[x,y]])] = [x - spike.width, y - spike.height];
-
-		return k(details, points);
 	},
 	visualize: (details, options) => {
 		let output = [];
@@ -111,7 +137,18 @@ let traverse = {
 	invert: details => {
 		let last = details.points.length-1, keyed = {};
 		details.forEach(({ point }, index) => keyed[point] = last - index);
-		return d({ ...details, keyed })
+		return d({ ...details, keyed });
+	},
+	slice: ({ left, right, top, bottom }) => details => {
+		if(!left) left = 0;
+		if(!right) right = details.width;
+		if(!top) top = 0;
+		if(!bottom) bottom = details.height;
+		let keyed = {};
+		for(let y = top; y < bottom; ++y)
+			for(let x = left; x < right; ++x)
+				keyed[[x - left, y - top]] = details.keyed[[x,y]];
+		return t.simplify({ ...details, keyed, height: bottom-top, width: right-left });
 	},
 	stripe: details => {
 		let offsets = [0, Math.ceil(details.height/2) * details.width], keyed = {};
@@ -303,43 +340,31 @@ t.diagonal = c(({ height }) => ['se', 0, height-1, 0, height-1, 1], ({ height, w
 ]);
 t.diamond = (height, width) => {
 	const spike = { height: Math.ceil((width-2)/2), width: Math.ceil((height-2)/2) };
-	const diamond = {
+	let diamond = {
 		height: height + spike.height*2, width: width + spike.width*2,
 		size: height * width + t.triangleSize(height-2, 'isosceles') * 2 + t.triangleSize(width-2, 'isosceles') * 2
+	}, even_height = diamond.height % 2 === 0, even_width = diamond.width % 2 === 0, base_y = Math.floor((diamond.height-1)/2), size = base_y;
+	diamond = {
+		...diamond,
+		...c(() => ['ne', 0, base_y, 0, base_y, even_width ? size+1 : size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
+			switch(direction) {
+				case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_height ? size+1 : size];
+				case 'se': return ['sw', even_height ? x-1 : x, y, base_x, base_y, even_width ? size+1 : size];
+				case 'sw': return ['nw', x, even_width ? y-1 : y, base_x, base_y, even_height ? size+1 : size];
+				case 'nw': return !even_height || size > 1 ? ['ne', ++base_x, base_y, base_x, base_y, even_width ? size-- : --size] : ['s', ++base_x, base_y, 0, 0, height];
+			}
+		}, diamond.size)(diamond.height, diamond.width)
 	};
-	let even_height = diamond.height % 2 === 0, even_width = diamond.width % 2 === 0, base_y = Math.floor((diamond.height-1)/2), size = base_y;
-	const result = c(() => ['ne', 0, base_y, 0, base_y, even_width ? size+1 : size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
-		switch(direction) {
-			case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_height ? size+1 : size];
-			case 'se': return ['sw', even_height ? x-1 : x, y, base_x, base_y, even_width ? size+1 : size];
-			case 'sw': return ['nw', x, even_width ? y-1 : y, base_x, base_y, even_height ? size+1 : size];
-			case 'nw': return !even_height || size > 1 ? ['ne', ++base_x, base_y, base_x, base_y, even_width ? size-- : --size] : ['s', ++base_x, base_y, 0, 0, height];
-		}
-	}, diamond.size)(diamond.height, diamond.width);
-	const keyed = result.keyed;
-	return t.trim({ keyed, height, width, spike, diamond: { ...diamond, keyed } });
+	return { ...t.slice({top: spike.height, bottom: diamond.height-spike.height, left: spike.width, right: diamond.width-spike.width})(diamond), spike, diamond, height, width };
 };
 t.fan = (height, width) => {
-    const half_width = width/2, half_height = height/2, hwf = Math.floor(half_width), hwc = Math.ceil(half_width), hhf = Math.floor(half_height), hhc = Math.ceil(half_height);
-	
-	let mod = -(width % 2);
-	if(width % 2 === 1 && height % 2) {
-		mod += 1;
-	}  else if(width % 2 === 0 && height % 2 === 0) {
-		mod -= 1;
-	}
-
-    return t.callback(
-        () => [ 'w', hwf - (width % 2 === 0 ? 1 : 0), hhf + mod, hwf - (1 - width % 2), hhf + mod, hwc],
-        ({ direction, x, y, base_x, base_y }) => {
-            switch(direction) {
-                case 'w': return y === 0 ? ['n', hwc, hhf + mod, hwc, hhf, hhc] : ['w', base_x, --base_y, base_x, base_y, hwc];
-                case 'n': return x === width-1 ? ['e', hwf , hhc, hwc, hhc, hwc] : ['n', ++base_x, hhf + mod, base_x, base_y, hhc];
-                case 'e': return y === height-1 ? ['s', hwf-1, hhc, hwf-1, hhc, hhf] : ['e', hwf, ++base_y, base_x, base_y, hwc];
-                case 's': return ['s', --base_x, hhc, base_x, base_y, hhf];
-            }
-        }
-    )(height, width);
+	const hw = width/2, hh = height/2, hwf = Math.floor(hw), hwc = Math.ceil(hw), hhf = Math.floor(hh), hhc = Math.ceil(hh);
+	return t.pipe(t.horizontal, t.flip('xy'))(hhc, hwc)
+		.concatenate(t.pipe(t.vertical, t.flip('y'))(hhc, hwf), 'horizontal')
+		.concatenate(
+			t.flip('x')(t.pipe(t.horizontal, t.flip('x'))(hhf, hwc).concatenate(t.vertical(hhf, hwf), 'horizontal')),
+			'vertical'
+		);
 };
 t.pulse = type => {
 	let size = 1;
@@ -383,20 +408,21 @@ t.stitch = (() => {
 })();
 t.triangle = (height, width) => {
 	const spike = { height: Math.ceil((width-2)/2), width: height-1 };
-	const triangle = {
+	let triangle = {
 		height: height + spike.height,
 		width: width + spike.width*2,
 		size: height * width + t.triangleSize(height-1, 'right') * 2 + t.triangleSize(width-2, 'isosceles')
+	}, even_width = triangle.width % 2 === 0, size = triangle.height;
+	triangle = {
+		...triangle,
+		...c(() => ['ne', 0, triangle.height-1, 0, 0, even_width ? size : --size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
+			switch(direction) {
+				case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_width ? size++ : ++size];
+				case 'se': return ['ne', ++base_x, triangle.height-1, base_x, base_y, size -= 2];
+			}
+		}, triangle.size)(triangle.height, triangle.width)
 	};
-	let even_width = triangle.width % 2 === 0, size = triangle.height;
-	const result = c(() => ['ne', 0, triangle.height-1, 0, 0, even_width ? size : --size], ({ direction, height, width, x, y, base_x, base_y, index }) => {
-		switch(direction) {
-			case 'ne': return ['se', x, even_width ? y+1 : y, base_x, base_y, even_width ? size++ : ++size];
-			case 'se': return ['ne', ++base_x, triangle.height-1, base_x, base_y, size -= 2];
-		}
-	}, triangle.size)(triangle.height, triangle.width);
-	const keyed = result.keyed;
-	return t.trim({ keyed, height, width, spike, triangle: { ...triangle, keyed } });
+	return { ...t.slice({top: spike.height, left: spike.width, right: triangle.width-spike.width})(triangle), spike, triangle, height, width };
 };
 
 if(typeof module !== 'undefined') module['exports'] = { traverse };
