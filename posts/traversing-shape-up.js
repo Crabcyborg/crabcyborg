@@ -7,6 +7,8 @@ import { traverse as t } from 'traverse-grid';
 
 export const title = 'Traversing Shape Up Components';
 
+const traverse_grid_url = 'https://github.com/Crabcyborg/traverse-grid';
+
 const example_size = 7;
 const size = 5;
 let diamond;
@@ -56,6 +58,7 @@ const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height:
 
 export const content = () => [
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'minimizing-large-shape-up'}), ', I mention that I can get a shape smaller by traversing the array from different directions.'),
+    m('p', "I have developed a package dedicated to handling all of my traversing, available ", m('a', {href: traverse_grid_url, target: '_blank'}, 'on github'), '.'),
     m('h3', 'Horizontal'),
     "The most common way to traverse an array.",
     m(Visualization, { method: t.horizontal }),
