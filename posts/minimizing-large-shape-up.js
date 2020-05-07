@@ -5,7 +5,7 @@ import { shapes as optimized } from '$app/shapeup/shapes-optimized';
 import { bestMethod, methods, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 const compress = min.compress, decompress = min.decompress;
-import { traverse as t } from '$app/traverse-grid';
+import { traverse as t } from 'traverse-grid';
 
 export const title = 'Minimizing a Large Shape Up Component';
 

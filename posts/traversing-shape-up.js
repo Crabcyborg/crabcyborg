@@ -3,7 +3,7 @@ import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { Gradient, Example, methods, applyOffOn, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
-import { traverse as t } from '$app/traverse-grid';
+import { traverse as t } from 'traverse-grid';
 
 export const title = 'Traversing Shape Up Components';
 

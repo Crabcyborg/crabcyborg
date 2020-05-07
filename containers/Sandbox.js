@@ -3,7 +3,7 @@ import { ShapeUp } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import {  } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
-import { traverse as t } from '$app/traverse-grid';
+import { traverse as t } from 'traverse-grid';
 
 const oninit = v => {
 //	t.forEach(t.vertical(5,5), ({index}) => console.log(index));

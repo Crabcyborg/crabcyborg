@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { ShapeUp } from '$app/components';
 import { min } from 'min-string';
-import { traverse as t } from '$app/traverse-grid';
+import { traverse as t } from 'traverse-grid';
 import { shapes } from '$app/shapeup/shapes';
 import { colors } from '$app/shapeup/colors';
 

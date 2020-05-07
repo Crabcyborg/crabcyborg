@@ -3,7 +3,7 @@ import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
 import { Gradient, Example, bestMethod, bestSeed, applyOffOn, repositionBase49Limit, methods } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
-import { traverse as t } from '$app/traverse-grid';
+import { traverse as t } from 'traverse-grid';
 
 export const title = 'Traverse Grid Mutations';
 
@@ -85,6 +85,10 @@ const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height:
 const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
+    m(Visualization, { method: () => t.spiral(5,5).concatenate(t.diamond(5,5), 'horizontal') } ),
+    
+
+
     "With traverse-grid it is really easy to apply mutations to methods.",
     m('p', 'In an earlier post, ', m(GoToPost, {key: 'traversing-shape-up'}), ', I briefly go over several mutations including alternate, flip, reposition, waterfall, reflect, bounce and rotate.'),
     "Some other supported mutations applied to the horizontal pattern that do not outperform some of my preferred methods for my library:",

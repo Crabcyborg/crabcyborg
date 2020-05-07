@@ -5,7 +5,8 @@
   "dependencies": {
     "animejs": "^3.1.0",
     "min-string": "^1.0.6",
-    "mithril": "^1.1.6"
+    "mithril": "^1.1.6",
+    "traverse-grid": "^1.0.1"
   },
   "devDependencies": {
     "file-loader": "^5.0.2",
