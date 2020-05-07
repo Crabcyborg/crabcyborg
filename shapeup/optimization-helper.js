@@ -37,7 +37,7 @@ const prefix_by_key = {
 	straight_smooth: ']]L',
 	smooth_x2: ']]M',
 	straight_smooth_x2: ']]N',
-	turn_rotated: ']]O',
+	rotated_alternate: ']]O',
 	skew: ']]P',
 	alternate_diagonal: ']]Q',
 	straight_smooth_x5: ']]R',
@@ -45,7 +45,12 @@ const prefix_by_key = {
 	step2: ']]T',
 	step3: ']]U',
 	step4: ']]V',
-	pulse: ']]W'
+	cinnamon_roll: ']]W',
+	watertile: ']]X',
+	watertile2: ']]Y',
+	watertile3: ']]Z',
+	rotated_watertile: ']]_',
+	rotated_waterfall: ']]@'
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
@@ -57,7 +62,7 @@ export const flatten = input => {
 		for(let target of targets) flat.push((input[index] & target) != 0 ? 1 : 0);
 	}
 	return flat;
-}
+};
 
 export const spread = input => {
 	let values = [], previous = 0;
@@ -253,7 +258,20 @@ export const unsubRepositionPatterns = input => unsubPatterns(input, min.three_c
 export const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, repositionOffOn);
 export const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
+/*
+triangle, triangle_rotated, snake_rotated, donut, clover, bacon, shift, stripe, smooth,
+skew, step3, step4, corner_in, corner_out, corner_crawl, pulse_corner, climb, cascade, fan
+*/
+
 export const bestMethod = (shape, mirrored) => {
+	let m = { compressed: min.compress(shape) };
+	for(let method of ['horizontal', 'vertical', 'spiral', 'diagonal', 'diamond', 'snake', 'stitch', 'double'])
+		m[method] = t[method];
+	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'split', 'reflect', 'waterfall', 'straight_smooth', 'smooth_x2', 'straight_smooth_x2', 'alternate_diagonal', 'straight_smooth_x5', 'step2', 'watertile', 'watertile2', 'watertile3', 'cinnamon_roll', 'rotated_watertile', 'rotated_waterfall'])
+		m[method] = methods[method];
+
+	const keys = Object.keys(m);
+
 	let on_by_default_by_result = {};
 	const repositionCompress = method => {
 		let on_by_default = false;
@@ -268,134 +286,35 @@ export const bestMethod = (shape, mirrored) => {
 		return result;
 	};
 
-	mirrored === undefined && (mirrored = false);
+	let log = [], best = false;
+	for(let key of keys) {
+		let string = typeof m[key] === 'function' ? repositionCompress(m[key]) : m[key], length = string.length;
+		log.push({key, string, length});
+		if(best && best.length < length) continue;
+		if(!best || length < best.length) best = { length, methods: [key], strings: [string] };
+		else best.methods.push(key), best.strings.push(string);
+	}
 
-	let compressed = min.compress(shape);
-	let horizontal = repositionCompress(t.horizontal);
-	let vertical = repositionCompress(t.vertical);
-	let spiral = repositionCompress(t.spiral);
-	let diagonal = repositionCompress(t.diagonal);
-	let diamond = repositionCompress(t.diamond);
-	let snake = repositionCompress(t.snake);
-	let triangle_flipped = repositionCompress(t.pipe(t.triangle, t.flip('y')));
-	let alternate = repositionCompress(methods.alternate);
-	let turn_rotated = repositionCompress(methods.turn_rotated);
-	let reposition = repositionCompress(methods.reposition);
-	let bounce = repositionCompress(methods.bounce);
-	let leap = repositionCompress(methods.leap);
-	let split = repositionCompress(methods.split);
-	let reflect = repositionCompress(methods.reflect);
-	let waterfall = repositionCompress(methods.waterfall);
-	let stitch = repositionCompress(t.stitch);
-	let straight_smooth = repositionCompress(methods.straight_smooth);
-	let smooth_x2 = repositionCompress(methods.smooth_x2);
-	let straight_smooth_x2 = repositionCompress(methods.straight_smooth_x2);
-	let alternate_diagonal = repositionCompress(methods.alternate_diagonal);
-	let straight_smooth_x5 = repositionCompress(methods.straight_smooth_x5);
-	let double = repositionCompress(t.double);
-	let step2 = repositionCompress(t.pipe(t.horizontal, t.step(2)));
-	let pulse = repositionCompress(t.pulse());
-//	let fan = repositionCompress(t.fan);
-//	let cascade = repositionCompress(t.cascade);
-//	let climb = repositionCompress(t.climb);
-//	let triangle = repositionCompress(t.triangle);
-//	let triangle_rotated = repositionCompress(t.pipe(t.triangle, t.swap));
-//	let snake_rotated = repositionCompress(t.rotate(t.snake));
-//	let swirl = repositionCompress(methods.swirl);
-//	let donut = repositionCompress(methods.donut);
-//	let clover = repositionCompress(methods.clover);
-//	let bacon = repositionCompress(methods.bacon);
-//	let shift = repositionCompress(methods.shift);
-//	let stripe = repositionCompress(methods.stripe);
-//	let smooth = repositionCompress(methods.smooth);
-//	let skew = repositionCompress(methods.skew);
-//	let step3 = repositionCompress(t.pipe(t.horizontal, t.step(3)));
-//	let step4 = repositionCompress(t.pipe(t.horizontal, t.step(4)));
-//	let corner_in = repositionCompress(methods.corner_in);
-//	let corner_out = repositionCompress(methods.corner_out);
-//	let corner_crawl = repositionCompress(methods.corner_crawl);
-//	let pulse_corner = repositionCompress(t.pulse('corner'));
-
-	let string_by_key = {
-		compressed, horizontal, vertical, spiral, diagonal, diamond, snake, triangle_flipped, alternate, turn_rotated,
-		reposition, bounce, leap, split, reflect, waterfall, stitch, straight_smooth, smooth_x2, straight_smooth_x2,
-		alternate_diagonal, straight_smooth_x5, double, step2, pulse
-		/*triangle,*/ /*triangle_rotated,*//*snake_rotated,*//*swirl, donut,*//*clover, bacon,*//*shift,*//* stripe,*//*smooth,*/
-		/*skew,*//*, step3, step4, corner_in, corner_out*//*, corner_crawl*//*, pulse_corner*//*climb*//*cascade*//*fan*/
-	};
-	let key_by_value = {
-		[compressed.length]: 'compressed',
-		[horizontal.length]: 'horizontal',
-		[vertical.length]: 'vertical',
-		[spiral.length]: 'spiral',
-		[diagonal.length]: 'diagonal',
-		[diamond.length]: 'diamond',
-		[snake.length]: 'snake',
-		[triangle_flipped.length]: 'triangle_flipped',
-		[alternate.length]: 'alternate',
-		[turn_rotated.length]: 'turn_rotated',
-		[reposition.length]: 'reposition',
-		[bounce.length]: 'bounce',
-		[leap.length]: 'leap',
-		[split.length]: 'split',
-		[reflect.length]: 'reflect',
-		[waterfall.length]: 'waterfall',
-		[stitch.length]: 'stitch',
-		[straight_smooth.length]: 'straight_smooth',
-		[smooth_x2.length]: 'smooth_x2',
-		[straight_smooth_x2.length]: 'straight_smooth_x2',
-		[straight_smooth_x5.length]: 'straight_smooth_x5',
-		[double.length]: 'double',
-		[step2.length]: 'step2',
-		[pulse.length]: 'pulse',
-//		[fan.length]: 'fan'
-//		[cascade.length]: 'cascade'
-//		[climb.length]: 'climb'
-//		[triangle.length]: 'triangle',
-//		[triangle_rotated.length]: 'triangle_rotated',
-//		[snake_rotated.length]: 'snake_rotated',
-//		[swirl.length]: 'swirl',
-//		[donut.length]: 'donut',
-//		[clover.length]: 'clover',
-//		[bacon.length]: 'bacon',
-//		[shift.length]: 'shift',
-//		[stripe.length]: 'stripe',
-//		[smooth.length]: 'smooth',
-//		[skew.length]: 'skew',
-//		[alternate_diagonal.length]: 'alternate_diagonal',
-//		[step3.length]: 'step3',
-//		[step4.length]: 'step4',
-//		[corner_in.length]: 'corner_in',
-//		[corner_out.length]: 'corner_out',
-//		[corner_crawl.length]: 'corner_crawl',
-//		[pulse_corner.length]: 'pulse_corner'
-	};
-	let swapped = Object.assign({}, ...Object.entries(key_by_value).map(([a,b]) => ({ [b]: a })));
-	let smallest = Math.min(
-		compressed.length, horizontal.length, vertical.length, spiral.length, diagonal.length, diamond.length, snake.length,
-		triangle_flipped.length, alternate.length, turn_rotated.length, reposition.length, bounce.length, split.length, reflect.length,
-		waterfall.length, stitch.length, straight_smooth.length, smooth_x2.length, straight_smooth_x2.length, leap.length,
-		straight_smooth_x5.length, double.length, step2.length,
-		/*alternate_diagonal.length,*//*triangle.length,*/  /*triangle_rotated.length,*/ /*snake_rotated.length,*/
-		/*swirl.length, donut.length,*/ /*clover.length, bacon.length,*/  /*shift.length,*//* stripe.length,*/ /*smooth.length,*//*skew.length,*/ 
-		/*step3.length, step4.length, corner_in.length, corner_out.length*//*, corner_crawl.length*//*, pulse_corner.length*//*cascade.length*/
-	);
-	let method = smallest === compressed.length ? 'compressed' : key_by_value[smallest];
-	let length = parseInt(swapped[key_by_value[smallest]]);
-	let raw_length = shape.join(',').length;
-	let ratio = Math.round(length / (mirrored || raw_length) * 10000) / 100;
+	const raw_length = shape.join(',').length;
 
 	if(!mirrored && isSymmetricalHorizontally(shape)) {
 		const best_half = bestMethod(half(shape), raw_length);
-
-		if(best_half.length < length) {
-			best_half.string = (shape[1] % 2 === 1 ? '[' : ')') + best_half.string;
-			return best_half;
-		}
+		if(best_half.best.length < best.length) return best_half;
 	}
 
-	const string = (on_by_default_by_result[string_by_key[method]] ? '_' : '') + prefix_by_key[method] + string_by_key[method];
-	return { method, length, string, mirrored, swapped, ratio, vertical_symmetry: isSymmetricalVertically(shape) };
+	let strings = [], index = 0;
+	for(let string of best.strings) {
+		let key = best.methods[index], on_by_default = on_by_default_by_result[string];
+		string = prefix_by_key[key] + string;
+		if(on_by_default) string = '_' + string;
+		if(mirrored) string = (shape[1] % 2 === 1 ? '[' : ')') + string;
+		strings.push(string);
+		++index;
+	}
+ 
+	best.strings = strings;
+
+	return { best, log, ratio: Math.round(best.length / (mirrored || raw_length) * 10000) / 100 };
 };
 
 export const matchMethod = shape => {
@@ -408,11 +327,9 @@ export const matchMethod = shape => {
 	let prefixes = Object.keys(key_by_prefix);
 	prefixes.reverse();
 
-	for(let prefix of prefixes) {
-		if(shape[0] === prefix[0] && (prefix.length < 2 || shape[1] === prefix[1]) && (prefix.length < 3 || shape[2] === prefix[2])) {
+	for(let prefix of prefixes)
+		if(shape[0] === prefix[0] && (prefix.length < 2 || shape[1] === prefix[1]) && (prefix.length < 3 || shape[2] === prefix[2]))
 			return { prefix, key: key_by_prefix[prefix], string: shape.substr(prefix.length), mirrored, mirror_even, mirror_odd, on_by_default };
-		}
-	}
 
 	return { prefix: '', key: shape.indexOf(',') > 0 ? 'raw' : 'compressed', string: shape, mirrored, mirror_even, mirror_odd, on_by_default };
 };
@@ -483,19 +400,17 @@ const examples = {
     alternate: 'PAC',
     bounce: 'CASH',
 	leap: 'PLANE',
-	reflect: 'GIN',
 	waterfall: 'CHAIR',
-	pulse: 'TRUNK',
 	stitch: 'NOTE',
 	straight_smooth_x2: 'SPACE',
 	straight_smooth: 'BUZZ',
-	double: 'HOUSE'
+	watertile: 'RAIN'
 };
 
 export const Example = {
     oninit: v => {
-        const { method } = v.attrs, shape = shapes[examples[method]], best = bestMethod(shape);
-        v.state = { shape, best };
+        const { method } = v.attrs, shape = shapes[examples[method]], { best, ratio } = bestMethod(shape);
+        v.state = { shape, best, methods: best.methods.join(', '), ratio, url: `/shapeup/${best.strings[0]}` };
     },
     view: v => m(
         'div',
@@ -503,13 +418,15 @@ export const Example = {
         m(
             '.mono',
             {},
-            v.state.best.method, ' ',
-            v.state.best.ratio, '% ',
+            v.state.methods, ' ',
+            v.state.ratio, '% ',
             v.state.best.length, ' characters ',
-            m('a.break', { href: `/shapeup/${v.state.best.string}`, target: '_blank' }, `/shapeup/${v.state.best.string}`) 
+            m('a.break', { href: v.state.url, target: '_blank' }, v.state.url)
         )
     )
 };
+
+export const watertile = size => (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall)(size || 1, width), 'vertical')(height, width);
 
 export const methods = {
 	split: t.pipe(t.horizontal, t.split),	
@@ -531,7 +448,7 @@ export const methods = {
 	straight_smooth: t.pipe(t.horizontal, t.smooth('straight')),
 	smooth_x2: t.pipe(t.horizontal, t.repeat(t.smooth(), 2)),
 	straight_smooth_x2: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 2)),
-	turn_rotated: t.rotate(t.pipe(t.horizontal, t.alternate())),
+	rotated_alternate: t.rotate(t.pipe(t.horizontal, t.alternate())),
 	skew: t.pipe(t.horizontal, t.skew),
 	alternate_diagonal: t.pipe(t.horizontal, t.alternate('diagonal')),
 	straight_smooth_x5: t.pipe(t.horizontal, t.smooth('straight', 5)),
@@ -541,9 +458,15 @@ export const methods = {
 	corner_in: t.corner('in'),
 	corner_out: t.corner('out'),
 	corner_crawl: t.corner('crawl'),
-	pulse: t.pulse(),
+	pulse_edge: t.pulse('edge'),
 	pulse_corner: t.pulse('corner'),
-	fold: t.pipe(t.horizontal, t.fold)
+	fold: t.pipe(t.horizontal, t.fold),
+	watertile: watertile(),
+	watertile2: watertile(2),
+	watertile3: watertile(3),
+	cinnamon_roll: t.tile(t.spiral(3,3), 'horizontal'),
+	rotated_watertile: (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall, t.swap)(1, height), 'vertical')(height, width),
+	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall))
 };
 
 export const bestSeed = (shape, from, to) => {

@@ -45,7 +45,7 @@ export const oninit = () => {
 	first.limited = onOffLimit(first.on_off_vertical, 63);
 	first.vertical = repositionBase49Limit(first.on_off_vertical);
 	first.vertical_url = `/shapeup/~${first.vertical}`;
-	first.best = repositionBase49Limit(applyOnOff(first.raw, methods.turn_rotated));
+	first.best = repositionBase49Limit(applyOnOff(first.raw, methods.rotated_alternate));
 	first.best_url = `/shapeup/]]O${first.best}`;
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
@@ -54,8 +54,8 @@ export const oninit = () => {
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
-	third.best = bestMethod(third.raw);
-	third.best_url = `/shapeup/${third.best.string}`;
+	third.best = bestMethod(third.raw).best;
+	third.best_url = `/shapeup/${third.best.strings[0]}`;
 	url = `/shapeup/|${first.on_off_compressed}`;
 	alternative_url = `/shapeup/}${first.alternative}`;
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
@@ -63,7 +63,7 @@ export const oninit = () => {
 	alternative_base82_url = `/shapeup/*${base82}`;
 	second.on_off_spiral = applyOnOff(second.raw, t.spiral);
 	second.spiral_minimized = repositionBase49Limit(second.on_off_spiral);
-	second.half = bestMethod(second.raw).string;
+	second.half = bestMethod(second.raw).best.strings[0];
 	second.half_url = `/shapeup/${second.half}`;
 };
 
@@ -120,7 +120,7 @@ export const content = () => [
 	m('p.break', third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
 	m('div.mt2', m('a.break', { href: third.repositioned_url, target: '_blank' }, third.repositioned_url)),
-	m('p.f7', 'Using the ', third.best.method, ' method described in ', m(GoToPost, {style: { fontSize: '.75rem' }, key: 'traversing-shape-up'}), ' I can get our bee down to ', third.best.length, ' characters! ', m('a.f7.break', { href: third.best_url, target: '_blank' }, third.best_url)),
+	m('p.f7', 'Using the ', third.best.methods[0], ' method described in ', m(GoToPost, {style: { fontSize: '.75rem' }, key: 'traversing-shape-up'}), ' I can get our bee down to ', third.best.length, ' characters! ', m('a.f7.break', { href: third.best_url, target: '_blank' }, third.best_url)),
 	m('p', "Our eiffel tower, at ", second.repositioned_base49.length, " characters, is an example of a shape that still works better with the previous method."),
 	m('div.mt2', m('a.break', { href: second.repositioned_url, target: '_blank' }, second.repositioned_url)),
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),

@@ -9,8 +9,7 @@ export const title = 'Traversing Shape Up Components';
 
 const example_size = 7;
 const size = 5;
-
-let diamond, triangle;
+let diamond;
 
 export const oninit = () => {
     diamond = t.diamond(example_size, example_size);
@@ -51,55 +50,6 @@ export const oninit = () => {
     diamond.actual_diamond_configuration = applyOffOn(diamond.actual_on_off_diamond, t.diamond);
     diamond.actual_diamond_compressed = repositionBase49Limit(diamond.actual_on_off_diamond);
     diamond.actual_diamond_url = `/shapeup/]${diamond.actual_diamond_compressed}`;
-
-    triangle = t.triangle(example_size, example_size);
-    triangle.visualization = (() => {
-        let { spike } = triangle, visualization = [];
-        const { keyed, height, width } = triangle.triangle;
-        for(let y = 0; y < height; ++y) {
-            let row = [];    
-            for(let x = 0; x < width; ++x) {
-                if(keyed[[x,y]] !== undefined) {
-                    row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
-                } else {
-                    if(x >= spike.width && x < width-spike.width && y >= spike.height && y < height-spike.height) {
-                        row.push('__');
-                    } else {
-                        row.push('  ');
-                    }
-                }
-            }
-        
-            visualization.push(row.join(' '));
-        }
-
-        return visualization.join('\n');
-    })();
-    triangle.trimmed = (() => {
-        let { spike } = triangle, trimmed = [];
-        const { keyed, height, width } = triangle.triangle;
-        for(let y = spike.height; y < example_size+spike.height; ++y) {
-            let row = [];
-            for(let x = spike.width; x < example_size+spike.width; ++x) row.push(`${keyed[[x,y]]}`.padStart(2,'0'));
-            trimmed.push(row.join(' '));
-        }
-
-        return trimmed.join('\n');
-    })();
-    triangle.actual_on_off_triangle = [9,17,72,81];
-    triangle.actual_on_off_triangle_swapped_dimensions = [17,9,72,81];
-
-    triangle.actual_triangle_configuration = applyOffOn(triangle.actual_on_off_triangle, t.triangle);
-    triangle.actual_triangle_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
-    triangle.actual_triangle_url = `/shapeup/--${triangle.actual_triangle_compressed}`;
-    triangle.flipped = t.pipe(t.triangle, t.flip('y'))(example_size, example_size);
-    triangle.flipped_configuration = applyOffOn(triangle.actual_on_off_triangle, t.pipe(t.triangle, t.flip('y')));
-    triangle.flipped_compressed = repositionBase49Limit(triangle.actual_on_off_triangle);
-    triangle.flipped_url = `/shapeup/~~${triangle.flipped_compressed}`;
-    triangle.rotated = t.pipe(t.triangle, t.swap)(example_size, example_size);
-    triangle.rotated_configuration = applyOffOn(triangle.actual_on_off_triangle_swapped_dimensions, t.triangle, true);
-    triangle.rotated_compressed = repositionBase49Limit(triangle.actual_on_off_triangle_swapped_dimensions);
-    triangle.rotated_url = `/shapeup/\`\`${triangle.rotated_compressed}`;
 };
 
 const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: example_size, width: example_size }) };
@@ -135,14 +85,6 @@ export const content = () => [
     m(Visualization, { method: t.pipe(t.horizontal, t.waterfall) } ),
     'The waterfall is the best method for traversing our chair:',
     m(Example, { method: 'waterfall' }),
-    m('h3', 'Reflect'),
-    m(Visualization, { method: methods.reflect }),
-    'The reflect method is a pretty simple mutation. It is the best method for traversing our martini glass:',
-    m(Example, { method: 'reflect' }),
-    m('h3', 'Stitch'),
-    m(Visualization, { method: t.pipe(t.stitch) } ),
-    'Stitch zig zags in pairs along two cell columns until it fills a space. It is the best method for traversing our note:',
-    m(Example, { method: 'stitch' }),
     m('h3', 'Diagonal'),
     "The diagonal method does not win out very often, but when it does it can be very effective.",
     m(Visualization, { method: t.diagonal }),
@@ -165,34 +107,10 @@ export const content = () => [
     m('p', 'The entire url for this diamond is ', m('a.break', { href: diamond.actual_diamond_url, target: '_blank' }, diamond.actual_diamond_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', diamond.actual_on_off_diamond.join(','), '.'),
     "It is also the best way to traverse our moon:",
     m(Example, { method: 'diamond' }),
-    m('h3', 'Double'),
-    'The double method as a 2x2 horizontal variation of the Tile method. It works like the horizontal method but 2 pixels at a time, covering 2 rows in each iteration. It is the best method for traversing blockier looking shapes, including our house:',
-    m(Visualization, { method: t.double }),
-    m(Example, { method: 'double' }),
     m('h3', 'Snake'),
     'The snake method is a 2x2 alternated vertical variation of the Tile method. It works like the horizontal method but instead of always moving to the right, it wiggles down and up throughout the process covering two rows at a time. It is the best method for traversing our dolphin.',
     m(Visualization, { method: t.snake }),
-    m(Example, { method: 'snake' }),
-    m('h3', 'Pulse (edge)'),
-    m(Visualization, { method: t.pulse() }),
-    'It is the best way to traverse our elephant:',
-    m(Example, { method: 'pulse' }),
-    m('h3', 'Triangle'),
-    'The triangle method is pretty similar to the diamond method:',
-    m('pre.mono', triangle.visualization),
-    'Trimmed:',
-    m('pre.mono', triangle.trimmed),
-    'And reduced:',
-    m(Visualization, { method: t.triangle }),
-    'It works better than anything else if your shape is this exact type of triangle',
-    m(ShapeUp, { configuration: triangle.actual_triangle_configuration, size: 6 }),
-    m('p', 'The entire url for this triangle is ', m('a.break', { href: triangle.actual_triangle_url, target: '_blank' }, triangle.actual_triangle_url), ' because it is just 1 on value and 1 off value. The raw data is simply ', triangle.actual_on_off_triangle.join(','), '.'),
-    'However none of the shapes in my library are smallest using this exact triangle. It\'s a good thing we can flip the pattern and try the same thing upside down.',
-    m(Visualization, { method: t.pipe(t.triangle, t.flip('y')) }),    
-    m(ShapeUp, { configuration: triangle.flipped_configuration, size: 6 }),
-    m('div', m('a.break', { href: triangle.flipped_url, target: '_blank' }, triangle.flipped_url)),
-    'The upside down triangle method is the best method for traversing our checkmark.',
-    m(Example, { method: 'triangle' }),
+    m(Example, { method: 'snake' })
  /*
     'Why stop at just flipping it when the triangle method can be rotated as well?',
     m(Visualization, { method: t.pipe(t.triangle, t.swap) }),  
