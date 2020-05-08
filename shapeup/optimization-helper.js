@@ -266,9 +266,9 @@ skew, step3, step4, corner_in, corner_out, corner_crawl, pulse_corner, climb, ca
 
 export const bestMethod = (shape, mirrored) => {
 	let m = { compressed: min.compress(shape) };
-	for(let method of ['horizontal', 'vertical', 'spiral', 'diagonal', 'diamond', 'snake', 'stitch', 'double'])
+	for(let method of ['horizontal', 'vertical', 'spiral', 'diagonal', 'diamond', 'snake', 'stitch'])
 		m[method] = t[method];
-	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'split', 'reflect', 'waterfall', 'straight_smooth', 'smooth_x2', 'straight_smooth_x2', 'alternate_diagonal', 'straight_smooth_x5', 'step2', 'watertile', 'watertile2', 'watertile3', 'cinnamon_roll', 'rotated_watertile', 'rotated_waterfall'])
+	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'waterfall', 'straight_smooth', 'straight_smooth_x2',  'straight_smooth_x5', 'step2', 'watertile', 'watertile2', 'cinnamon_roll', 'rotated_watertile', 'rotated_waterfall'])
 		m[method] = methods[method];
 
 	const keys = Object.keys(m);
