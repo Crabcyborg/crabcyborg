@@ -6,14 +6,12 @@ import { shapes } from '$app/shapeup/shapes';
 import { colors } from '$app/shapeup/colors';
 
 const targets = [128,64,32,16,8,4,2,1];
-const base82_symbols = min.base64_symbols + min.counter_symbols + min.additional_symbols + min.three_character_permutations_symbols + min.two_character_permutations_symbols;
 
 const prefix_by_key = {
 	compressed: '',
 	on_off: '|',
 	alternative: '}',
 	alternative_base49: '^',
-	alternative_base82: '*',
 	horizontal: '-',
 	vertical: '~',
 	spiral: '`',
@@ -235,7 +233,6 @@ export const repositionTopPatterns = input => topPatterns(input, min.three_chara
 export const toBase49 = input => input.map(index => min.base64_symbols[index]).join('');
 export const repositionBase49 = min.pipe(repositionOnOff, toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
 export const repositionBase49Limit = min.pipe(repositionOnOff, input => onOffLimit(input, 63), toBase49, min.counter, repositionTopPatterns, min.twoCharacterPermutations);
-export const toBase82 = input => input.slice(0, 2).join(',') + ',' + input.slice(2).map(index => base82_symbols[index]).join('');
 
 export const unsubPatterns = (input, symbols) => {
 	symbols === undefined && (symbols = min.three_character_permutations_symbols + min.counter_symbols);
@@ -247,12 +244,6 @@ export const unsubPatterns = (input, symbols) => {
 
 export const alternativeDecompress = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTwoMostCommonPatterns, min.toDecimal);
 export const base49ToDecimal = input => input.split('').map(character => min.base64_symbols.indexOf(character));
-
-export const base82ToDecimal = input => {
-	const split = input.split(',');
-	console
-	return [ split[0], split[1], ...split[2].split('').map(character => base82_symbols.indexOf(character)) ];
-};
 
 export const alternativeDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubPatterns, min.unsubTopTwoPatterns, base49ToDecimal);
 export const unsubRepositionPatterns = input => unsubPatterns(input, min.three_character_permutations_symbols);
@@ -350,7 +341,6 @@ export const handleString = shape => {
 			case 'on_off': return offOn(min.decompress(shape));
 			case 'alternative': return offOn(alternativeDecompress(shape));
 			case 'alternative_base49': return offOn(alternativeDecompressBase49(shape));
-			case 'alternative_base82': return offOn(base82ToDecimal(shape));
 		}
 		if(methods[key] !== undefined) return offOnDecompress(methods[key]);
 		if(t[key] !== undefined) return offOnDecompress(t[key]);

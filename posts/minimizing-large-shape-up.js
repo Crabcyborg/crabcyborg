@@ -1,21 +1,19 @@
 import m from 'mithril';
+import { traverse as t } from 'traverse-grid';
+import { min } from 'min-string';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { shapes as optimized } from '$app/shapeup/shapes-optimized';
-import { bestMethod, methods, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit, toBase82 } from '$app/shapeup/optimization-helper';
-import { min } from 'min-string';
-const compress = min.compress, decompress = min.decompress;
-import { traverse as t } from 'traverse-grid';
+import { bestMethod, methods, applyOnOff, repositionOnOff, onOffLimit, half, topPatterns, toBase49, repositionBase49, repositionBase49Limit } from '$app/shapeup/optimization-helper';
 
 export const title = 'Minimizing a Large Shape Up Component';
 
-let data, url, first, second, third, alternative_url, alternative_base49_url, base82, alternative_base82_url;
+let data, url, first, second, third;
 const alternative = min.pipe(min.toBase64, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 const alternativeBase49 = min.pipe(toBase49, min.twoMostCommonPatterns, topPatterns, min.twoCharacterPermutations);
 
 const meta = key => {
 	const raw = shapes[key];
-	const compressed = compress(raw);
+	const compressed = min.compress(raw);
 	const compressed_length = compressed.length;	
 	const raw_length = raw.length;
 	const raw_csv = raw.join(',');
@@ -24,7 +22,7 @@ const meta = key => {
 	const on_off_length = on_off.length;
 	const on_off_csv = on_off.join(',');
 	const on_off_csv_length = on_off_csv.length;	
-	const on_off_compressed = compress(on_off);
+	const on_off_compressed = min.compress(on_off);
 	const on_off_compressed_length = on_off_compressed.length;
 	const on_off_max = Math.max(...on_off);
 	return {raw, compressed, compressed_length, raw_length, raw_csv, raw_csv_length, on_off, on_off_length, on_off_csv, on_off_csv_length, on_off_compressed, on_off_compressed_length, on_off_max};
@@ -38,31 +36,32 @@ export const oninit = () => {
 	first = data[examples[0]];
 	second = data[examples[1]];
 	third = data[examples[2]];
+
 	first.alternative = alternative(first.on_off);
-	third.alternative = alternative(third.on_off);
-	third.on_off_base49 = alternativeBase49(third.on_off);
 	first.on_off_vertical = applyOnOff(first.raw, t.vertical);
 	first.limited = onOffLimit(first.on_off_vertical, 63);
 	first.vertical = repositionBase49Limit(first.on_off_vertical);
 	first.vertical_url = `/shapeup/~${first.vertical}`;
 	first.best = repositionBase49Limit(applyOnOff(first.raw, methods.rotated_alternate));
 	first.best_url = `/shapeup/]]O${first.best}`;
+	first.on_off_url = `/shapeup/|${first.on_off_compressed}`;
+	first.alternative_url = `/shapeup/}${first.alternative}`;
+
 	second.repositioned_base49 = repositionBase49(second.on_off);
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 	second.vertical = repositionBase49(applyOnOff(second.raw, t.vertical));
 	second.vertical_url = `/shapeup/~${second.vertical}`;
+	second.half = bestMethod(second.raw).best.strings[0];
+	second.half_url = `/shapeup/${second.half}`;
+
+	third.alternative = alternative(third.on_off);
+	third.on_off_base49 = alternativeBase49(third.on_off);
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
 	third.best = bestMethod(third.raw).best;
 	third.best_url = `/shapeup/${third.best.strings[0]}`;
-	url = `/shapeup/|${first.on_off_compressed}`;
-	alternative_url = `/shapeup/}${first.alternative}`;
-	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
-	base82 = toBase82(first.on_off);
-	alternative_base82_url = `/shapeup/*${base82}`;
-	second.half = bestMethod(second.raw).best.strings[0];
-	second.half_url = `/shapeup/${second.half}`;
+	third.alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 };
 
 export const content = () => [
@@ -76,7 +75,7 @@ export const content = () => [
 	m('p.mb0', 'Compressed Length: ', first.compressed_length),
 	m('p.mt0', 'Compressed On/Off Length: ', first.on_off_compressed_length),
 	m('p', "Our On/Off version is ", Math.round(first.compressed_length / first.on_off_compressed_length * 10) / 10, "x smaller than the previous optimized size and ", Math.round(first.raw_csv_length / first.on_off_compressed_length * 10) / 10, "x smaller than the original raw data."),
-	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: url, target: '_blank' }, url)),
+	m('div.mt2', m('a', { style: { wordWrap: 'break-word' }, href: first.on_off_url, target: '_blank' }, first.on_off_url)),
 	"This is not a holy grail solution as it relies heavily on the consistency of the on and off patterns. Let's explore how it works on a few other shapes:",
 	m(ShapeUp, {configuration: second.raw, size: 4}),
 	m(
@@ -107,13 +106,13 @@ export const content = () => [
 	m('p.mt0', 'Alternative Compressed On/Off Length: ', third.alternative.length),
 	m('p', "A ton of functions do nothing in this situation so I've removed several and used the characters for counters and three character permutations to replace more top patterns instead, getting my payload down by ", third.on_off_compressed_length - third.alternative.length, " characters."),
 	m('p', "The original method is still better, but this new function can be used to bring vizsla down to ", first.alternative.length, " characters, ", first.on_off_compressed_length - first.alternative.length, " fewer than before."),
-	m('div.mt2', m('a.break', { href: alternative_url, target: '_blank' }, alternative_url)),	
+	m('div.mt2', m('a.break', { href: first.alternative_url, target: '_blank' }, first.alternative_url)),	
 	m('p', "To find a pattern, it always helps to see the data you're working with:"),
 	m('p.break', third.on_off_csv),
 	m('p', 'No values ever exceed ', third.on_off_max, ', so I can get this a lot smaller if I drop support for values up to 255.'),
 	'If I treat each value as an index in my array of base 64 characters, I can support any gap up to 63 with just a single character, immediately reducing the size of our base 64 string by 25%.',
 	m('p', 'Our bumble bee is down to only ', third.on_off_base49.length, ' characters long, now ', Math.round(third.raw_csv_length / third.on_off_base49.length * 100)/100, 'x smaller than the original.'),
-	m('div.mt2', m('a.break', { href: alternative_base49_url, target: '_blank' }, alternative_base49_url)),
+	m('div.mt2', m('a.break', { href: third.alternative_base49_url, target: '_blank' }, third.alternative_base49_url)),
 	m('p', "It's also easier to find patterns if we put our on values beside other on values and off values beside other off values:"),
 	m('p.break', third.repositioned_on_off.join(',')),
 	m('p', "When I compress this repositioned set of data I get my payload down to ", third.repositioned_base49.length, "."),
@@ -125,11 +124,6 @@ export const content = () => [
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
 	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
 	m('p.f7', 'Oh by the way, the eiffel tower is symmetrical and I found a better method so I can drop half of the data and take our payload down to ', second.half.length, ' characters ', m('a.break.f7', { href: second.half_url, target: '_blank' }, second.half_url)),
-	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
-	m('p.break', first.on_off_csv),
-	m('p', first.raw[0], ' is actually just our height and it turns out the next highest values after our height and our width is only ', Math.max(...first.on_off.slice(2)), '. I can add the width and height as raw data and then index the rest.'),
-	m('div.mt2', m('a.break', { href: alternative_base82_url, target: '_blank' }, alternative_base82_url)),
-	m('p', "Our lean little pup is down to only ", base82.length, " characters long, now ", Math.round(first.raw_csv_length / base82.length * 100)/100, "x smaller than the original. I see a ton of repetition but I've used up most of my characters."),
 	"What does vizsla look like with a vertical scan?",
 	m('p.break', first.on_off_vertical.join(',')),
 	m('p', "This is quite a bit smaller, but the max goes all the way up to ", Math.max(...first.on_off_vertical), ". It's actually really easy to enforce a limit of 63 with the on/off strategy, converting 100 for example to ", onOffLimit([100], 63).join(','), '.'),
