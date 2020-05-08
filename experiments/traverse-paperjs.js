@@ -5,8 +5,9 @@ import { refactorColors } from '$app/shapeup/colors';
 import { injectScript } from '$app/helpers';
 import { toPolygons } from '$app/shapeup/svg-helper';
 import { traverse as t } from 'traverse-grid';
+import { methods } from '$app/shapeup/optimization-helper';
 
-const size = 6;
+const size = 30;
 
 let colors = refactorColors('#ffffff');
 let loaded_paper = false;
@@ -26,20 +27,15 @@ export var title = 'Visualizing traverse-grid with Paper.js';
 
 const Visualization = {
 	oncreate: v => {
-		console.log('here');
-
 		const canvas = document.getElementById(v.attrs.id);
 		paper.setup(canvas);
 		
-		points = v.attrs.method(5,5).points;
-
 		let path = new paper.Path();
 		path.strokeColor = 'black';
 		path.strokeWidth = 5;
 
-		const scale = 30, offset = scale;
-		for(let point of points) {
-			path.add(new paper.Point(point[0] * scale + offset, point[1] * scale + offset));
+		for(let point of v.attrs.method(5,5).points) {
+			path.add(new paper.Point(point[0] * size + size, point[1] * size + size));
 		}
 
 		path.smooth();
@@ -85,6 +81,9 @@ export var experiment = {
 		m(Visualization, { id: 'pulse-corner', method: t.pulse('corner') }),
 		m(Visualization, { id: 'seed-48374873847394234', method: t.seed(48374873847394234) }),
 		m(Visualization, { id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) }),
-		m(Visualization, { id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) }),
+		m(Visualization, { id: 'watertile-1', method: methods.watertile }),
+		m(Visualization, { id: 'watertile-2', method: methods.watertile2 }),
+		m(Visualization, { id: 'watertile-3', method: methods.watertile3 }),
+		m(Visualization, { id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) })
 	]
 };
