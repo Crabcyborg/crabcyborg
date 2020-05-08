@@ -1,19 +1,12 @@
 import m from 'mithril';
-import { ShapeUp } from '$app/components';
-import { shapes } from '$app/shapeup/shapes';
-import { refactorColors } from '$app/shapeup/colors';
 import { injectScript } from '$app/helpers';
-import { toPolygons } from '$app/shapeup/svg-helper';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 
-const size = 30;
-
-let colors = refactorColors('#ffffff');
+const size = 30, width = 180, height = 180;
 let loaded_paper = false;
-let points;
 
-const oncreate = () => {	
+const oncreate = v => {
 	injectScript(
 		'https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js',
 		() => {
@@ -21,6 +14,48 @@ const oncreate = () => {
 			m.redraw();
 		}
 	);
+
+	v.state.visualizations = [
+		{ id: 'horizontal', method: t.horizontal },
+		{ id: 'vertical', method: t.vertical },
+		{ id: 'alternate', method: t.pipe(t.horizontal, t.alternate()) },
+		{ id: 'alternate-diagonal', method: t.pipe(t.horizontal, t.alternate('diagonal')) },
+		{ id: 'snake', method: t.snake },
+		{ id: 'double', method: t.double },
+		{ id: 'waterfall', method: t.pipe(t.horizontal, t.waterfall) },
+		{ id: 'spiral', method: t.spiral },
+		{ id: 'diamond', method: t.diamond },
+		{ id: 'triangle', method: t.triangle },
+		{ id: 'reposition', method: t.pipe(t.horizontal, t.reposition) },
+		{ id: 'bounce', method: t.pipe(t.horizontal, t.bounce) },
+		{ id: 'reflect', method: t.pipe(t.horizontal, t.reflect) },
+		{ id: 'fold', method: t.pipe(t.horizontal, t.fold) },
+		{ id: 'stripe', method: t.pipe(t.horizontal, t.stripe) },
+		{ id: 'trade', method: t.pipe(t.horizontal, t.trade) },
+		{ id: 'skew', method: t.pipe(t.horizontal, t.skew) },
+		{ id: 'step-2', method: t.pipe(t.horizontal, t.step(2)) },
+		{ id: 'step-3', method: t.pipe(t.horizontal, t.step(3)) },
+		{ id: 'step-4', method: t.pipe(t.horizontal, t.step(4)) },
+		{ id: 'shift-10', method: t.pipe(t.horizontal, t.shift(10)) },
+		{ id: 'smooth', method: t.pipe(t.horizontal, t.smooth()) },
+		{ id: 'split', method: t.pipe(t.horizontal, t.split) },
+		{ id: 'climb', method: t.climb },
+		{ id: 'cascade', method: t.cascade },
+		{ id: 'fan', method: t.fan },
+		{ id: 'stitch', method: t.stitch },
+		{ id: 'diagonal', method: t.diagonal },
+		{ id: 'corner-in', method: t.corner('in') },
+		{ id: 'corner-out', method: t.corner('out') },
+		{ id: 'corner-crawl', method: t.corner('crawl') },
+		{ id: 'pulse-edge', method: t.pulse('edge') },
+		{ id: 'pulse-corner', method: t.pulse('corner') },
+		{ id: 'seed-48374873847394234', method: t.seed(48374873847394234) },
+		{ id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) },
+		{ id: 'watertile-1', method: methods.watertile },
+		{ id: 'watertile-2', method: methods.watertile2 },
+		{ id: 'watertile-3', method: methods.watertile3 },
+		{ id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) }
+	 ];
 };
 
 export var title = 'Visualizing traverse-grid with Paper.js';
@@ -29,55 +64,14 @@ const Visualization = {
 	oncreate: v => {
 		paper.setup(document.getElementById(v.attrs.id));
 		let path = new paper.Path();
-		path.strokeColor = 'black';
-		path.strokeWidth = 5;
+		path.strokeColor = 'black', path.strokeWidth = 5;
 		v.attrs.method(5,5).forEach(({x,y}) => path.add(new paper.Point(x*size+size, y*size+size)));
 		path.smooth();
 	},
-	view: v => m('.fl', m(`canvas#${v.attrs.id}`, { width: 180, height: 180 }), m('p.mb0.mt0.tc', v.attrs.id.replace(/-/g, ' ')))
+	view: v => m('.fl', m(`canvas#${v.attrs.id}`, { width, height }), m('p.mb0.mt0.tc', v.attrs.id.replace(/-/g, ' ')))
 };
 
 export var experiment = {
 	oncreate,
-	view: v => loaded_paper && [
-		m(Visualization, { id: 'horizontal', method: t.horizontal }),
-		m(Visualization, { id: 'vertical', method: t.vertical }),
-		m(Visualization, { id: 'alternate', method: t.pipe(t.horizontal, t.alternate()) }),
-		m(Visualization, { id: 'alternate-diagonal', method: t.pipe(t.horizontal, t.alternate('diagonal')) }),
-		m(Visualization, { id: 'snake', method: t.snake }),
-		m(Visualization, { id: 'double', method: t.double }),
-		m(Visualization, { id: 'waterfall', method: t.pipe(t.horizontal, t.waterfall) }),
-		m(Visualization, { id: 'spiral', method: t.spiral }),
-		m(Visualization, { id: 'diamond', method: t.diamond }),
-		m(Visualization, { id: 'triangle', method: t.triangle }),
-		m(Visualization, { id: 'reposition', method: t.pipe(t.horizontal, t.reposition) }),
-		m(Visualization, { id: 'bounce', method: t.pipe(t.horizontal, t.bounce) }),
-		m(Visualization, { id: 'reflect', method: t.pipe(t.horizontal, t.reflect) }),
-		m(Visualization, { id: 'fold', method: t.pipe(t.horizontal, t.fold) }),
-		m(Visualization, { id: 'stripe', method: t.pipe(t.horizontal, t.stripe) }),
-		m(Visualization, { id: 'trade', method: t.pipe(t.horizontal, t.trade) }),
-		m(Visualization, { id: 'skew', method: t.pipe(t.horizontal, t.skew) }),
-		m(Visualization, { id: 'step-2', method: t.pipe(t.horizontal, t.step(2)) }),
-		m(Visualization, { id: 'step-3', method: t.pipe(t.horizontal, t.step(3)) }),
-		m(Visualization, { id: 'step-4', method: t.pipe(t.horizontal, t.step(4)) }),
-		m(Visualization, { id: 'shift-10', method: t.pipe(t.horizontal, t.shift(10)) }),
-		m(Visualization, { id: 'smooth', method: t.pipe(t.horizontal, t.smooth()) }),
-		m(Visualization, { id: 'split', method: t.pipe(t.horizontal, t.split) }),
-		m(Visualization, { id: 'climb', method: t.climb }),
-		m(Visualization, { id: 'cascade', method: t.cascade }),
-		m(Visualization, { id: 'fan', method: t.fan }),
-		m(Visualization, { id: 'stitch', method: t.stitch }),
-		m(Visualization, { id: 'diagonal', method: t.diagonal }),
-		m(Visualization, { id: 'corner-in', method: t.corner('in') }),
-		m(Visualization, { id: 'corner-out', method: t.corner('out') }),
-		m(Visualization, { id: 'corner-crawl', method: t.corner('crawl') }),
-		m(Visualization, { id: 'pulse-edge', method: t.pulse('edge') }),
-		m(Visualization, { id: 'pulse-corner', method: t.pulse('corner') }),
-		m(Visualization, { id: 'seed-48374873847394234', method: t.seed(48374873847394234) }),
-		m(Visualization, { id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) }),
-		m(Visualization, { id: 'watertile-1', method: methods.watertile }),
-		m(Visualization, { id: 'watertile-2', method: methods.watertile2 }),
-		m(Visualization, { id: 'watertile-3', method: methods.watertile3 }),
-		m(Visualization, { id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) })
-	]
+	view: v => loaded_paper && v.state.visualizations.map(attrs => m(Visualization, attrs))
 };
