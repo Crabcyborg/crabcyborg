@@ -10,13 +10,10 @@ const size = 6;
 let colors = refactorColors('#ffffff');
 let loaded_paper = false;
 
-const oncreate = () => injectScript(
-	'https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js',
-	() => {
-		paper.setup(document.getElementById('mycanvas'));
-		loaded_paper = true;
-	}
-);
+const oncreate = () => injectScript('https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js', () => {
+	paper.setup(document.getElementById('mycanvas'));
+	loaded_paper = true;
+});
 
 const onUpdate = shapeup => {
 	if(!loaded_paper) {
