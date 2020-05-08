@@ -27,17 +27,11 @@ export var title = 'Visualizing traverse-grid with Paper.js';
 
 const Visualization = {
 	oncreate: v => {
-		const canvas = document.getElementById(v.attrs.id);
-		paper.setup(canvas);
-		
+		paper.setup(v.dom);
 		let path = new paper.Path();
 		path.strokeColor = 'black';
 		path.strokeWidth = 5;
-
-		for(let point of v.attrs.method(5,5).points) {
-			path.add(new paper.Point(point[0] * size + size, point[1] * size + size));
-		}
-
+		v.attrs.method(5,5).forEach(({x,y}) => path.add(new paper.Point(x*size+size, y*size+size)));
 		path.smooth();
 	},
 	view: v => m(`canvas#${v.attrs.id}`, { width: 200, height: 200 })

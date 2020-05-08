@@ -13,7 +13,7 @@ let try_me = '';
 
 const Canvas = {
 	oncreate: v => {
-		const context = document.getElementById('target').getContext('2d');
+		const context = v.dom.getContext('2d');
 		context.drawImage(img, 0, 0);
 		const d = context.getImageData(0, 0, canvas_dimensions.width, canvas_dimensions.height);
 
@@ -34,7 +34,7 @@ const Canvas = {
 
 		m.redraw();
 	},
-	view: v => m('canvas#target', canvas_dimensions)
+	view: v => m('canvas', canvas_dimensions)
 };
 
 export const oncreate = () => {

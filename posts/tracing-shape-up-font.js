@@ -29,7 +29,7 @@ const flatten = (image, background) => {
 
 const Measure = {
 	oncreate: v => {
-		const context = document.getElementById('measure').getContext('2d');		
+		const context = v.dom.getContext('2d');
 		context.font = font;
 		
 		const measure = context.measureText(v.attrs.message);
@@ -40,12 +40,12 @@ const Measure = {
 
 		setTimeout(m.redraw, 0);
 	},
-	view: v => m('canvas#measure', { width: 0, height: 0 })
+	view: v => m('canvas', { width: 0, height: 0 })
 };
 
 const Canvas = {
 	oncreate: v => {
-		const context = document.getElementById('target').getContext('2d');		
+		const context = v.dom.getContext('2d');
 		context.font = font;
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
@@ -70,7 +70,7 @@ const Canvas = {
 
 		setTimeout(m.redraw, 0);
 	},
-	view: v => m('canvas#target', { style: { maxWidth: '100%' }, ...canvas_dimensions})
+	view: v => m('canvas', { style: { maxWidth: '100%' }, ...canvas_dimensions})
 };
 
 export const content = () => [
