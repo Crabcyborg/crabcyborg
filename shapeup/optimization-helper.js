@@ -250,6 +250,7 @@ export const base49ToDecimal = input => input.split('').map(character => min.bas
 
 export const base82ToDecimal = input => {
 	const split = input.split(',');
+	console
 	return [ split[0], split[1], ...split[2].split('').map(character => base82_symbols.indexOf(character)) ];
 };
 

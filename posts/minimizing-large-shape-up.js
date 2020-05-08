@@ -61,8 +61,6 @@ export const oninit = () => {
 	alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 	base82 = toBase82(first.on_off);
 	alternative_base82_url = `/shapeup/*${base82}`;
-	second.on_off_spiral = applyOnOff(second.raw, t.spiral);
-	second.spiral_minimized = repositionBase49Limit(second.on_off_spiral);
 	second.half = bestMethod(second.raw).best.strings[0];
 	second.half_url = `/shapeup/${second.half}`;
 };
@@ -126,7 +124,6 @@ export const content = () => [
 	m('p', "But wait! The eiffel tower shape also switches between on and off states more frequently if you scan it horizontally than if you do it vertically, so I wrote a function that does that too."),
 	m('div.mt2', m('a.break', { href: second.vertical_url, target: '_blank' }, second.vertical_url)),
 	m('p', 'Our eiffel tower is down to ', second.vertical.length, ' characters!'),
-	m('p', 'But there are so many ways to iterate through this grid, not just left to right and top to bottom. I have also implemented methods that traverse in a spiral, diagonally, and in a diamond. It turns out that the eiffel tower works best with the spiral method at ', second.spiral_minimized.length, ' characters.'),
 	m('p.f7', 'Oh by the way, the eiffel tower is symmetrical and I found a better method so I can drop half of the data and take our payload down to ', second.half.length, ' characters ', m('a.break.f7', { href: second.half_url, target: '_blank' }, second.half_url)),
 	m('p', "Can we apply this to vizsla as well? For her, the gap is ", first.on_off_max, ", a pretty large set of characters to establish a 1:1 relation with. If I used every symbol in the defined set of min-string characters I still would only support up to 85."),
 	m('p.break', first.on_off_csv),
