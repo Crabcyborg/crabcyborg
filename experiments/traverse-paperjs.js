@@ -89,7 +89,16 @@ export var experiment = {
 			{ id: 'bounce-reflect-reposition', method: t.pipe(methods.bounce, t.reflect, t.reposition) },
 			{ id: 'snake-alternate', method: (height, width) => t.tile(t.snake(2,width).concatenate(t.pipe(t.snake, t.flip('x'))(2,width), 'vertical'))(height, width) },
 			{ id: 'slide', method: methods.slide },
-			{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) }
+			{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) },
+			{ id: 'cinnamon-roll', method: methods.cinnamon_roll },
+			{ id: 'tile-diamond', method: t.tile(t.diamond(3,3), 'horizontal') },
+			{ id: 'tile-snake', method: t.tile(t.snake(3,3), 'horizontal') },
+			{ id: 'tile-waterfall', method: t.tile(t.pipe(t.horizontal, t.waterfall)(3,3), 'horizontal') },
+			{ id: 'tile-cascade', method: t.tile(t.cascade(3,3), 'horizontal') },
+			{ id: 'tile-smooth', method: t.tile(t.pipe(t.horizontal, t.smooth())(3,3), 'horizontal') },
+			{ id: 'tile-stitch', method: t.tile(t.stitch(3,3), 'horizontal') },
+			{ id: 'tile-bounce', method: t.tile(t.pipe(t.horizontal, t.bounce)(3,3), 'horizontal') },
+			{ id: 'tile-reposition', method: t.tile(t.pipe(t.horizontal, t.reposition)(3,3), 'horizontal') },
 		 ];
 	},
 	oncreate,
