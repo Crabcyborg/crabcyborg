@@ -361,7 +361,7 @@ export const Gradient = {
         let output = [];
 		for(let y = 0, row = []; y < details.height; ++y, row = []) {
 			for(let x = 0; x < details.width; ++x) {
-				let index = details.keyed[[x,y]];
+				let index = details.keyed[[x,y]] || (details.keyed[[x,y]] == 0 ? details.keyed[[x,y]] : '__');
 				let [ r,g,b ] = color;
 				let pad = 150;
 				let adjustment = index * 4;
@@ -419,6 +419,47 @@ export const Example = {
 
 export const watertile = size => (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall)(size || 1, width), 'vertical')(height, width);
 
+export const k = (details, points) => t.details({ ...details, keyed: t.key(points) });
+
+export const bounce = number => details => {
+	let size = details.height * details.width, to = Math.floor(size/2), points = [];
+	for(let index = 0; index < to; index += number) {
+		for(let i = 0; i < number; ++i) points.push(details.points[index+i]);
+		for(let i = 0; i < number; ++i) points.push(details.points[size - index - (number+i-1)]);
+	}
+	to < size/2 && (points.push(details.points[to]));
+	return k(details, points);
+};
+
+export const cascade = number => t.callback(
+	({height}) => ['s', 0, height-number, 0, height-number, number],
+	({direction, height, width, x, y, base_x, base_y}) => {
+		let new_x = y >= height ? (base_y <= 0 ? ++base_x : base_x) : x+1;
+		return new_x === width ? ['s', ++base_x, 0, base_x, base_y, height % number] : ['s', new_x, y >= height ? Math.max(base_y -= number, 0) : y, base_x, base_y, y >= height && base_y < 0 ? height % number : number];
+	}
+);
+
+export const skew = number => details => {
+	let keyed = {}, index = 0;
+	for(let y = 0; y < details.height; ++y) {
+		const base_x = (y % details.width) * number % details.width;
+		for(let x = base_x; x < details.width; ++x) keyed[[x,y]] = details.indices[index++];
+		for(let x = 0; x < base_x; ++x) keyed[[x,y]] = details.indices[index++];
+	}
+	return t.details({ ...details, keyed });
+};
+
+export const reposition = number => details => {
+	let length = details.points.length, points = [];
+	for(let index = 0; index < length; index += number*2) 
+		for(let i = 0; i < number && index+i < length; ++i)
+			points.push(details.points[index+i]);
+	for(let index = number; index < length; index += number*2)
+		for(let i = 0; i < number && index+i < length; ++i)
+			points.push(details.points[index+i]);
+	return k(details, points);
+};
+
 export const methods = {
 	split: t.pipe(t.horizontal, t.split),	
 	bounce: t.pipe(t.horizontal, t.bounce),
@@ -457,7 +498,15 @@ export const methods = {
 	watertile3: watertile(3),
 	cinnamon_roll: t.tile(t.spiral(3,3), 'horizontal'),
 	rotated_watertile: (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall, t.swap)(1, height), 'vertical')(height, width),
-	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall))
+	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall)),
+	bounce2: t.pipe(t.horizontal, bounce(2)),
+	bounce3: t.pipe(t.horizontal, bounce(3)),
+	cascade3: cascade(3),
+	cascade4: cascade(4),
+	skew2: t.pipe(t.horizontal, skew(2)),
+	skew3: t.pipe(t.horizontal, skew(3)),
+	reposition2: t.pipe(t.horizontal, reposition(2)),
+	reposition3: t.pipe(t.horizontal, reposition(3))
 };
 
 export const bestSeed = (shape, from, to) => {

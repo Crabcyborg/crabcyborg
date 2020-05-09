@@ -65,7 +65,19 @@ export var experiment = {
 			{ id: 'watertile-1', method: methods.watertile },
 			{ id: 'watertile-2', method: methods.watertile2 },
 			{ id: 'watertile-3', method: methods.watertile3 },
-			{ id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) }
+			{ id: 'smooth-straight-10', method: t.pipe(t.horizontal, t.smooth('straight', 10)) },
+			{ id: 'stitch-alternate', method: (height, width) => t.tile(t.stitch(height,2).concatenate(t.pipe(t.stitch, t.flip('y'))(height,2), 'horizontal'))(height, width) },
+			{ id: 'snake-3', method: t.tile({ points: [[0,0], [0,1], [0,2], [1,2], [1,1], [1,0]], height: 3, width: 2 }) },
+			{ id: 'triple', method: t.tile(t.horizontal(3,3)) },
+			{ id: 'alternate-2', method: (height, width) => t.tile(t.horizontal(2,width).concatenate(t.pipe(t.horizontal, t.flip('x'))(2,width), 'vertical'))(height, width) },
+			{ id: 'bounce-2', method: methods.bounce2 },
+			{ id: 'bounce-3', method: methods.bounce3 },
+			{ id: 'cascade-3', method: methods.cascade3 },
+			{ id: 'cascade-4', method: methods.cascade4 },
+			{ id: 'skew-2', method: methods.skew2 },
+			{ id: 'skew-3', method: methods.skew3 },
+			{ id: 'reposition-2', method: methods.reposition2 },
+			{ id: 'reposition-3', method: methods.reposition3 }
 		 ];
 	},
 	oncreate,
