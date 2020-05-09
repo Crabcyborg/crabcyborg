@@ -117,4 +117,6 @@ export const content = () => [
     m(Visualization, { method:   t.pipe(methods.watertile, t.alternate(), t.reposition) }), 
     m('h3', 'Slide (3)'),
     m(Visualization, { method: methods.slide3 }),
+    m('h3', m(Descriptor, 'waterfall + spiral')),
+    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) }),
 ];

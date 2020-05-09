@@ -88,7 +88,8 @@ export var experiment = {
 			{ id: 'bow', method: t.pipe(t.diamond, t.reflect) },
 			{ id: 'bounce-reflect-reposition', method: t.pipe(methods.bounce, t.reflect, t.reposition) },
 			{ id: 'snake-alternate', method: (height, width) => t.tile(t.snake(2,width).concatenate(t.pipe(t.snake, t.flip('x'))(2,width), 'vertical'))(height, width) },
-			{ id: 'slide', method: methods.slide }
+			{ id: 'slide', method: methods.slide },
+			{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) }
 		 ];
 	},
 	oncreate,
