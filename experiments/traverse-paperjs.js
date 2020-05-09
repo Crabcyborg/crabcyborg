@@ -3,7 +3,7 @@ import { injectScript } from '$app/helpers';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 
-const size = 30, width = 180, height = 180;
+const size = 28, width = 180, height = 180;
 let loaded_paper = false;
 
 const oncreate = v => injectScript('https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js', () => {
@@ -18,7 +18,7 @@ const Visualization = {
 		paper.setup(document.getElementById(v.attrs.id));
 		let path = new paper.Path();
 		path.strokeColor = 'black', path.strokeWidth = 5;
-		v.attrs.method(5,5).forEach(({x,y}) => path.add(new paper.Point(x*size+size, y*size+size)));
+		v.attrs.method(5,5).forEach(({x,y}) => path.add(new paper.Point(x*size+size*1.2, y*size+size*1.2)));
 		path.smooth();
 	},
 	view: v => m('.fl', m(`canvas#${v.attrs.id}`, { width, height }), m('p.mb0.mt0.tc', v.attrs.id.replace(/-/g, ' ')))
@@ -82,7 +82,11 @@ export var experiment = {
 			{ id: 'donut', method: methods.donut },
 			{ id: 'swirl', method: methods.swirl },
 			{ id: 'clover', method: methods.clover },
-			{ id: 'bacon', method: methods.bacon }
+			{ id: 'bacon', method: methods.bacon },
+			{ id: 'watertile-alternate-reposition', method: t.pipe(methods.watertile, t.alternate(), t.reposition) },
+			{ id: 'cascade-alternate', method: t.pipe(t.cascade, t.swap, t.alternate(), t.swap) },
+			{ id: 'bow', method: t.pipe(t.diamond, t.reflect) },
+			{ id: 'bounce-reflect-reposition', method: t.pipe(methods.bounce, t.reflect, t.reposition) }
 		 ];
 	},
 	oncreate,

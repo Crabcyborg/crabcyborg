@@ -113,4 +113,6 @@ export const content = () => [
     m(Visualization, { method: methods.reposition2 }),
     m('h3', 'Reposition 3'),
     m(Visualization, { method: methods.reposition3 }),
+    m('h3', m(Descriptor, 'watertile + alternate + reposition')),
+    m(Visualization, { method:   t.pipe(methods.watertile, t.alternate(), t.reposition) }),  
 ];
