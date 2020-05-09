@@ -114,5 +114,7 @@ export const content = () => [
     m('h3', 'Reposition 3'),
     m(Visualization, { method: methods.reposition3 }),
     m('h3', m(Descriptor, 'watertile + alternate + reposition')),
-    m(Visualization, { method:   t.pipe(methods.watertile, t.alternate(), t.reposition) }),  
+    m(Visualization, { method:   t.pipe(methods.watertile, t.alternate(), t.reposition) }), 
+    m('h3', 'Slide (3)'),
+    m(Visualization, { method: methods.slide3 }),
 ];

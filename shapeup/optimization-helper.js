@@ -460,6 +460,16 @@ export const reposition = number => details => {
 	return k(details, points);
 };
 
+export const slide = number => details => {
+	let keyed = {}, index = 0;
+	for(let y = 0; y < details.height; ++y) {
+		const base_x = number % details.width;
+		for(let x = base_x; x < details.width; ++x) keyed[[x,y]] = details.indices[index++];
+		for(let x = 0; x < base_x; ++x) keyed[[x,y]] = details.indices[index++];
+	}
+	return t.details({ ...details, keyed });
+};
+
 export const methods = {
 	split: t.pipe(t.horizontal, t.split),	
 	bounce: t.pipe(t.horizontal, t.bounce),
@@ -506,7 +516,10 @@ export const methods = {
 	skew2: t.pipe(t.horizontal, skew(2)),
 	skew3: t.pipe(t.horizontal, skew(3)),
 	reposition2: t.pipe(t.horizontal, reposition(2)),
-	reposition3: t.pipe(t.horizontal, reposition(3))
+	reposition3: t.pipe(t.horizontal, reposition(3)),
+	slide: t.pipe(t.horizontal, slide(1)),
+	slide2: t.pipe(t.horizontal, slide(2)),
+	slide3: t.pipe(t.horizontal, slide(3)),
 };
 
 export const bestSeed = (shape, from, to) => {
