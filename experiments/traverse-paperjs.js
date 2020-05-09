@@ -77,7 +77,12 @@ export var experiment = {
 			{ id: 'skew-2', method: methods.skew2 },
 			{ id: 'skew-3', method: methods.skew3 },
 			{ id: 'reposition-2', method: methods.reposition2 },
-			{ id: 'reposition-3', method: methods.reposition3 }
+			{ id: 'reposition-3', method: methods.reposition3 },
+			{ id: 'leap', method: methods.leap },
+			{ id: 'donut', method: methods.donut },
+			{ id: 'swirl', method: methods.swirl },
+			{ id: 'clover', method: methods.clover },
+			{ id: 'bacon', method: methods.bacon }
 		 ];
 	},
 	oncreate,
