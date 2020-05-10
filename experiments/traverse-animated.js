@@ -6,6 +6,8 @@ import { refactorColors } from '$app/shapeup/colors';
 
 const height = 7, width = 7, size = 10, delay = 30;
 
+const debounce = (a,b,c) => {var d;return ()=>{var e=this,f=arguments;clearTimeout(d),d=setTimeout(function(){d=null,c||a.apply(e,f)},b),c&&!d&&a.apply(e,f)}};
+
 export var title = 'Visualizing traverse-grid as an animation';
 
 const AnimatedVisualization = {
@@ -19,11 +21,11 @@ const AnimatedVisualization = {
 			details.forEach(({x,y}, index) => {
 				v.state.timeouts.push(setTimeout(() => {
 					v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: x*v.attrs.size, y: y*v.attrs.size, fill: color });
-					m.redraw();
 					index === final && v.state.timeouts.push(setTimeout(() => {
 						v.state.rects = v.state.timeouts = [];
 						animate();
 					}, 1000));
+					debounce(m.redraw, 100)();
 				}, index*v.attrs.delay));
 			});
 		};
