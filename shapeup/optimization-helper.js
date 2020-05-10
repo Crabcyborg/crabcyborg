@@ -48,7 +48,11 @@ const prefix_by_key = {
 	watertile2: ']]Y',
 	watertile3: ']]Z',
 	rotated_watertile: ']]_',
-	rotated_waterfall: ']]@'
+	rotated_waterfall: ']]@',
+	straight_smooth_x5: ']]$',
+	straight_smooth_x6: ']]*',
+	straight_smooth_x7: ']]^',
+	straight_smooth_x10: ']](',
 };
 
 let key_by_prefix = Object.assign({}, ...Object.entries(prefix_by_key).map(([a,b]) => ({ [b]: a })));
@@ -250,16 +254,11 @@ export const unsubRepositionPatterns = input => unsubPatterns(input, min.three_c
 export const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, repositionOffOn);
 export const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
-/*
-triangle, triangle_rotated, snake_rotated, donut, clover, bacon, shift, stripe, smooth,
-skew, step3, step4, corner_in, corner_out, corner_crawl, pulse_corner, climb, cascade, fan
-*/
-
 export const bestMethod = (shape, mirrored) => {
 	let m = { compressed: min.compress(shape) };
 	for(let method of ['horizontal', 'vertical', 'spiral', 'diagonal', 'diamond', 'snake', 'stitch'])
 		m[method] = t[method];
-	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'waterfall', 'straight_smooth', 'straight_smooth_x2',  'straight_smooth_x5', 'step2', 'watertile', 'watertile2', 'cinnamon_roll', 'rotated_watertile', 'rotated_waterfall'])
+	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'waterfall', 'straight_smooth', 'straight_smooth_x5', 'straight_smooth_x6', 'straight_smooth_x7', 'straight_smooth_x10', 'watertile', 'watertile2', 'rotated_watertile', 'rotated_waterfall'])
 		m[method] = methods[method];
 
 	const keys = Object.keys(m);
@@ -425,7 +424,7 @@ export const bounce = number => details => {
 	let size = details.height * details.width, to = Math.floor(size/2), points = [];
 	for(let index = 0; index < to; index += number) {
 		for(let i = 0; i < number; ++i) points.push(details.points[index+i]);
-		for(let i = 0; i < number; ++i) points.push(details.points[size - index - (number+i-1)]);
+		for(let i = 0; i < number; ++i) points.push(details.points[size - index - (number-i)]);
 	}
 	to < size/2 && (points.push(details.points[to]));
 	return k(details, points);
@@ -435,7 +434,7 @@ export const cascade = number => t.callback(
 	({height}) => ['s', 0, height-number, 0, height-number, number],
 	({direction, height, width, x, y, base_x, base_y}) => {
 		let new_x = y >= height ? (base_y <= 0 ? ++base_x : base_x) : x+1;
-		return new_x === width ? ['s', ++base_x, 0, base_x, base_y, height % number] : ['s', new_x, y >= height ? Math.max(base_y -= number, 0) : y, base_x, base_y, y >= height && base_y < 0 ? height % number : number];
+		return new_x === width ? ['s', ++base_x, 0, base_x, base_y, height % number || 3] : ['s', new_x, y >= height ? Math.max(base_y -= number, 0) : y, base_x, base_y, y >= height && base_y < 0 ? height % number || 3 : number];
 	}
 );
 
@@ -489,7 +488,10 @@ export const methods = {
 	smooth: t.pipe(t.horizontal, t.smooth()),
 	straight_smooth: t.pipe(t.horizontal, t.smooth('straight')),
 	smooth_x2: t.pipe(t.horizontal, t.repeat(t.smooth(), 2)),
-	straight_smooth_x2: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 2)),
+	straight_smooth_x5: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 5)),
+	straight_smooth_x6: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 6)),
+	straight_smooth_x7: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 7)),
+	straight_smooth_x10: t.pipe(t.horizontal, t.repeat(t.smooth('straight'), 10)),
 	rotated_alternate: t.rotate(t.pipe(t.horizontal, t.alternate())),
 	skew: t.pipe(t.horizontal, t.skew),
 	alternate_diagonal: t.pipe(t.horizontal, t.alternate('diagonal')),
@@ -506,6 +508,7 @@ export const methods = {
 	watertile: watertile(),
 	watertile2: watertile(2),
 	watertile3: watertile(3),
+	snake_alternate: (height, width) => t.tile(t.snake(2,width).concatenate(t.pipe(t.snake, t.flip('x'))(2,width), 'vertical'))(height, width),
 	cinnamon_roll: t.tile(t.spiral(3,3), 'horizontal'),
 	rotated_watertile: (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall, t.swap)(1, height), 'vertical')(height, width),
 	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall)),

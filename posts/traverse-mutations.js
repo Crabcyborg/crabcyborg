@@ -1,7 +1,7 @@
 import m from 'mithril';
 import { Gist, ShapeUp, GoToPost } from '$app/components';
 import { shapes } from '$app/shapeup/shapes';
-import { Gradient, Example, bestMethod, bestSeed, applyOffOn, repositionBase49Limit, methods } from '$app/shapeup/optimization-helper';
+import { Gradient, Example, bestMethod, bestSeed, applyOffOn, repositionBase49Limit, methods, cascade } from '$app/shapeup/optimization-helper';
 import { min } from 'min-string';
 import { traverse as t } from 'traverse-grid';
 
@@ -114,9 +114,9 @@ export const content = () => [
     m('h3', 'Reposition 3'),
     m(Visualization, { method: methods.reposition3 }),
     m('h3', m(Descriptor, 'watertile + alternate + reposition')),
-    m(Visualization, { method:   t.pipe(methods.watertile, t.alternate(), t.reposition) }), 
+    m(Visualization, { method: t.pipe(methods.watertile, t.alternate(), t.reposition) }), 
     m('h3', 'Slide (3)'),
     m(Visualization, { method: methods.slide3 }),
     m('h3', m(Descriptor, 'waterfall + spiral')),
-    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) }),
+    m(Visualization, { method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) })
 ];

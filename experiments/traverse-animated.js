@@ -2,27 +2,39 @@ import m from 'mithril';
 import { injectScript } from '$app/helpers';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
+import { refactorColors } from '$app/shapeup/colors';
 
-const size = 28, width = 180, height = 180;
-let loaded_paper = false;
+const height = 7, width = 7, size = 10, delay = 30;
 
-const oncreate = v => injectScript('https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.2/paper-core.min.js', () => {
-	loaded_paper = true;
-	m.redraw();
-});
+export var title = 'Visualizing traverse-grid as an animation';
 
-export var title = 'Visualizing traverse-grid with Paper.js';
+const AnimatedVisualization = {
+	oninit: v => {
+		v.state.rects = v.state.timeouts = [];
 
-const Visualization = {
-	oncreate: v => {
-		paper.setup(document.getElementById(v.attrs.id));
-		let path = new paper.Path();
-		path.strokeColor = 'black', path.strokeWidth = 5;
-		v.attrs.method(5,5).forEach(({x,y}) => path.add(new paper.Point(x*size+size*1.2, y*size+size*1.2)));
-		path.smooth();
+		const colors = refactorColors('#ffffff'), final = v.attrs.height*v.attrs.width-1, details = v.attrs.method(v.attrs.height, v.attrs.width);
+		const animate = () => {
+			const color = colors[Math.floor(Math.random() * colors.length)];
+
+			details.forEach(({x,y}, index) => {
+				v.state.timeouts.push(setTimeout(() => {
+					v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: x*v.attrs.size, y: y*v.attrs.size, fill: color });
+					m.redraw();
+					index === final && v.state.timeouts.push(setTimeout(() => {
+						v.state.rects = v.state.timeouts = [];
+						animate();
+					}, 1000));
+				}, index*v.attrs.delay));
+			});
+		};
+	
+		animate();
 	},
-	view: v => m('.fl', m(`canvas#${v.attrs.id}`, { width, height }), m('p.mb0.mt0.tc', v.attrs.id.replace(/-/g, ' ')))
+	onremove: v => v.state.timeouts.forEach(timeout => clearTimeout(timeout)),
+	view: v => m('svg', { height: v.attrs.height*v.attrs.size, width: v.attrs.width*v.attrs.size }, v.state.rects.map(rect => m('rect', rect)))
 };
+
+const visualize = attrs => m('.fl.ml2',	m(AnimatedVisualization, { method: attrs.method, height, width, size, delay }), m('p.mb0.mt0.tc', { style: { overflow: 'hidden', width: '70px', textOverflow: 'ellipsis', height: '90px' } }, attrs.id.replace(/-/g, ' ')));
 
 export var experiment = {
 	oninit: v => {
@@ -90,17 +102,8 @@ export var experiment = {
 			{ id: 'snake-alternate', method: methods.snake_alternate },
 			{ id: 'slide', method: methods.slide },
 			{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) },
-			{ id: 'cinnamon-roll', method: methods.cinnamon_roll },
-			{ id: 'tile-diamond', method: t.tile(t.diamond(3,3), 'horizontal') },
-			{ id: 'tile-snake', method: t.tile(t.snake(3,3), 'horizontal') },
-			{ id: 'tile-waterfall', method: t.tile(t.pipe(t.horizontal, t.waterfall)(3,3), 'horizontal') },
-			{ id: 'tile-cascade', method: t.tile(t.cascade(3,3), 'horizontal') },
-			{ id: 'tile-smooth', method: t.tile(t.pipe(t.horizontal, t.smooth())(3,3), 'horizontal') },
-			{ id: 'tile-stitch', method: t.tile(t.stitch(3,3), 'horizontal') },
-			{ id: 'tile-bounce', method: t.tile(t.pipe(t.horizontal, t.bounce)(3,3), 'horizontal') },
-			{ id: 'tile-reposition', method: t.tile(t.pipe(t.horizontal, t.reposition)(3,3), 'horizontal') },
+			{ id: 'cinnamon-roll', method: methods.cinnamon_roll }
 		 ];
 	},
-	oncreate,
-	view: v => loaded_paper && m('.dib', v.state.visualizations.map(attrs => m(Visualization, attrs)))
+	view: v => m('.dib', v.state.visualizations.map(visualize))
 };
