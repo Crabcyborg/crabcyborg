@@ -4,35 +4,27 @@ import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 import { refactorColors } from '$app/shapeup/colors';
 
-const height = 7, width = 7, size = 10, delay = 30;
+const height = 7, width = 7, size = 10, delay = 100;
 
-const debounce = (a,b,c) => {var d;return ()=>{var e=this,f=arguments;clearTimeout(d),d=setTimeout(function(){d=null,c||a.apply(e,f)},b),c&&!d&&a.apply(e,f)}};
+function debounce(a,b,c){var d;return function(){var e=this,f=arguments;clearTimeout(d),d=setTimeout(function(){d=null,c||a.apply(e,f)},b),c&&!d&&a.apply(e,f)}}
 
 export var title = 'Visualizing traverse-grid as an animation';
+
+let listeners = [];
 
 const AnimatedVisualization = {
 	oninit: v => {
 		v.state.rects = v.state.timeouts = [];
 
 		const colors = refactorColors('#ffffff'), final = v.attrs.height*v.attrs.width-1, details = v.attrs.method(v.attrs.height, v.attrs.width);
-		const animate = () => {
-			const color = colors[Math.floor(Math.random() * colors.length)];
+		const color = colors[Math.floor(Math.random() * colors.length)];
 
-			details.forEach(({x,y}, index) => {
-				v.state.timeouts.push(setTimeout(() => {
-					v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: x*v.attrs.size, y: y*v.attrs.size, fill: color });
-					index === final && v.state.timeouts.push(setTimeout(() => {
-						v.state.rects = v.state.timeouts = [];
-						animate();
-					}, 1000));
-					debounce(m.redraw, 100)();
-				}, index*v.attrs.delay));
-			});
-		};
-	
-		animate();
+		listeners.push(index => {
+			if(index === 0) v.state.rects = [];
+			const [x,y] = details.points[index];
+			v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: x*v.attrs.size, y: y*v.attrs.size, fill: color });
+		});
 	},
-	onremove: v => v.state.timeouts.forEach(timeout => clearTimeout(timeout)),
 	view: v => m('svg', { height: v.attrs.height*v.attrs.size, width: v.attrs.width*v.attrs.size }, v.state.rects.map(rect => m('rect', rect)))
 };
 
@@ -105,7 +97,15 @@ export var experiment = {
 			{ id: 'slide', method: methods.slide },
 			{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) },
 			{ id: 'cinnamon-roll', method: methods.cinnamon_roll }
-		 ];
+		];
+
+		let index = 0, limit = height*width;
+		v.state.interval = setInterval(() => {
+			listeners.forEach((listener) => listener(index));
+			++index === limit && (index = 0);
+			m.redraw();
+		}, delay);
 	},
+	onremove: v => clearInterval(v.state.interval),
 	view: v => m('.dib', v.state.visualizations.map(visualize))
 };
