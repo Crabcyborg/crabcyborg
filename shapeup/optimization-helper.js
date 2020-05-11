@@ -119,10 +119,11 @@ export const offOnLimit = input => {
 }
 
 // convert raw to on/off
-export const applyOnOff = (input, method) => {
-	const [ height, width ] = input, flat = flatten(input);
+export const applyOnOff = (input, method) => applyOnOffPreflattened(input[0], input[1], flatten(input), method);
+
+export const applyOnOffPreflattened = (height, width, flat, method) => {
 	let output = [ height, width ], previous = 0, count = 0;
-	t.forEach(method(height, width), ({ point }) => {
+	method(height, width).forEach(({ point }) => {
 		let index = point[1] * width + point[0];
 		if(flat[index] == previous) {
 			++count;
@@ -254,19 +255,30 @@ export const unsubRepositionPatterns = input => unsubPatterns(input, min.three_c
 export const repositionDecompressBase49 = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, repositionOffOn);
 export const repositionDecompressBase49Limit = min.pipe(min.unsubTwoCharacterPermutations, unsubRepositionPatterns, min.decounter, base49ToDecimal, offOnLimit, repositionOffOn);
 
-export const bestMethod = (shape, mirrored) => {
+export const bestMethod = (shape, details, mirrored) => {
+	const start = performance.now();
+
+	const [ height, width ] = shape;
+	const flat = flatten(shape);
+
 	let m = { compressed: min.compress(shape) };
 	for(let method of ['horizontal', 'vertical', 'spiral', 'diagonal', 'diamond', 'snake', 'stitch'])
 		m[method] = t[method];
 	for(let method of ['triangle_flipped', 'alternate', 'rotated_alternate', 'reposition', 'bounce', 'leap', 'waterfall', 'straight_smooth', 'straight_smooth_x5', 'straight_smooth_x6', 'straight_smooth_x7', 'straight_smooth_x10', 'watertile', 'watertile2', 'rotated_watertile', 'rotated_waterfall'])
 		m[method] = methods[method];
 
-	const keys = Object.keys(m);
+	let keys;
+	if(details !== undefined && details.methods !== undefined) {
+		keys = details.methods;
+	} else {
+		keys = Object.keys(m);
+	}
 
 	let on_by_default_by_result = {};
 	const repositionCompress = method => {
 		let on_by_default = false;
-		const applied = applyOnOff(shape, method);
+
+		const applied = applyOnOffPreflattened(height, width, flat, method);
 		if(applied[2] == 0) {
 			on_by_default = true;
 			applied.splice(2,1);
@@ -289,7 +301,7 @@ export const bestMethod = (shape, mirrored) => {
 	const raw_length = shape.join(',').length;
 
 	if(!mirrored && isSymmetricalHorizontally(shape)) {
-		const best_half = bestMethod(half(shape), raw_length);
+		const best_half = bestMethod(half(shape), details, raw_length);
 		if(best_half.best.length < best.length) return best_half;
 	}
 
@@ -304,6 +316,8 @@ export const bestMethod = (shape, mirrored) => {
 	}
  
 	best.strings = strings;
+
+	console.log('bestMethod ran in', performance.now() - start);
 
 	return { best, log, ratio: Math.round(best.length / (mirrored || raw_length) * 10000) / 100 };
 };
@@ -351,9 +365,7 @@ export const handleString = shape => {
 };
 
 export const Gradient = {
-    oninit: v => {
-        v.state.details = v.attrs.method(v.attrs.height, v.attrs.width);
-    },
+    oninit: v => v.state.details = v.attrs.method(v.attrs.height, v.attrs.width),
     view: v => {
         const { details } = v.state;
 		const color = colors[Math.floor(Math.random() * colors.length)];
@@ -386,7 +398,6 @@ const examples = {
     diagonal: 'KNIFE',
     snake: 'FLIP',
     triangle: 'CHECK',
-//  triangle_rotated: 'LIP',
     alternate: 'PAC',
     bounce: 'CASH',
 	leap: 'PLANE',
@@ -399,7 +410,7 @@ const examples = {
 
 export const Example = {
     oninit: v => {
-        const { method } = v.attrs, shape = shapes[examples[method]], { best, ratio } = bestMethod(shape);
+        const { method } = v.attrs, shape = shapes[examples[method]], { best, ratio } = bestMethod(shape, v.attrs.details);
         v.state = { shape, best, methods: best.methods.join(', '), ratio, url: `/shapeup/${best.strings[0]}` };
     },
     view: v => m(

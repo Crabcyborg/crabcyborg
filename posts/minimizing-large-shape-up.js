@@ -51,7 +51,7 @@ export const oninit = () => {
 	second.repositioned_url = `/shapeup/-${second.repositioned_base49}`;
 	second.vertical = repositionBase49(applyOnOff(second.raw, t.vertical));
 	second.vertical_url = `/shapeup/~${second.vertical}`;
-	second.half = bestMethod(second.raw).best.strings[0];
+	second.half = bestMethod(second.raw, { methods: [ 'spiral' ] }).best.strings[0];
 	second.half_url = `/shapeup/${second.half}`;
 
 	third.alternative = alternative(third.on_off);
@@ -59,7 +59,7 @@ export const oninit = () => {
 	third.repositioned_on_off = repositionOnOff(third.on_off);
 	third.repositioned_base49 = repositionBase49(third.on_off);
 	third.repositioned_url = `/shapeup/-${third.repositioned_base49}`;
-	third.best = bestMethod(third.raw).best;
+	third.best = bestMethod(third.raw, { methods: [ 'straight_smooth' ] }).best;
 	third.best_url = `/shapeup/${third.best.strings[0]}`;
 	third.alternative_base49_url = `/shapeup/^${third.on_off_base49}`;
 };
