@@ -5,24 +5,19 @@ import { methods } from '$app/shapeup/optimization-helper';
 import { refactorColors } from '$app/shapeup/colors';
 
 const height = 7, width = 7, size = 10, delay = 100;
-
-function debounce(a,b,c){var d;return function(){var e=this,f=arguments;clearTimeout(d),d=setTimeout(function(){d=null,c||a.apply(e,f)},b),c&&!d&&a.apply(e,f)}}
+let listeners = [];
 
 export var title = 'Visualizing traverse-grid as an animation';
 
-let listeners = [];
-
 const AnimatedVisualization = {
 	oninit: v => {
-		v.state.rects = v.state.timeouts = [];
+		const colors = refactorColors('#ffffff'), points = v.attrs.method(v.attrs.height, v.attrs.width).points;
+		v.state.rects = [];
 
-		const colors = refactorColors('#ffffff'), final = v.attrs.height*v.attrs.width-1, details = v.attrs.method(v.attrs.height, v.attrs.width);
-		const color = colors[Math.floor(Math.random() * colors.length)];
-
+		let color;
 		listeners.push(index => {
-			if(index === 0) v.state.rects = [];
-			const [x,y] = details.points[index];
-			v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: x*v.attrs.size, y: y*v.attrs.size, fill: color });
+			if(index === 0) v.state.rects = [], color = colors[Math.floor(Math.random() * colors.length)];
+			v.state.rects.push({ height: v.attrs.size, width: v.attrs.size, x: points[index][0]*v.attrs.size, y: points[index][1]*v.attrs.size, fill: color });
 		});
 	},
 	view: v => m('svg', { height: v.attrs.height*v.attrs.size, width: v.attrs.width*v.attrs.size }, v.state.rects.map(rect => m('rect', rect)))
