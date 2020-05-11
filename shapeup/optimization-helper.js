@@ -424,7 +424,7 @@ export const bounce = number => details => {
 	let size = details.height * details.width, to = Math.floor(size/2), points = [];
 	for(let index = 0; index < to; index += number) {
 		for(let i = 0; i < number; ++i) points.push(details.points[index+i]);
-		for(let i = 0; i < number; ++i) points.push(details.points[size - index - (number-i)]);
+		for(let i = number-1; i >= 0; --i) points.push(details.points[size - index - (number-i)]);
 	}
 	to < size/2 && (points.push(details.points[to]));
 	return k(details, points);
