@@ -10,6 +10,7 @@ import * as shapeup_matter from './shapeup-matter';
 import * as min_string_string from './min-string-string';
 import * as traverse_paperjs from './traverse-paperjs';
 import * as traverse_animated from './traverse-animated';
+import * as traverse_draw_shapeup from './traverse-draw-shapeup';
 
 export var experiments = {	
 	'shape-up': shape_up,
@@ -23,5 +24,6 @@ export var experiments = {
 	'shapeup-matter': shapeup_matter,
 	'min-string-string': min_string_string,
 	'traverse-paperjs': traverse_paperjs,
-	'traverse-animated': traverse_animated
+	'traverse-animated': traverse_animated,
+	'traverse-draw-shapeup': traverse_draw_shapeup
 };

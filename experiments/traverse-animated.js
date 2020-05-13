@@ -1,5 +1,4 @@
 import m from 'mithril';
-import { injectScript } from '$app/helpers';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 import { refactorColors } from '$app/shapeup/colors';
