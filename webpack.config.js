@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 // var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -20,7 +21,7 @@ module.exports = () => {
 					exclude: /node_modules/
 				},
 				{
-					test: /\.(png|jpg|gif)$/,
+					test: /\.(png|jpg|gif|pdf)$/,
 					loader: 'file-loader'
 				}
 			]
@@ -40,6 +41,9 @@ module.exports = () => {
 				template: 'index.html'
 			}),
 			new webpack.HotModuleReplacementPlugin(),
+			new CopyPlugin([
+				{ from: 'copy/resume.pdf', to: 'resume.pdf', toType: 'file' }
+			])
 		//	new BundleAnalyzerPlugin()
 		],
 		resolve: {
