@@ -76,7 +76,7 @@ const randomMethod = () => {
 		{ id: 'diamond', method: t.diamond },
 		{ id: 'triangle', method: t.triangle },
 		{ id: 'reposition', method: t.pipe(t.horizontal, t.reposition) },
-		{ id: 'bounce', method: t.pipe(t.horizontal, t.bounce) },
+		{ id: 'bounce', method: t.pipe(t.horizontal, t.bounce(1)) },
 		{ id: 'reflect', method: t.pipe(t.horizontal, t.reflect) },
 		{ id: 'fold', method: t.pipe(t.horizontal, t.fold) },
 		{ id: 'stripe', method: t.pipe(t.horizontal, t.stripe) },
@@ -89,15 +89,15 @@ const randomMethod = () => {
 		{ id: 'smooth', method: t.pipe(t.horizontal, t.smooth()) },
 		{ id: 'split', method: t.pipe(t.horizontal, t.split) },
 		{ id: 'climb', method: t.climb },
-//		{ id: 'cascade', method: t.cascade },
+		{ id: 'cascade', method: t.cascade },
 		{ id: 'fan', method: t.fan },
 		{ id: 'stitch', method: t.stitch },
 		{ id: 'diagonal', method: t.diagonal },
 		{ id: 'corner-in', method: t.corner('in') },
 		{ id: 'corner-out', method: t.corner('out') },
 		{ id: 'corner-crawl', method: t.corner('crawl') },
-//		{ id: 'pulse-edge', method: t.pulse('edge') },
-//		{ id: 'pulse-corner', method: t.pulse('corner') },
+		{ id: 'pulse-edge', method: t.pulse('edge') },
+		{ id: 'pulse-corner', method: t.pulse('corner') },
 		{ id: 'seed-48374873847394234', method: t.seed(48374873847394234) },
 		{ id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) },
 		{ id: 'watertile-1', method: methods.watertile },
@@ -108,10 +108,10 @@ const randomMethod = () => {
 		{ id: 'snake-3', method: t.tile({ points: [[0,0], [0,1], [0,2], [1,2], [1,1], [1,0]], height: 3, width: 2 }) },
 		{ id: 'triple', method: t.tile(t.horizontal(3,3)) },
 		{ id: 'alternate-2', method: (height, width) => t.tile(t.horizontal(2,width).concatenate(t.pipe(t.horizontal, t.flip('x'))(2,width), 'vertical'))(height, width) },
-//		{ id: 'bounce-2', method: methods.bounce2 },
-//		{ id: 'bounce-3', method: methods.bounce3 },
-//		{ id: 'cascade-3', method: methods.cascade3 },
-//		{ id: 'cascade-4', method: methods.cascade4 },
+		{ id: 'bounce-2', method: methods.bounce2 },
+		{ id: 'bounce-3', method: methods.bounce3 },
+		{ id: 'cascade-3', method: methods.cascade3 },
+		{ id: 'cascade-4', method: methods.cascade4 },
 		{ id: 'skew-2', method: methods.skew2 },
 		{ id: 'skew-3', method: methods.skew3 },
 		{ id: 'reposition-2', method: methods.reposition2 },
@@ -130,10 +130,10 @@ const randomMethod = () => {
 		{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) },
 		{ id: 'cinnamon-roll', method: methods.cinnamon_roll }
 	];
-	return selection[Math.floor(Math.random() * selection.length)];
+	return { id: 'pulse_edge', method: methods.pulse_edge };// selection[Math.floor(Math.random() * selection.length)];
 };
 
-const delay = 20, size = 4;
+const delay = 5, size = 4;
 export var title = 'Drawing a Shape Up Component with traverse-grid';
 
 export var experiment = {

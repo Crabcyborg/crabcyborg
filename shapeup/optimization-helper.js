@@ -365,7 +365,7 @@ export const handleString = shape => {
 };
 
 export const Gradient = {
-    oninit: v => v.state.details = v.attrs.method(v.attrs.height, v.attrs.width),
+    oninit: v => v.state.details = v.attrs.method(v.attrs.height, v.attrs.width, 45),
     view: v => {
         const { details } = v.state;
 		const color = colors[Math.floor(Math.random() * colors.length)];
@@ -431,24 +431,6 @@ export const watertile = size => (height, width) => t.tile(t.pipe(t.horizontal, 
 
 export const k = (details, points) => t.details({ ...details, keyed: t.key(points) });
 
-export const bounce = number => details => {
-	let size = details.height * details.width, to = Math.floor(size/2), points = [];
-	for(let index = 0; index < to; index += number) {
-		for(let i = 0; i < number; ++i) points.push(details.points[index+i]);
-		for(let i = number-1; i >= 0; --i) points.push(details.points[size - index - (number-i)]);
-	}
-	to < size/2 && (points.push(details.points[to]));
-	return k(details, points);
-};
-
-export const cascade = number => t.callback(
-	({height}) => ['s', 0, height-number, 0, height-number, number],
-	({direction, height, width, x, y, base_x, base_y}) => {
-		let new_x = y >= height ? (base_y <= 0 ? ++base_x : base_x) : x+1;
-		return new_x === width ? ['s', ++base_x, 0, base_x, base_y, height % number || 3] : ['s', new_x, y >= height ? Math.max(base_y -= number, 0) : y, base_x, base_y, y >= height && base_y < 0 ? height % number || 3 : number];
-	}
-);
-
 export const skew = number => details => {
 	let keyed = {}, index = 0;
 	for(let y = 0; y < details.height; ++y) {
@@ -482,10 +464,10 @@ export const slide = number => details => {
 
 export const methods = {
 	split: t.pipe(t.horizontal, t.split),	
-	bounce: t.pipe(t.horizontal, t.bounce),
-	swirl: t.pipe(t.spiral, t.bounce, t.reposition, t.bounce),
-	donut: t.pipe(t.diamond, t.bounce),
-	leap: t.pipe(t.horizontal, t.alternate(), t.mutate(t.diagonal), t.bounce),
+	bounce: t.pipe(t.horizontal, t.bounce(1)),
+	swirl: t.pipe(t.spiral, t.bounce(1), t.reposition, t.bounce(1)),
+	donut: t.pipe(t.diamond, t.bounce(1)),
+	leap: t.pipe(t.horizontal, t.alternate(), t.mutate(t.diagonal), t.bounce(1)),
 	clover: t.pipe(t.horizontal, t.reposition, t.mutate(t.spiral)),
 	bacon: t.pipe(t.diagonal, t.reposition),
 	reflect: t.pipe(t.horizontal, t.reflect),
@@ -494,6 +476,7 @@ export const methods = {
 	alternate: t.pipe(t.horizontal, t.alternate()),
 	reposition: t.pipe(t.horizontal, t.reposition),
 	waterfall: t.pipe(t.horizontal, t.waterfall),
+	trade: t.pipe(t.horizontal, t.trade),
 	triangle_flipped: t.pipe(t.triangle, t.flip('y')),
 	triangle_rotated: t.rotate(t.triangle),
 	smooth: t.pipe(t.horizontal, t.smooth()),
@@ -523,10 +506,10 @@ export const methods = {
 	cinnamon_roll: t.tile(t.spiral(3,3), 'horizontal'),
 	rotated_watertile: (height, width) => t.tile(t.pipe(t.horizontal, t.waterfall, t.swap)(1, height), 'vertical')(height, width),
 	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall)),
-	bounce2: t.pipe(t.horizontal, bounce(2)),
-	bounce3: t.pipe(t.horizontal, bounce(3)),
-	cascade3: cascade(3),
-	cascade4: cascade(4),
+	bounce2: t.pipe(t.horizontal, t.bounce(2)),
+	bounce3: t.pipe(t.horizontal, t.bounce(3)),
+	cascade3: t.cascade(3),
+	cascade4: t.cascade(4),
 	skew2: t.pipe(t.horizontal, skew(2)),
 	skew3: t.pipe(t.horizontal, skew(3)),
 	reposition2: t.pipe(t.horizontal, reposition(2)),

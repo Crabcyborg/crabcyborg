@@ -7,7 +7,8 @@ import { traverse as t } from 'traverse-grid';
 
 export const title = 'Traverse Grid Mutations';
 
-const example_size = 7;
+const example_width = 3;
+const example_height = 16;
 const size = 5;
 
 export const oninit = () => {
@@ -30,7 +31,7 @@ export const oninit = () => {
     //*/ 
 };
 
-const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: v.attrs.height || example_size, width: v.attrs.width || example_size }) };
+const Visualization = { view: v => m(Gradient, { method: v.attrs.method, height: v.attrs.height || example_height, width: v.attrs.width || example_width }) };
 const Descriptor = { view: v => m('i.gray.f5.ml1', v.children) };
 
 export const content = () => [
@@ -64,7 +65,7 @@ export const content = () => [
     m('h3', m(Descriptor, 'smooth (straight x6)')),
     m(Visualization, { method: t.pipe(t.horizontal, t.smooth('straight', 6)) } ),
     m('h3', m(Descriptor, 'bounce + smooth (straight x5)')),
-    m(Visualization, { method: t.pipe(t.horizontal, t.bounce, t.smooth('straight', 5)) } ),
+    m(Visualization, { method: t.pipe(t.horizontal, t.bounce(1), t.smooth('straight', 5)) } ),
     m('h3', 'Smooth (x5)'),
     m(Visualization, { method: t.pipe(t.horizontal, t.smooth('default', 5)) }),
     m('h3', 'Smooth (straight x5)'),
@@ -76,7 +77,7 @@ export const content = () => [
     m('h3', m(Descriptor, 'diamond + smooth')),
     m(Visualization, { method: t.pipe(t.diamond, t.smooth()) }),
     m('h3', m(Descriptor, 'bounce + smooth (x4)')),
-    m(Visualization, { method: t.pipe(t.horizontal, t.bounce, t.smooth('default', 4)) }),
+    m(Visualization, { method: t.pipe(t.horizontal, t.bounce(1), t.smooth('default', 4)) }),
     m('h3', m(Descriptor, 'donut + smooth (straight x2)')),
     m(Visualization, { method: t.pipe(methods.donut, t.smooth('straight', 2)) }),
     m('h3', m(Descriptor, 'spiral + smooth (straight x2)')),
@@ -92,9 +93,9 @@ export const content = () => [
     m('h3', m(Descriptor, 'concatenate (vertical, sliced spiral + waterfall)')),
     m(Visualization, { method: (height, width) => t.pipe(t.spiral, t.slice({ top: 2 }))(height, width).concatenate(methods.waterfall(3,3), 'vertical')}),
     m('h3', m(Descriptor, 'concatenate (vertical, sliced diamond + spiral)')),
-    m(Visualization, { method: (height, width) => t.pipe(t.diamond, t.slice({ top: 3 }))(example_size, example_size).concatenate(t.spiral(3, 3), 'vertical')}),
+    m(Visualization, { method: (height, width) => t.pipe(t.diamond, t.slice({ top: 3 }))(height, width).concatenate(t.spiral(3, 3), 'vertical')}),
     m('h3', m(Descriptor, 'concatenate (horizontal, sliced diamond + reposition)')),
-    m(Visualization, { method: () => t.pipe(t.diamond, t.slice({ top: 3 }))(example_size, example_size).concatenate(methods.reposition(8, 3), 'horizontal')}),
+    m(Visualization, { method: (height, width) => t.pipe(t.diamond, t.slice({ top: 3 }))(height, width).concatenate(methods.reposition(8, 3), 'horizontal')}),
     m('h3', 'Cinnamon Roll', m(Descriptor, 'tiled 3x3 spiral')),
     m(Visualization, { method: methods.cinnamon_roll }),
     m('h3', 'Rotated Watertile'),
