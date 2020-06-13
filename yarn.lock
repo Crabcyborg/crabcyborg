@@ -3827,10 +3827,10 @@ toposort@^1.0.0:
   resolved "https://registry.yarnpkg.com/toposort/-/toposort-1.0.7.tgz#2e68442d9f64ec720b8cc89e6443ac6caa950029"
   integrity sha1-LmhELZ9k7HILjMieZEOsbKqVACk=
 
-traverse-grid@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/traverse-grid/-/traverse-grid-1.0.1.tgz#787b183eb9d6c99fe593e847e49173612f55c714"
-  integrity sha512-jXskzBEb97RqXSw5CcsjdNwDbmy5qpl5FIqAQ63czjbZNvny2qvnMYhpZBFlZsB+duGrwDp8o4U/24w6KRCH5g==
+traverse-grid@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/traverse-grid/-/traverse-grid-1.0.2.tgz#c11e80ae3efd241560d47f2a082cf876e827e596"
+  integrity sha512-kfDtdUn6N4PmptTvm+HnpgF/BEfNwfcqdb5DLcFFQUtb7uXywdFemdSpzbUXys2MIA4nm8NW7d7gIC6Uza8jeQ==
 
 tryer@^1.0.1:
   version "1.0.1"

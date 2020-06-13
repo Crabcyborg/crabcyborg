@@ -7,8 +7,8 @@ import { traverse as t } from 'traverse-grid';
 
 export const title = 'Traverse Grid Mutations';
 
-const example_width = 3;
-const example_height = 16;
+const example_width = 7;
+const example_height = 7;
 const size = 5;
 
 export const oninit = () => {

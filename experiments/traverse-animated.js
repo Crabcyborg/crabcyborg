@@ -3,7 +3,7 @@ import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 import { refactorColors } from '$app/shapeup/colors';
 
-const height = 20, width = 7, size = 10, delay = 10;
+const height = 8, width = 7, size = 10, delay = 100;
 let listeners = [];
 
 export var title = 'Visualizing traverse-grid as an animation';
