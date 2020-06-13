@@ -89,7 +89,7 @@ const randomMethod = () => {
 		{ id: 'smooth', method: t.pipe(t.horizontal, t.smooth()) },
 		{ id: 'split', method: t.pipe(t.horizontal, t.split) },
 		{ id: 'climb', method: t.climb },
-		{ id: 'cascade', method: t.cascade },
+//		{ id: 'cascade', method: t.cascade },
 		{ id: 'fan', method: t.fan },
 		{ id: 'stitch', method: t.stitch },
 		{ id: 'diagonal', method: t.diagonal },
@@ -97,7 +97,7 @@ const randomMethod = () => {
 		{ id: 'corner-out', method: t.corner('out') },
 		{ id: 'corner-crawl', method: t.corner('crawl') },
 //		{ id: 'pulse-edge', method: t.pulse('edge') },
-		{ id: 'pulse-corner', method: t.pulse('corner') },
+//		{ id: 'pulse-corner', method: t.pulse('corner') },
 		{ id: 'seed-48374873847394234', method: t.seed(48374873847394234) },
 		{ id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) },
 		{ id: 'watertile-1', method: methods.watertile },
@@ -133,7 +133,7 @@ const randomMethod = () => {
 	return selection[Math.floor(Math.random() * selection.length)];
 };
 
-const delay = 20, size = 4;
+const delay = 15, size = 4;
 export var title = 'Drawing a Shape Up Component with traverse-grid';
 
 export var experiment = {
