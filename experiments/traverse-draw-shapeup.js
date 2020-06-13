@@ -96,7 +96,7 @@ const randomMethod = () => {
 		{ id: 'corner-in', method: t.corner('in') },
 		{ id: 'corner-out', method: t.corner('out') },
 		{ id: 'corner-crawl', method: t.corner('crawl') },
-		{ id: 'pulse-edge', method: t.pulse('edge') },
+//		{ id: 'pulse-edge', method: t.pulse('edge') },
 		{ id: 'pulse-corner', method: t.pulse('corner') },
 		{ id: 'seed-48374873847394234', method: t.seed(48374873847394234) },
 		{ id: 'smooth-straight', method: t.pipe(t.horizontal, t.smooth('straight')) },
@@ -130,10 +130,10 @@ const randomMethod = () => {
 		{ id: 'waterfall-spiral', method: t.pipe(t.horizontal, t.waterfall, t.mutate(t.spiral)) },
 		{ id: 'cinnamon-roll', method: methods.cinnamon_roll }
 	];
-	return { id: 'pulse_edge', method: methods.pulse_edge };// selection[Math.floor(Math.random() * selection.length)];
+	return selection[Math.floor(Math.random() * selection.length)];
 };
 
-const delay = 5, size = 4;
+const delay = 20, size = 4;
 export var title = 'Drawing a Shape Up Component with traverse-grid';
 
 export var experiment = {

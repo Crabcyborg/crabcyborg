@@ -27,7 +27,6 @@ const visualize = attrs => m('.fl.ml2',	m(AnimatedVisualization, { method: attrs
 export var experiment = {
 	oninit: v => {
 		v.state.visualizations = [
-
 			{ id: 'horizontal', method: t.horizontal },
 			{ id: 'vertical', method: t.vertical },
 			{ id: 'alternate', method: t.pipe(t.horizontal, t.alternate()) },
