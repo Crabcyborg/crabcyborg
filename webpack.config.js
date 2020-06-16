@@ -42,7 +42,8 @@ module.exports = () => {
 			}),
 			new webpack.HotModuleReplacementPlugin(),
 			new CopyPlugin([
-				{ from: 'copy/resume.pdf', to: 'resume.pdf', toType: 'file' }
+				{ from: 'copy/resume.pdf', to: 'resume.pdf', toType: 'file' },
+				{ from: 'copy/elm', to: 'elm' }
 			])
 		//	new BundleAnalyzerPlugin()
 		],

@@ -21,6 +21,10 @@ const onUpdate = shapeup => {
 	const { grid, width, height } = shapeup.state;
 	const size = 10;
 
+	console.log(JSON.stringify({
+		grid, width, height
+	}));
+
 	for(let y_index = 0; y_index < height; y_index++) {
 		for(let x_index = 0; x_index < width; x_index++) {
 			if(grid[y_index][x_index].empty) {

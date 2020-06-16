@@ -7,6 +7,7 @@ import * as shapeup_paperjs from './shapeup-paperjs';
 import * as shapeup_fillrect from './shapeup-fillrect';
 import * as shapeup_svg from './shapeup-svg';
 import * as shapeup_matter from './shapeup-matter';
+import * as shapeup_elm from './shapeup-elm';
 import * as min_string_string from './min-string-string';
 import * as traverse_paperjs from './traverse-paperjs';
 import * as traverse_animated from './traverse-animated';
@@ -22,6 +23,7 @@ export var experiments = {
 	'shapeup-fillrect': shapeup_fillrect,
 	'shapeup-svg': shapeup_svg,
 	'shapeup-matter': shapeup_matter,
+	'shapeup-elm': shapeup_elm,
 	'min-string-string': min_string_string,
 	'traverse-paperjs': traverse_paperjs,
 	'traverse-animated': traverse_animated,
