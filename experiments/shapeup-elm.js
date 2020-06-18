@@ -9,6 +9,7 @@ const elm_source_code_url = 'https://github.com/Crabcyborg/shape-up-elm/blob/mas
 
 let colors = refactorColors('#ffffff');
 let loaded_elm = false;
+let app = false;
 
 const oncreate = () => injectScript('/elm/render-shape-up.js', () => {
 	loaded_elm = true;
@@ -35,7 +36,13 @@ const onUpdate = shapeup => {
 	);
 
     const node = document.getElementById('elm-target');
-    node && Elm.Main.init({node, flags: { grid, height, width }});
+	const payload = { grid, height, width };
+
+	if(node) {
+		app = Elm.Main.init({node, flags: payload});
+	} else {
+		app.ports.receiveData.send(payload);
+	}
 };
 
 export var title = 'Rendering Shape Up using Elm';
@@ -46,7 +53,8 @@ export var experiment = {
 		[
 			m('#elm-wrapper', m('#elm-target')),
             m(ShapeUp, {configuration: shapes.DEER, size, behaviour: 'blink', blink_delay: 1000, onUpdate}),
-            m('p', "It's alive! But I need to implement ports next to have a subscription working. ", m('a', { href: elm_source_code_url }, 'Check out the Elm Source code here'), '.')
+			m('p', "I'm still trying to wrap my mind around functional programming, but I managed to get this experiment going! ", m('a', { href: elm_source_code_url }, 'Check out the Elm Source code here'), '.'),
+			m('p', "This was my first time using Elm and it is really awesome. I just might try using it again.")
 		]
 	]
 };

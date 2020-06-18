@@ -5202,11 +5202,11 @@ var $author$project$Main$renderCell = function (cell) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromInt(cell.x * 20)),
+				$elm$core$String$fromInt(cell.x * 10)),
 				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromInt(cell.y * 20)),
-				$elm$svg$Svg$Attributes$width('20'),
-				$elm$svg$Svg$Attributes$height('20'),
+				$elm$core$String$fromInt(cell.y * 10)),
+				$elm$svg$Svg$Attributes$width('10'),
+				$elm$svg$Svg$Attributes$height('10'),
 				$elm$svg$Svg$Attributes$fill(cell.color)
 			]),
 		_List_Nil);
