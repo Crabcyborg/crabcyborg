@@ -5,6 +5,7 @@ import { refactorColors } from '$app/shapeup/colors';
 import { injectScript } from '$app/helpers';
 
 const size = 6;
+const elm_url = 'https://elm-lang.org/';
 const elm_source_code_url = 'https://github.com/Crabcyborg/shape-up-elm/blob/master/src/Main.elm';
 
 let colors = refactorColors('#ffffff');
@@ -53,8 +54,8 @@ export var experiment = {
 		[
 			m('#elm-wrapper', m('#elm-target')),
             m(ShapeUp, {configuration: shapes.DEER, size, behaviour: 'blink', blink_delay: 1000, onUpdate}),
-			m('p', "I'm still trying to wrap my mind around functional programming, but I managed to get this experiment going! ", m('a', { href: elm_source_code_url }, 'Check out the Elm Source code here'), '.'),
-			m('p', "This was my first time using Elm and it is really awesome. I just might try using it again.")
+			m('p', "I'm still trying to wrap my mind around functional programming, but I managed to get this experiment going! ", m('a', { href: elm_source_code_url, target: '_blank' }, 'Check out the Elm Source code here'), '.'),
+			m('p', "This was my first time using ", m('a', { href: elm_url, target: '_blank' }, "Elm"), " and it is really awesome. I just might try using it again.")
 		]
 	]
 };
