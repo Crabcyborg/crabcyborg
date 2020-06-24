@@ -14,6 +14,7 @@ import * as tracing_shape_up from './tracing-shape-up';
 import * as shape_up_text from './shape-up-text';
 import * as tracing_shape_up_font from './tracing-shape-up-font';
 import * as frankenfighter_wordpress from './frankenfighter-wordpress';
+import * as traverse_qunit from './traverse-qunit';
 
 const imports = {
 	putting_together_animal_body_parts_with_mithril_js,
@@ -31,10 +32,11 @@ const imports = {
 	tracing_shape_up,
 	shape_up_text,
 	tracing_shape_up_font,
-	frankenfighter_wordpress
+	frankenfighter_wordpress,
+	traverse_qunit
 };
 
-export const posts = Object.keys(imports).reduce(function(posts, key) {
+export const posts = Object.keys(imports).reduce((posts, key) => {
 	posts[key.replace(/_/g, '-')] = imports[key];
 	return posts;
 }, []);

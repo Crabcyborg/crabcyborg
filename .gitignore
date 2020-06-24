@@ -11,6 +11,7 @@
 # production
 /dist/*.png
 /dist/*.jpg
+/dist/*.txt
 /dist/main.bundle.js
 /dist/index.html
 

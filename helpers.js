@@ -10,7 +10,16 @@ export const injectScript = (src, callback) => {
 	injectedScripts.push(src);
 	callback !== undefined && script.addEventListener('load', callback);
 	document.body.appendChild(script);
-}
+};
+
+export const injectStyle = (src, callback) => {
+	var link = document.createElement('link');
+	link.href = src;
+	link.type = 'text/css';
+	link.rel = 'stylesheet';
+	callback !== undefined && link.addEventListener('load', callback);
+	document.getElementsByTagName('head')[0].appendChild(link);
+};
 
 export const injectClassDefinitions = definitions => {
 	var element = document.createElement('style');
