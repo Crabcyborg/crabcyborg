@@ -508,6 +508,7 @@ export const methods = {
 	rotated_waterfall: t.rotate(t.pipe(t.horizontal, t.waterfall)),
 	bounce2: t.pipe(t.horizontal, t.bounce(2)),
 	bounce3: t.pipe(t.horizontal, t.bounce(3)),
+	cascade: t.cascade(2),
 	cascade3: t.cascade(3),
 	cascade4: t.cascade(4),
 	skew2: t.pipe(t.horizontal, skew(2)),

@@ -3,3 +3,8 @@ export { default as vertical } from './vertical.txt';
 export { default as spiral } from './spiral.txt';
 export { default as diamond } from './diamond.txt';
 export { default as snake } from './snake.txt';
+export { default as stitch } from './stitch.txt';
+export { default as triangle } from './triangle.txt';
+export { default as double } from './double.txt';
+export { default as cascade} from './cascade.txt';
+export { default as climb} from './climb.txt';
