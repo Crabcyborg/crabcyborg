@@ -6,7 +6,7 @@
     "animejs": "^3.1.0",
     "min-string": "^1.0.6",
     "mithril": "^1.1.6",
-    "traverse-grid": "^1.0.2"
+    "traverse-grid": "^1.0.4"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.1.1",

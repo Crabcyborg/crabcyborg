@@ -89,7 +89,7 @@ const randomMethod = () => {
 		{ id: 'smooth', method: t.pipe(t.horizontal, t.smooth()) },
 		{ id: 'split', method: t.pipe(t.horizontal, t.split) },
 		{ id: 'climb', method: t.climb },
-//		{ id: 'cascade', method: t.cascade },
+		{ id: 'cascade', method: t.cascade(2) },
 		{ id: 'fan', method: t.fan },
 		{ id: 'stitch', method: t.stitch },
 		{ id: 'diagonal', method: t.diagonal },

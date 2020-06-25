@@ -3865,10 +3865,10 @@ toposort@^1.0.0:
   resolved "https://registry.yarnpkg.com/toposort/-/toposort-1.0.7.tgz#2e68442d9f64ec720b8cc89e6443ac6caa950029"
   integrity sha1-LmhELZ9k7HILjMieZEOsbKqVACk=
 
-traverse-grid@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/traverse-grid/-/traverse-grid-1.0.2.tgz#c11e80ae3efd241560d47f2a082cf876e827e596"
-  integrity sha512-kfDtdUn6N4PmptTvm+HnpgF/BEfNwfcqdb5DLcFFQUtb7uXywdFemdSpzbUXys2MIA4nm8NW7d7gIC6Uza8jeQ==
+traverse-grid@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/traverse-grid/-/traverse-grid-1.0.4.tgz#32a4dad28c78677432254204beadb743e9cf511e"
+  integrity sha512-8xU9iyo5Sirf7LfoSRTRB3RzggxAj0+9L8MkWyhd8tj3oGiU6UiC/7gha1dcFGIe/ObDygqVCeNKm4/FLTCQ/A==
 
 tryer@^1.0.1:
   version "1.0.1"

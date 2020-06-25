@@ -32,6 +32,7 @@ export const oncreate = () => {
 export const content = () => [
 	"The other day I was given a programming challenge that included some QUnit testing. I didn't really have the time left to really touch QUnit beyond confirming that none of my tests had broken.",
 	"It's a shame because it's really easy to use and I'm excited to write some tests. I know there are still a few bugs in traverse-grid that I need to work out. Visualizations were really useful but unit testing is required to know that everything really works without having to really look at anything but a summary and I should have been doing this earlier.",
+	"It's already helped me identify some of the issues that have been bothering me as it revealed patterns that I hadn't noticed myself.",
 	m('h3', 'What are we going to test?'),
 	"traverse-grid contains a lot of functions, and every one of those functions could be tested against several times as there are a lot of possible outcomes.",
 	m('#qunit'),
