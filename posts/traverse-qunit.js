@@ -2,7 +2,7 @@ import m from 'mithril';
 import { injectScript, injectStyle } from '$app/helpers';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
-import * as _3x3 from '$app/tests/data/3x3';
+import { _3x3, _8x4, _5x7 } from '$app/tests/data';
 
 export const title = 'Testing Traverse Grid with QUnit';
 
@@ -10,22 +10,28 @@ export const oncreate = () => {
 	injectStyle('https://cdnjs.cloudflare.com/ajax/libs/qunit/2.10.0/qunit.min.css');
 
 	injectScript('https://cdnjs.cloudflare.com/ajax/libs/qunit/2.10.0/qunit.min.js', () => {
-		QUnit.test('3x3', assert => {
-			for(let key of Object.keys(_3x3)) {
-				if(methods[key]) {
-					assert.equal( t.visualize(methods[key](3,3)), _3x3[key], key );
-				} else if(t[key]) {
-					assert.equal( t.visualize(t[key](3,3)), _3x3[key], key );
+		const dimensions = { '3x3': _3x3, '8x4': _8x4, '5x7': _5x7 };
+		const tests = Object.keys(dimensions);
+		for(let test of tests) {
+			let [ height, width ] = test.split('x');			
+			height = parseInt(height);
+			width = parseInt(width);
+
+			const data = dimensions[test];
+
+			QUnit.test(test, assert => {
+				for(let key of Object.keys(data)) {
+					const callback = methods[key] || t[key];
+					callback && assert.equal( t.visualize(callback(height, width)), data[key], key );
 				}
-			}
-		});
+			});	
+		}
 	});
 };
 
 export const content = () => [
 	"The other day I was given a programming challenge that included some QUnit testing. I didn't really have the time left to really touch QUnit beyond confirming that none of my tests had broken.",
-	"It's a shame because it's really easy to use and I knew QUnit was out there but it never really popped into my mind as something I could make a post about until after taking this challenge.",
-	"And I know there are still a few bugs in traverse-grid that I need to work out, and without the proper tests it's difficult to know that I'm really in the clear.",
+	"It's a shame because it's really easy to use and I'm excited to write some tests. I know there are still a few bugs in traverse-grid that I need to work out. Visualizations were really useful but unit testing is required to know that everything really works without having to really look at anything but a summary and I should have been doing this earlier.",
 	m('h3', 'What are we going to test?'),
 	"traverse-grid contains a lot of functions, and every one of those functions could be tested against several times as there are a lot of possible outcomes.",
 	m('#qunit'),
