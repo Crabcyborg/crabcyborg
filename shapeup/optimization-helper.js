@@ -463,6 +463,9 @@ export const slide = number => details => {
 };
 
 export const methods = {
+	flipx: t.pipe(t.horizontal, t.flip('x')),
+	flipy: t.pipe(t.horizontal, t.flip('y')),
+	flipxy: t.pipe(t.horizontal, t.flip('xy')),
 	split: t.pipe(t.horizontal, t.split),	
 	bounce: t.pipe(t.horizontal, t.bounce(1)),
 	swirl: t.pipe(t.spiral, t.bounce(1), t.reposition, t.bounce(1)),

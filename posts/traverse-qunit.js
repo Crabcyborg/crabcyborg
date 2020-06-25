@@ -3,6 +3,7 @@ import { injectScript, injectStyle } from '$app/helpers';
 import { traverse as t } from 'traverse-grid';
 import { methods } from '$app/shapeup/optimization-helper';
 import { _3x3, _8x4, _5x7 } from '$app/tests/data';
+import { call } from 'file-loader';
 
 export const title = 'Testing Traverse Grid with QUnit';
 
@@ -31,7 +32,8 @@ export const oncreate = () => {
 
 export const content = () => [
 	"The other day I was given a programming challenge that included some QUnit testing. I didn't really have the time left to really touch QUnit beyond confirming that none of my tests had broken.",
-	"It's a shame because it's really easy to use and I'm excited to write some tests. I know there are still a few bugs in traverse-grid that I need to work out. Visualizations were really useful but unit testing is required to know that everything really works without having to really look at anything but a summary and I should have been doing this earlier.",
+	m('p', "Where I went wrong, is that I need to ", m('i', 'start'), " with unit tests. QUnit is actually really easy to use and I'm excited to write some tests. I know there are still a few bugs in traverse-grid that I need to work out. Visualizations were really useful but unit testing is required to know that everything really works without having to really look at anything but a summary and I should have been doing this earlier."),
+	"In fact, I was writing tests a lot like this but doing it way more manually. I wasn't going about these problems enough like a programmer.",
 	"It's already helped me identify some of the issues that have been bothering me as it revealed patterns that I hadn't noticed myself.",
 	m('h3', 'What are we going to test?'),
 	"traverse-grid contains a lot of functions, and every one of those functions could be tested against several times as there are a lot of possible outcomes.",
