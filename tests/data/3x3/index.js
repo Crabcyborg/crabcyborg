@@ -31,3 +31,4 @@ export { default as bounce } from './bounce.txt';
 export { default as smooth } from './smooth.txt';
 export { default as straight_smooth } from './straight_smooth.txt';
 export { default as waterfall } from './waterfall.txt';
+export { default as reposition } from './reposition.txt';
