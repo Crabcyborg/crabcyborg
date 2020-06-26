@@ -31,3 +31,4 @@ export { default as straight_smooth } from './straight_smooth.txt';
 export { default as stripe } from './stripe.txt';
 export { default as triangle } from './triangle.txt';
 export { default as waterfall } from './waterfall.txt';
+export { default as flipxy } from './flipxy.txt'

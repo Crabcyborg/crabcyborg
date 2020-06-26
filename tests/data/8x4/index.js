@@ -22,7 +22,7 @@ export { default as fan } from './fan.txt';
 export { default as double } from './double.txt';
 export { default as corner_out } from './corner_out.txt';
 export { default as corner_in } from './corner_in.txt';
-//export { default as diamond } from './diamond.txt';
+export { default as diamond } from './diamond.txt';
 export { default as alternate_diagonal } from './alternate_diagonal.txt';
 export { default as flipxy } from './flipxy.txt';
 export { default as flipy } from './flipy.txt';
