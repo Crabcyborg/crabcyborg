@@ -1,12 +1,12 @@
 import m from 'mithril';
 import { refactorColors } from '$app/shapeup/colors';
-import { injectClassDefinition, injectClassDefinitions, shuffle } from '$app/helpers';
+import { injectClassDefinition, injectClassDefinitions } from '$app/helpers';
 import anime from 'animejs/lib/anime.es.js';
+import { shapeup } from '$app/lib/shapeup';
 
 const colors = refactorColors('255,255,255');
 const class_prefix = 'su';
 const color_class_prefix = 'c';
-const targets = [128,64,32,16,8,4,2,1];
 
 let index = 0;
 let initialized = false;
@@ -47,130 +47,13 @@ const processTargetShapeState = i => {
 
 const updateShapeUpComponent = v => {
 	const configuration = typeof v.attrs.configuration === 'function' ? v.attrs.configuration() : v.attrs.configuration;
+	const generated = shapeup.generate( configuration, colors.length );
 
-	const [ height, width ] = configuration;
-	let x = -1, y = -1, data_index = 2, target_index = 0, color_index = 0, grid = [], unassigned = [];
-	let random_target = 0.1;
-	let count_by_color_index = {}, coordinates_by_color_index = {};
-
-	const use_colors = shuffle(Array.from({length: colors.length}, (x,i) => i));
-
-	const assign = (target, adjacent) => {
-		if(adjacent.empty || adjacent.unassigned || coordinates_by_color_index[adjacent.color_index] === undefined) {
-			return false;
-		}
-
-		target.color_index = adjacent.color_index;
-		count_by_color_index[target.color_index]++;
-		coordinates_by_color_index[target.color_index].push({x: target.x, y: target.y});
-		target.unassigned = false;
-		return true;
-	};
-
-	while(++y < height) {
-		let row = [];
-
-		while(++x < width) {
-			let obj = {x,y};
-			let byte = configuration[data_index];
-			obj.empty = (byte & targets[target_index]) === 0;
-
-			if(obj.empty) {
-				row.push(obj);
-			} else {
-				obj.unassigned = true;
-
-				let checks = [];
-				grid.length && checks.push('up');
-				x > 0 && checks.push('left');
-				checks.length > 1 && Math.random() < .5 && (checks = [checks[1], checks[0]]);
-
-				for(let check of checks) {
-					if(Math.random() > random_target) {
-						continue;
-					}
-
-					let cell;
-					switch(check) {
-						case 'up': cell = grid[grid.length-1][x]; break;
-						case 'left': cell = row[x-1]; break;
-					}
-
-					if(assign(obj, cell)) {
-						break;
-					}
-				}
-
-				if(obj.unassigned) {
-					obj.color_index = use_colors[color_index++];
-					color_index % 5 === 0 && (random_target = Math.max(random_target + .5, 1));
-
-					if(color_index+1 >= colors.length) {
-						delete obj.color_index;
-						unassigned.push(obj);
-					} else {
-						count_by_color_index[obj.color_index] = 1;
-						coordinates_by_color_index[obj.color_index] = [{x: obj.x, y: obj.y}];
-						obj.unassigned = false;
-					}
-				}
-
-				row.push(obj);
-			}
-
-			if(target_index++ === 7) {
-				++data_index;
-				target_index = 0;
-			}
-		}
-
-		grid.push(row);
-		x = -1;
-	}
-
-	let tries = 0;
-	while(unassigned.length && tries++ < 10) {
-		unassigned = unassigned.filter(obj => {
-			let checks = [];
-			obj.x > 1 && checks.push(grid[obj.y][obj.x-1]);
-			obj.y > 1 && checks.push(grid[obj.y-1][obj.x]);
-			obj.x+1 < width && checks.push(grid[obj.y][obj.x+1]);
-			obj.y+1 < height && checks.push(grid[obj.y+1][obj.x]);
-
-			while(checks.length) {
-				let random_index = Math.floor(Math.random()*checks.length);
-				let check = checks.splice(random_index, 1);
-
-				if(assign(obj, check)) {
-					return false;
-				}
-			}
-
-			return true;
-		});
-	}
-
-	var color_keys = Object.keys(count_by_color_index);
-	var highest = 0;
-	var highest_color_index;
-
-	for(let color_index of color_keys) {
-		if(count_by_color_index[color_index] > highest) {
-			highest_color_index = color_index;
-			highest = count_by_color_index[highest_color_index];
-
-			// randomly quit early to avoid only picking the largest object
-			if(highest > 10 && Math.random() < .5) {
-				break;
-			}
-		}
-	}
-
-	v.state.width = width;
-	v.state.height = height;
-	v.state.grid = grid;
-	v.state.highest_color_index = highest_color_index;
-	v.state.highest_color_coordinates = coordinates_by_color_index[highest_color_index];
+	v.state.width = generated.width;
+	v.state.height = generated.height;
+	v.state.grid = generated.grid;
+	v.state.highest_color_index = generated.highest_color_index;
+	v.state.highest_color_coordinates = generated.highest_color_coordinates;
 
 	switch(v.attrs.behaviour) {
 		case 'click-target': {
