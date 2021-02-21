@@ -25,5 +25,3 @@ export const content = () => [
 	m('p', "You can read on, or you could pull a copy of this website from ", m('a', { href: github_url }, 'github'), ", play with this config file, and create your first monster! You might even notice that Monster.js has a Wing component, but Lady Tiger doesn't have any wings! You can add whatever images you want to use to the folder ", m('i', 'assets'), ", then include a reference to the file in ", m('i', 'assets/index.js'), "."),
 	"For now, working with this configuration file might be a little tedious, but if we set up an editor that generates these configs for us, it might be already pretty close to useable."
 ];
-
-export const next = 'animating-your-amalgamation-of-animal-appendages';
