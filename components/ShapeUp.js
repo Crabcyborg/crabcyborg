@@ -71,6 +71,7 @@ const updateShapeUpComponent = v => {
 		} break;
 
 		case 'scatter': {
+			const color_keys = Object.keys( generated.count_by_color_index );
 			const step = 150;
 			const duration = step*(color_keys.length+4)*2;
 			let delay = -step;

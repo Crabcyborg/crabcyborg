@@ -317,8 +317,6 @@ export const bestMethod = (shape, details, mirrored) => {
  
 	best.strings = strings;
 
-	console.log('bestMethod ran in', performance.now() - start);
-
 	return { best, log, ratio: Math.round(best.length / (mirrored || raw_length) * 10000) / 100 };
 };
 
